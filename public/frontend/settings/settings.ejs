@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>الإعدادات</title>
+    <meta name="description" content="إعدادات لوحة التحكم">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 68px;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
+        }
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Alexandria', system-ui, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 0;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-background);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0563a7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d99ff;
+        }
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border-color);
+            position: fixed;
+            right: 0;
+            top: var(--header-height);
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease, z-index 0.3s;
+            z-index: 30;
+            padding: 24px 16px;
+            transform: translateX(0);
+        }
+        .dashboard-sidebar.mobile-closed {
+            transform: translateX(100%);
+        }
+        @media (max-width: 1024px) {
+            .dashboard-sidebar.mobile-open {
+                z-index: 105;
+            }
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--color-muted);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .sidebar-item i {
+            font-size: 22px;
+            width: 28px;
+            flex-shrink: 0;
+        }
+        .sidebar-item:hover {
+            background: rgba(13, 153, 255, 0.08);
+            color: var(--color-primary);
+        }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(13, 153, 255, 0.15), rgba(124, 58, 237, 0.1));
+            color: var(--color-primary);
+            border-right: 3px solid var(--color-primary);
+            font-weight: 600;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-muted);
+            padding: 16px 16px 8px;
+            font-weight: 600;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-sidebar {
+                transform: translateX(100%);
+                width: 260px;
+                z-index: 45;
+            }
+            .dashboard-sidebar.mobile-open {
+                transform: translateX(0);
+                z-index: 105;
+            }
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(100%);
+                z-index: 45;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+        @media (min-width: 1025px) {
+            .dashboard-sidebar {
+                transform: translateX(0) !important;
+                z-index: 30;
+            }
+            .dashboard-sidebar.mobile-open,
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(0) !important;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: var(--shadow-glow);
+        }
+        .badge-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #10b981;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ef4444;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-info {
+            background: rgba(13, 153, 255, 0.12);
+            border: 1px solid rgba(13, 153, 255, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0d99ff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--color-background);
+            z-index: 110;
+            transition: background-color 0.3s;
+        }
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .header-avatar:hover {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+        main {
+            padding-top: var(--header-height);
+        }
+        .bottom-mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        @media (max-width: 1024px) {
+            .bottom-mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            padding: 6px 4px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .bottom-nav-item span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            font-size: 0.68rem;
+        }
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+        }
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+            background: rgba(13, 153, 255, 0.12);
+        }
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        .bottom-nav-item.active i {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 102;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            color: var(--color-primary);
+        }
+        .bottom-nav-item.active span {
+            margin-top: 18px;
+        }
+        .nav-notch {
+            position: absolute;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--color-background);
+            border-radius: 50%;
+            z-index: 101;
+            transform: translate(-50%, -50%);
+            transition: left 0.3s ease;
+            pointer-events: none;
+        }
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover {
+            background: #0b85e0;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.25);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--color-white);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .btn-outline:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.05);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 24px 20px;
+                border-radius: 18px;
+                max-width: 95vw;
+            }
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: var(--color-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            z-index: 5;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        .theme-toggle {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all .4s ease;
+        }
+        .theme-toggle .toggle-circle {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
+            transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
+        }
+        .theme-toggle .icon {
+            position: absolute;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .4s ease;
+        }
+        .theme-toggle .sun-icon {
+            color: #ff6b35;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .theme-toggle .moon-icon {
+            color: #a78bfa;
+            opacity: 0;
+            transform: rotate(180deg) scale(.5);
+        }
+        .theme-toggle.dark {
+            background: linear-gradient(45deg, #475569, #1e293b);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .toggle-circle {
+            right: calc(100% - 31px);
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .sun-icon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(.5);
+        }
+        .theme-toggle.dark .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .input-field {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--color-white);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+        select.input-field {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 36px;
+            cursor: pointer;
+        }
+        textarea.input-field {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .settings-tab {
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--color-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .settings-tab:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.05);
+        }
+        .settings-tab.active {
+            background: var(--color-primary);
+            color: #fff;
+            font-weight: 600;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            transition: all 0.3s;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            right: 3px;
+            bottom: 3px;
+            background: var(--color-muted);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .toggle-switch input:checked+.toggle-slider {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(-24px);
+            background: #fff;
+        }
+        .avatar-upload {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--color-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .avatar-upload:hover {
+            border-color: #f59e0b;
+            transform: scale(1.05);
+        }
+        @media (max-width: 640px) {
+            .settings-tab {
+                font-size: 0.75rem;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1">
+                <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item " data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
+                        التحكم</span></a>
+                <div class="sidebar-section-title">الكاش</div>
+            
+                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices">
+                    <i class="las la-file-invoice-dollar"></i>
+                    <span>خوارج</span>
+                </a>
+            
+                <a href="/visa" class="sidebar-item" data-page="visa">
+                    <i class="las la-credit-card"></i>
+                    <span>فيز</span>
+                </a>
+            
+                <a href="/cash" class="sidebar-item" data-page="transfers">
+                    <i class="las la-exchange-alt"></i>
+                    <span>تحويلات</span>
+                </a>
+            
+                <div class="sidebar-section-title">الإدارة</div>
+                <a href="/payments" class="sidebar-item " data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
+                <div class="sidebar-section-title">النظام</div>
+                <a href="/settings" class="sidebar-item active" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل
+                        النشاط</span></a>
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i
+                            class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                </div>
+            </nav>
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                </div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
+            </div>
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                </div>
+            </header>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-[var(--color-white)] flex items-center gap-3">
+                        <i class="las la-cog text-primary text-3xl"></i> الإعدادات
+                    </h1>
+                    <p class="text-[var(--color-muted)] mt-1 mr-10">إدارة إعدادات النظام والمطعم</p>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-2" id="settingsTabs">
+                    <button class="settings-tab active" data-tab="profile"><i class="las la-user"></i> الملف الشخصي</button>
+                    <button class="settings-tab" data-tab="restaurant"><i class="las la-store-alt"></i> معلومات المطعم</button>
+                    <button class="settings-tab" data-tab="notifications"><i class="las la-bell"></i> الإشعارات</button>
+                    <button class="settings-tab" data-tab="security"><i class="las la-shield-alt"></i> الأمان</button>
+                    <button class="settings-tab" data-tab="appearance"><i class="las la-palette"></i> المظهر</button>
+                    <button class="settings-tab" data-tab="backup"><i class="las la-cloud-upload-alt"></i> النسخ الاحتياطي</button>
+                </div>
+                <div id="settingsContent">
+                    <div class="info-card" id="tab-profile">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-user text-primary"></i> الملف الشخصي
+                        </h3>
+                        <div class="flex flex-col sm:flex-row items-start gap-6 mb-6">
+                            <div class="flex flex-col items-center gap-3">
+                                <img id="profileAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="avatar-upload" alt="صورة الملف">
+                                <button class="btn-outline btn-sm" id="changeAvatarBtn"><i class="las la-camera"></i> تغيير الصورة</button>
+                            </div>
+                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">الاسم الكامل</label>
+                                    <input type="text" class="input-field" id="fullNameInput" value="عبدالرحمن محمد" placeholder="الاسم الكامل">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
+                                    <input type="email" class="input-field" id="emailInput" value="gamesy500@gmail.com" placeholder="البريد الإلكتروني">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
+                                    <input type="tel" class="input-field" id="phoneInput" value="01063720595" placeholder="رقم الهاتف">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">الدور الوظيفي</label>
+                                    <select class="input-field" id="roleSelect">
+                                        <option value="admin" selected>مدير النظام</option>
+                                        <option value="manager">مدير مطعم</option>
+                                        <option value="cashier">كاشير</option>
+                                        <option value="viewer">مشاهد فقط</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="saveProfileBtn"><i class="las la-save"></i> حفظ التغييرات</button>
+                    </div>
+                    <div class="info-card hidden" id="tab-restaurant">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-store-alt text-primary"></i> معلومات المطعم
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">اسم المطعم</label>
+                                <input type="text" class="input-field" id="restaurantName" value="ابن حميدو السلام" placeholder="اسم المطعم">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">رقم السجل التجاري</label>
+                                <input type="text" class="input-field" id="commercialReg" value="----" placeholder="رقم السجل التجاري">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
+                                <input type="tel" class="input-field" id="restaurantPhone" value="01063720595" placeholder="رقم هاتف المطعم">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
+                                <input type="email" class="input-field" id="restaurantEmail" value="info@shadowza.sapce" placeholder="البريد الإلكتروني">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">العنوان</label>
+                                <textarea class="input-field" id="restaurantAddress" placeholder="العنوان الكامل">شارع السلام , خليج نعمه , امام مدخل البولينج , شرم الشيخ</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">ساعات العمل</label>
+                                <input type="text" class="input-field" id="workingHours" value="10:00 ص - 12:00 ص" placeholder="ساعات العمل">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-[var(--color-muted)] mb-1">العملة الافتراضية</label>
+                                <select class="input-field" id="currencySelect">
+                                    <option value="EGP" selected>ج.م - جنيه مصري</option>
+                                    <option value="SAR">ر.س - ريال سعودي</option>
+                                    <option value="USD">$ - دولار أمريكي</option>
+                                    <option value="EUR">€ - يورو</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="saveRestaurantBtn"><i class="las la-save"></i> حفظ معلومات المطعم</button>
+                    </div>
+                    <div class="info-card hidden" id="tab-notifications">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-bell text-primary"></i> إعدادات الإشعارات
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">إشعارات الطلبات الجديدة</p>
+                                    <p class="text-xs text-[var(--color-muted)]">تلقي إشعار عند وصول طلب جديد</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="notifyOrders" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">إشعارات المخزون المنخفض</p>
+                                    <p class="text-xs text-[var(--color-muted)]">تنبيه عند انخفاض المخزون للحد الأدنى</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="notifyInventory" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">إشعارات التقييمات</p>
+                                    <p class="text-xs text-[var(--color-muted)]">تلقي إشعار عند إضافة تقييم جديد</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="notifyReviews" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">التقارير الأسبوعية</p>
+                                    <p class="text-xs text-[var(--color-muted)]">استلام تقرير أسبوعي بالأداء</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="notifyWeekly">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">إشعارات البريد الإلكتروني</p>
+                                    <p class="text-xs text-[var(--color-muted)]">إرسال الإشعارات عبر البريد الإلكتروني</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="notifyEmail" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn-primary mt-6" id="saveNotificationsBtn"><i class="las la-save"></i> حفظ إعدادات الإشعارات</button>
+                    </div>
+                    <div class="info-card hidden" id="tab-security">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-shield-alt text-primary"></i> إعدادات الأمان
+                        </h3>
+                        <div class="space-y-4 mb-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">كلمة المرور الحالية</label>
+                                    <input type="password" class="input-field" id="currentPassword" placeholder="كلمة المرور الحالية">
+                                </div>
+                                <div></div>
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">كلمة المرور الجديدة</label>
+                                    <input type="password" class="input-field" id="newPassword" placeholder="كلمة المرور الجديدة">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[var(--color-muted)] mb-1">تأكيد كلمة المرور</label>
+                                    <input type="password" class="input-field" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
+                                </div>
+                            </div>
+                            <button class="btn-primary" id="changePasswordBtn"><i class="las la-lock"></i> تغيير كلمة المرور</button>
+                        </div>
+                        <hr class="border-[var(--border-color)] my-6">
+                        <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                            <div>
+                                <p class="font-medium text-[var(--color-white)]">المصادقة الثنائية</p>
+                                <p class="text-xs text-[var(--color-muted)]">تفعيل طبقة حماية إضافية للحساب</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="twoFactorAuth">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="mt-6 p-4 rounded-xl border border-red-500/20 bg-red-500/5">
+                            <p class="font-medium text-red-400 mb-3 flex items-center gap-2"><i class="las la-exclamation-triangle"></i> منطقة الخطر</p>
+                            <p class="text-xs text-[var(--color-muted)] mb-4">حذف الحساب نهائياً ولا يمكن التراجع عنه. سيتم حذف جميع البيانات المرتبطة بهذا الحساب.</p>
+                            <button class="btn-danger btn-sm" id="deleteAccountBtn"><i class="las la-trash-alt"></i> حذف الحساب</button>
+                        </div>
+                    </div>
+                    <div class="info-card hidden" id="tab-appearance">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-palette text-primary"></i> إعدادات المظهر
+                        </h3>
+                        <div class="space-y-4 mb-6">
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">الوضع الليلي</p>
+                                    <p class="text-xs text-[var(--color-muted)]">تفعيل الوضع الداكن للوحة التحكم</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="darkModeToggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">اللون الأساسي</p>
+                                    <p class="text-xs text-[var(--color-muted)]">اختيار اللون الرئيسي للوحة التحكم</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-[#0d99ff] border-2 border-white color-option" data-color="#0d99ff"></button>
+                                    <button class="w-8 h-8 rounded-full bg-[#7c3aed] border-2 border-transparent color-option" data-color="#7c3aed"></button>
+                                    <button class="w-8 h-8 rounded-full bg-[#10b981] border-2 border-transparent color-option" data-color="#10b981"></button>
+                                    <button class="w-8 h-8 rounded-full bg-[#f59e0b] border-2 border-transparent color-option" data-color="#f59e0b"></button>
+                                    <button class="w-8 h-8 rounded-full bg-[#ef4444] border-2 border-transparent color-option" data-color="#ef4444"></button>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">حجم الخط</p>
+                                    <p class="text-xs text-[var(--color-muted)]">ضبط حجم الخط في لوحة التحكم</p>
+                                </div>
+                                <select class="input-field w-auto" id="fontSizeSelect">
+                                    <option value="small">صغير</option>
+                                    <option value="medium" selected>متوسط</option>
+                                    <option value="large">كبير</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                <div>
+                                    <p class="font-medium text-[var(--color-white)]">الرسوم المتحركة</p>
+                                    <p class="text-xs text-[var(--color-muted)]">تفعيل الحركات الانتقالية في الواجهة</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="animationsToggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="saveAppearanceBtn"><i class="las la-save"></i> حفظ إعدادات المظهر</button>
+                    </div>
+                    <div class="info-card hidden" id="tab-backup">
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
+                            <i class="las la-cloud-upload-alt text-primary"></i> النسخ الاحتياطي والاستعادة
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <div class="p-5 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)] text-center">
+                                <i class="las la-download text-4xl text-primary mb-3"></i>
+                                <p class="font-medium text-[var(--color-white)] mb-2">إنشاء نسخة احتياطية</p>
+                                <p class="text-xs text-[var(--color-muted)] mb-4">تنزيل نسخة كاملة من جميع البيانات</p>
+                                <button class="btn-primary btn-sm w-full justify-center" id="createBackupBtn"><i class="las la-download"></i> إنشاء النسخة</button>
+                            </div>
+                            <div class="p-5 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)] text-center">
+                                <i class="las la-upload text-4xl text-warning mb-3"></i>
+                                <p class="font-medium text-[var(--color-white)] mb-2">استعادة نسخة احتياطية</p>
+                                <p class="text-xs text-[var(--color-muted)] mb-4">رفع ملف نسخة احتياطية لاستعادة البيانات</p>
+                                <button class="btn-outline btn-sm w-full justify-center" id="restoreBackupBtn"><i class="las la-upload"></i> رفع ملف</button>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <h4 class="font-bold text-[var(--color-white)] mb-3 flex items-center gap-2"><i class="las la-history text-[var(--color-muted)]"></i> سجل النسخ الاحتياطية</h4>
+                            <div class="space-y-2" id="backupHistory">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-3">
+                                        <i class="las la-file-archive text-primary text-xl"></i>
+                                        <div>
+                                            <p class="text-sm font-medium text-[var(--color-white)]">نسخة 2026-08-04</p>
+                                            <p class="text-xs text-[var(--color-muted)]">الحجم: 2.4 ميجابايت</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-outline btn-sm"><i class="las la-download"></i></button>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-3">
+                                        <i class="las la-file-archive text-primary text-xl"></i>
+                                        <div>
+                                            <p class="text-sm font-medium text-[var(--color-white)]">نسخة 2026-08-01</p>
+                                            <p class="text-xs text-[var(--color-muted)]">الحجم: 2.2 ميجابايت</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-outline btn-sm"><i class="las la-download"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- <div class="bottom-mobile-nav" id="bottomMobileNav">
+        <div class="nav-notch" id="navNotch"></div>
+        <a href="#" class="bottom-nav-item" data-tab="dashboard"><i class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="tickets"><i class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
+        <a href="#" class="bottom-nav-item active" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+    </div> -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
+            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
+            <p id="successMessage" class="text-[var(--color-muted)]"></p>
+            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeConfirmModal"><i class="las la-times"></i></button>
+            <i class="las la-exclamation-triangle text-5xl text-error mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]" id="confirmTitle">تأكيد الحذف</h3>
+            <p id="confirmMessage" class="text-[var(--color-muted)]">هل أنت متأكد من رغبتك في حذف الحساب؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex gap-3 mt-6">
+                <button id="cancelConfirmBtn" class="btn-outline flex-1 justify-center">إلغاء</button>
+                <button id="proceedConfirmBtn" class="btn-danger flex-1 justify-center">تأكيد الحذف</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const headerAvatar = document.getElementById('headerAvatar');
+
+            function openSidebar() { sidebar.classList.add('mobile-open');
+                sidebar.classList.remove('mobile-closed'); }
+
+            function closeSidebar() { sidebar.classList.remove('mobile-open');
+                sidebar.classList.add('mobile-closed'); }
+            if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1025) {
+                    sidebar.classList.remove('mobile-open', 'mobile-closed');
+                } else {
+                    if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
+                }
+            });
+            if (headerAvatar) {
+                headerAvatar.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (window.innerWidth < 1025) {
+                        if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                        else openSidebar();
+                    }
+                });
+            }
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
+                    if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e
+                            .target)) {
+                        closeSidebar();
+                    }
+                }
+            });
+const sidebarItems = document.querySelectorAll('.sidebar-item');
+
+sidebarItems.forEach(item => {
+    item.addEventListener('click', function () {
+        if (this.id === 'logoutBtn') return;
+
+        sidebarItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+
+        if (window.innerWidth < 1025) {
+            closeSidebar();
+        }
+    });
+});
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/';
+                });
+            }
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+            const navNotch = document.getElementById('navNotch');
+
+            function moveNotch(activeItem) {
+                if (!navNotch || !activeItem) return;
+                const rect = activeItem.getBoundingClientRect();
+                const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2 - navRect.left;
+                navNotch.style.left = centerX + 'px';
+            }
+
+            function setBottomNavActive() {
+                let activeItem = null;
+                bottomNavItems.forEach(item => {
+                    item.classList.remove('active');
+                    const tab = item.getAttribute('data-tab');
+                    if (tab === 'settings') { item.classList.add('active');
+                        activeItem = item; }
+                });
+                if (activeItem) moveNotch(activeItem);
+            }
+            setBottomNavActive();
+            window.addEventListener('resize', () => {
+                const activeItem = document.querySelector('.bottom-nav-item.active');
+                if (activeItem) moveNotch(activeItem);
+            });
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    bottomNavItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    moveNotch(this);
+                    const tab = this.getAttribute('data-tab');
+                    if (tab === 'dashboard') window.location.href = '?page=dashboard';
+                    if (tab === 'reports') window.location.href = '?page=reports';
+                });
+            });
+            const successModal = document.getElementById('successModal');
+            const closeSuccessModal = document.getElementById('closeSuccessModal');
+            const okSuccessBtn = document.getElementById('okSuccessBtn');
+            const successMessageEl = document.getElementById('successMessage');
+
+            function showSuccess(msg) { successMessageEl.textContent = msg;
+                successModal.classList.add('active'); }
+
+            function hideSuccess() { successModal.classList.remove('active'); }
+            closeSuccessModal.addEventListener('click', hideSuccess);
+            okSuccessBtn.addEventListener('click', hideSuccess);
+            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+            const confirmModal = document.getElementById('confirmModal');
+            const closeConfirmModal = document.getElementById('closeConfirmModal');
+            const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+            const proceedConfirmBtn = document.getElementById('proceedConfirmBtn');
+            const confirmMessageEl = document.getElementById('confirmMessage');
+            const confirmTitleEl = document.getElementById('confirmTitle');
+            let confirmCallback = null;
+
+            function showConfirm(title, message, callback) {
+                confirmTitleEl.textContent = title;
+                confirmMessageEl.textContent = message;
+                confirmCallback = callback;
+                confirmModal.classList.add('active');
+            }
+
+            function hideConfirm() { confirmModal.classList.remove('active');
+                confirmCallback = null; }
+            closeConfirmModal.addEventListener('click', hideConfirm);
+            cancelConfirmBtn.addEventListener('click', hideConfirm);
+            proceedConfirmBtn.addEventListener('click', function() { if (confirmCallback) confirmCallback();
+                hideConfirm(); });
+            window.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirm(); });
+
+            function showNotEditable() {
+                showSuccess("النظام غير قابل للتعديل حاليا");
+            }
+
+            const userAvatarImg = document.getElementById('userAvatar');
+            const profileAvatar = document.getElementById('profileAvatar');
+            const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+
+            function triggerAvatarUpload() {
+                showNotEditable();
+            }
+            if (userAvatarImg) userAvatarImg.addEventListener('click', triggerAvatarUpload);
+            if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', triggerAvatarUpload);
+            const settingsTabs = document.querySelectorAll('.settings-tab');
+            const tabContents = {
+                'profile': document.getElementById('tab-profile'),
+                'restaurant': document.getElementById('tab-restaurant'),
+                'notifications': document.getElementById('tab-notifications'),
+                'security': document.getElementById('tab-security'),
+                'appearance': document.getElementById('tab-appearance'),
+                'backup': document.getElementById('tab-backup')
+            };
+            settingsTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    settingsTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    Object.keys(tabContents).forEach(key => {
+                        if (tabContents[key]) tabContents[key].classList.add('hidden');
+                    });
+                    if (tabContents[tabName]) tabContents[tabName].classList.remove('hidden');
+                });
+            });
+            document.getElementById('saveProfileBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('saveRestaurantBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('saveNotificationsBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('changePasswordBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('deleteAccountBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('saveAppearanceBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('createBackupBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.getElementById('restoreBackupBtn').onclick = function(e) { e.preventDefault();
+                showNotEditable(); };
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(btn => {
+                btn.onclick = function(e) { e.preventDefault();
+                    showNotEditable(); };
+            });
+            document.getElementById('darkModeToggle').onchange = function(e) { e.preventDefault();
+                showNotEditable(); };
+            document.addEventListener('DOMContentLoaded', function() {
+                const themeToggles = document.querySelectorAll('.theme-toggle');
+                const body = document.body;
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                const applyTheme = (theme) => {
+                    const isDark = theme === 'dark';
+                    body.classList.toggle('light', !isDark);
+                    themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
+                    if (darkModeToggle) darkModeToggle.checked = isDark;
+                    localStorage.setItem('theme', theme);
+                };
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                applyTheme(savedTheme);
+                themeToggles.forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const isDark = body.classList.contains('light') === false;
+                        applyTheme(isDark ? 'light' : 'dark');
+                    });
+                });
+                try {
+                    const profileData = localStorage.getItem('userProfileSettings');
+                    if (profileData) {
+                        const p = JSON.parse(profileData);
+                        if (p.fullName) document.getElementById('fullNameInput').value = p.fullName;
+                        if (p.email) document.getElementById('emailInput').value = p.email;
+                        if (p.phone) document.getElementById('phoneInput').value = p.phone;
+                        if (p.role) document.getElementById('roleSelect').value = p.role;
+                    }
+                    const restaurantData = localStorage.getItem('restaurantSettings');
+                    if (restaurantData) {
+                        const r = JSON.parse(restaurantData);
+                        if (r.name) document.getElementById('restaurantName').value = r.name;
+                        if (r.commercialReg) document.getElementById('commercialReg').value = r.commercialReg;
+                        if (r.phone) document.getElementById('restaurantPhone').value = r.phone;
+                        if (r.email) document.getElementById('restaurantEmail').value = r.email;
+                        if (r.address) document.getElementById('restaurantAddress').value = r.address;
+                        if (r.workingHours) document.getElementById('workingHours').value = r.workingHours;
+                        if (r.currency) document.getElementById('currencySelect').value = r.currency;
+                    }
+                    const notifData = localStorage.getItem('notificationSettings');
+                    if (notifData) {
+                        const n = JSON.parse(notifData);
+                        if (n.orders !== undefined) document.getElementById('notifyOrders').checked = n.orders;
+                        if (n.inventory !== undefined) document.getElementById('notifyInventory').checked = n
+                            .inventory;
+                        if (n.reviews !== undefined) document.getElementById('notifyReviews').checked = n.reviews;
+                        if (n.weekly !== undefined) document.getElementById('notifyWeekly').checked = n.weekly;
+                        if (n.email !== undefined) document.getElementById('notifyEmail').checked = n.email;
+                    }
+                    const appearanceData = localStorage.getItem('appearanceSettings');
+                    if (appearanceData) {
+                        const a = JSON.parse(appearanceData);
+                        if (a.fontSize) document.getElementById('fontSizeSelect').value = a.fontSize;
+                        if (a.animations !== undefined) document.getElementById('animationsToggle').checked = a
+                            .animations;
+                    }
+                    const savedColor = localStorage.getItem('primaryColor');
+                    if (savedColor) {
+                        document.documentElement.style.setProperty('--color-primary', savedColor);
+                        colorOptions.forEach(b => {
+                            b.classList.remove('border-white');
+                            b.classList.add('border-transparent');
+                            if (b.getAttribute('data-color') === savedColor) {
+                                b.classList.remove('border-transparent');
+                                b.classList.add('border-white');
+                            }
+                        });
+                    }
+                } catch (e) {}
+            });
+        })();
+    </script>
+</body>
+</html>
