@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -739,96 +740,102 @@
             outline: none;
             border-color: var(--color-primary);
         }
-
-        /* ====== إعدادات الطباعة الكاملة ====== */
         @page {
-            size: 80mm 297mm;
+            size: 80mm auto;
             margin: 0;
         }
-
         @media print {
-            html, body {
+            html,
+            body {
                 width: 80mm;
-                height: 297mm;
                 margin: 0;
                 padding: 0;
-                background: white;
+                background: #ffffff;
                 font-family: 'Alexandria', sans-serif;
                 direction: rtl;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                color-adjust: exact;
             }
-            body * {
-                visibility: hidden;
-            }
-            #printArea, #printArea * {
-                visibility: visible;
+            body> :not(#printArea) {
+                display: none !important;
             }
             #printArea {
                 display: block !important;
-                position: fixed;
-                left: 0;
-                top: 0;
+                position: static;
                 width: 80mm;
-                min-height: 297mm;
-                padding: 3mm 5mm 3mm 5mm;
+                min-height: auto;
+                padding: 3mm 4mm 3mm 4mm;
                 margin: 0 auto;
-                background: white;
-                color: black;
+                background: #ffffff;
+                color: #000000;
                 direction: rtl;
                 overflow: hidden;
                 box-sizing: border-box;
                 font-family: 'Alexandria', sans-serif;
+                visibility: visible !important;
+            }
+            #printArea * {
+                visibility: visible !important;
             }
             #printArea table {
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 12px;
+                font-size: 13px;
                 table-layout: fixed;
                 border: 1px solid #000;
             }
             #printArea table td,
             #printArea table th {
-                padding: 3px 4px;
+                padding: 4px 5px;
                 border: 1px solid #000;
                 text-align: right;
-                font-size: 12px;
+                font-size: 13px;
                 word-break: break-word;
+                color: #000;
+                background: #fff;
             }
             #printArea table th {
-                font-size: 11px;
-                background: #e6e6e6;
+                font-size: 12px;
+                background: #e8e8e8;
                 font-weight: 700;
+                color: #000;
             }
             #printArea .header-table td {
                 border: none;
                 padding: 0;
+                background: transparent;
+            }
+            #printArea .header-table {
+                border: none;
+                margin-bottom: 3mm;
             }
             #printArea .restaurant-name {
-                font-size: 18px;
+                font-size: 20px;
                 font-weight: 700;
                 margin-bottom: 1mm;
                 color: #000;
                 text-align: right;
             }
             #printArea .print-date {
-                font-size: 11px;
+                font-size: 12px;
                 font-weight: 600;
                 color: #000;
-                margin-bottom: 2mm;
+                margin-bottom: 3mm;
                 text-align: right;
             }
             #printArea .logo-cell {
                 text-align: left;
                 vertical-align: bottom;
-                padding-right: 12px;
+                padding-right: 10px;
                 padding-top: 0;
                 padding-bottom: 0;
                 padding-left: 0;
                 border: none;
+                background: transparent;
             }
             #printArea .logo-cell img {
-                max-width: 14mm;
+                max-width: 16mm;
                 height: auto;
                 display: block;
             }
@@ -836,27 +843,28 @@
                 border-top: 2px solid #000;
                 border-bottom: 2px solid #000;
                 font-weight: 700;
-                font-size: 14px;
-                background: #f0f0f0;
+                font-size: 15px;
+                background: #f2f2f2;
+                color: #000;
             }
             #printArea .footer {
                 margin-top: 6mm;
                 padding-top: 2mm;
                 border-top: 1px dashed #000;
                 text-align: center;
-                font-size: 11px;
+                font-size: 12px;
                 color: #000;
                 font-weight: 700;
                 line-height: 1.6;
             }
             #printArea .footer .dev {
-                font-size: 9px;
+                font-size: 10px;
                 font-weight: 600;
                 color: #000;
                 margin-top: 1.5mm;
             }
             #printArea .footer .dev-version {
-                font-size: 9px;
+                font-size: 10px;
                 font-weight: 600;
                 color: #000;
                 margin-top: 0.5mm;
@@ -878,34 +886,18 @@
             </div>
             <nav class="flex-1">
                 <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item " data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
                 <div class="sidebar-section-title">الكاش</div>
-            
-                <a href="/outgoing" class="sidebar-item active" data-page="outgoing-invoices">
-                    <i class="las la-file-invoice-dollar"></i>
-                    <span>خوارج</span>
-                </a>
-            
-                <a href="/visa" class="sidebar-item" data-page="visa">
-                    <i class="las la-credit-card"></i>
-                    <span>فيز</span>
-                </a>
-            
-                <a href="/cash" class="sidebar-item" data-page="transfers">
-                    <i class="las la-exchange-alt"></i>
-                    <span>تحويلات</span>
-                </a>
-            
+                <a href="/outgoing" class="sidebar-item active" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
                 <div class="sidebar-section-title">الإدارة</div>
                 <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
                 <div class="sidebar-section-title">النظام</div>
                 <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل
-                        النشاط</span></a>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
                 <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i
-                            class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
@@ -946,7 +938,7 @@
                         <input type="text" class="restaurant-name-input" id="restaurantNameInput" placeholder="ابن حميدو السلام">
                         <span class="mr-auto text-xs text-[var(--color-muted)]">آخر تحديث: اليوم</span>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto pr-6">
                         <table class="restaurant-table" id="restaurantTable">
                             <thead>
                                 <tr>
@@ -991,51 +983,21 @@
                         </div>
                         <button class="btn-outline btn-sm" id="clearReportsBtn"><i class="las la-trash-alt"></i> مسح السجل</button>
                     </div>
-                    <!-- <div class="mt-4 space-y-3" id="recentReportsList">
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
-                            <div class="flex items-center gap-3">
-                                <span class="text-primary"><i class="las la-file-pdf text-xl"></i></span>
-                                <div>
-                                    <p class="font-medium text-[var(--color-white)]">تقرير إيرادات - يونيو 2026</p>
-                                    <p class="text-xs text-[var(--color-muted)]">تم الإنشاء: 2026-06-30 14:30</p>
-                                </div>
-                            </div>
-                            <span class="badge-success"><i class="las la-check-circle"></i> مكتمل</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
-                            <div class="flex items-center gap-3">
-                                <span class="text-primary"><i class="las la-file-excel text-xl"></i></span>
-                                <div>
-                                    <p class="font-medium text-[var(--color-white)]">تقرير إيرادات - مايو 2026</p>
-                                    <p class="text-xs text-[var(--color-muted)]">تم الإنشاء: 2026-06-28 11:15</p>
-                                </div>
-                            </div>
-                            <span class="badge-success"><i class="las la-check-circle"></i> مكتمل</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
-                            <div class="flex items-center gap-3">
-                                <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
-                                <div>
-                                    <p class="font-medium text-[var(--color-white)]">تقرير إيرادات - أبريل 2026</p>
-                                    <p class="text-xs text-[var(--color-muted)]">تم الإنشاء: 2026-06-25 09:45</p>
-                                </div>
-                            </div>
-                            <span class="badge-warning"><i class="las la-clock"></i> قيد المراجعة</span>
-                        </div> -->
+                    <div class="mt-4 space-y-3" id="recentReportsList">
                     </div>
                 </div>
             </div>
         </main>
     </div>
     <div id="printArea" style="display:none;"></div>
-    <!-- <div class="bottom-mobile-nav" id="bottomMobileNav">
+    <div class="bottom-mobile-nav" id="bottomMobileNav">
         <div class="nav-notch" id="navNotch"></div>
         <a href="#" class="bottom-nav-item" data-tab="dashboard"><i class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
         <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
         <a href="#" class="bottom-nav-item active" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
         <a href="#" class="bottom-nav-item" data-tab="tickets"><i class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
         <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-    </div> -->
+    </div>
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
             <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
@@ -1049,11 +1011,16 @@
         (function() {
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
-            function openSidebar() { sidebar.classList.add('mobile-open');
-                sidebar.classList.remove('mobile-closed'); }
 
-            function closeSidebar() { sidebar.classList.remove('mobile-open');
-                sidebar.classList.add('mobile-closed'); }
+            function openSidebar() {
+                sidebar.classList.add('mobile-open');
+                sidebar.classList.remove('mobile-closed');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-open');
+                sidebar.classList.add('mobile-closed');
+            }
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 1025) {
@@ -1079,20 +1046,17 @@
                     }
                 }
             });
-const sidebarItems = document.querySelectorAll('.sidebar-item');
-
-sidebarItems.forEach(item => {
-    item.addEventListener('click', function () {
-        if (this.id === 'logoutBtn') return;
-
-        sidebarItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-
-        if (window.innerWidth < 1025) {
-            closeSidebar();
-        }
-    });
-});
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.id === 'logoutBtn') return;
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    if (window.innerWidth < 1025) {
+                        closeSidebar();
+                    }
+                });
+            });
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', (e) => {
@@ -1116,12 +1080,16 @@ sidebarItems.forEach(item => {
                 bottomNavItems.forEach(item => {
                     item.classList.remove('active');
                     const tab = item.getAttribute('data-tab');
-                    if (tab === 'reports') { item.classList.add('active');
-                        activeItem = item; }
+                    if (tab === 'reports') {
+                        item.classList.add('active');
+                        activeItem = item;
+                    }
                 });
                 if (activeItem) moveNotch(activeItem);
-                else if (bottomNavItems.length > 0) { bottomNavItems[0].classList.add('active');
-                    moveNotch(bottomNavItems[0]); }
+                else if (bottomNavItems.length > 0) {
+                    bottomNavItems[0].classList.add('active');
+                    moveNotch(bottomNavItems[0]);
+                }
             }
             setBottomNavActive();
             window.addEventListener('resize', () => {
@@ -1141,34 +1109,107 @@ sidebarItems.forEach(item => {
             const okSuccessBtn = document.getElementById('okSuccessBtn');
             const successMessageEl = document.getElementById('successMessage');
 
-            function showSuccess(msg) { successMessageEl.textContent = msg;
-                successModal.classList.add('active'); }
+            function showSuccess(msg) {
+                successMessageEl.textContent = msg;
+                successModal.classList.add('active');
+            }
 
-            function hideSuccess() { successModal.classList.remove('active'); }
+            function hideSuccess() {
+                successModal.classList.remove('active');
+            }
             closeSuccessModal.addEventListener('click', hideSuccess);
             okSuccessBtn.addEventListener('click', hideSuccess);
-            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+            window.addEventListener('click', (e) => {
+                if (e.target === successModal) hideSuccess();
+            });
+            const recentReportsList = document.getElementById('recentReportsList');
+
+            function loadRecentReports() {
+                try {
+                    const stored = localStorage.getItem('restaurantRecentReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored);
+                        if (reports.length === 0) {
+                            recentReportsList.innerHTML =
+                                '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                            return;
+                        }
+                        let html = '';
+                        reports.forEach((report, index) => {
+                            const badgeClass = index === 0 ? 'badge-success' : (index === 1 ?
+                                'badge-warning' : 'badge-danger');
+                            const iconClass = index === 0 ? 'las la-check-circle' : (index === 1 ?
+                                'las la-clock' : 'las la-file-alt');
+                            const statusText = index === 0 ? 'مكتمل' : (index === 1 ? 'قيد المراجعة' :
+                                'محفوظ');
+                            html += `
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
+                                        <div>
+                                            <p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p>
+                                            <p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p>
+                                        </div>
+                                    </div>
+                                    <span class="${badgeClass}"><i class="${iconClass}"></i> ${statusText}</span>
+                                </div>`;
+                        });
+                        recentReportsList.innerHTML = html;
+                    } else {
+                        recentReportsList.innerHTML =
+                            '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                    }
+                } catch (e) {
+                    recentReportsList.innerHTML =
+                        '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                }
+            }
+
+            function addRecentReport(name) {
+                try {
+                    let reports = [];
+                    const stored = localStorage.getItem('restaurantRecentReports');
+                    if (stored) reports = JSON.parse(stored);
+                    reports.unshift({
+                        name: name || 'تقرير',
+                        date: new Date().toLocaleString('ar-EG'),
+                        timestamp: new Date().toISOString()
+                    });
+                    if (reports.length > 3) reports = reports.slice(0, 3);
+                    localStorage.setItem('restaurantRecentReports', JSON.stringify(reports));
+                    loadRecentReports();
+                } catch (e) {}
+            }
             document.getElementById('clearReportsBtn').addEventListener('click', function() {
-                const list = document.getElementById('recentReportsList');
-                list.innerHTML =
+                localStorage.removeItem('restaurantRecentReports');
+                recentReportsList.innerHTML =
                     '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
                 showSuccess('تم مسح سجل التقارير بنجاح.');
             });
+            loadRecentReports();
             const tbody = document.getElementById('restaurantTbody');
             const totalAmountEl = document.getElementById('totalAmount');
             const restaurantNameInput = document.getElementById('restaurantNameInput');
             const LOGO_URL = 'https://files.catbox.moe/27w55o.png';
 
-            function parseNumber(val) { const cleaned = val.replace(/,/g, ''); const num = parseFloat(cleaned); return isNaN(
-                    num) ? 0 : num; }
+            function parseNumber(val) {
+                const cleaned = String(val).replace(/,/g, '').trim();
+                const num = parseFloat(cleaned);
+                return isNaN(num) ? 0 : num;
+            }
 
-            function formatNumber(num) { return num.toLocaleString('en-US'); }
+            function formatNumber(num) {
+                if (num === 0) return '0';
+                return num.toLocaleString('en-US');
+            }
 
             function updateTotal() {
                 let total = 0;
                 const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => { const input = row.querySelector('.amount-input'); if (input) total +=
-                        parseNumber(input.value); });
+                rows.forEach(row => {
+                    const input = row.querySelector('.amount-input');
+                    if (input) total += parseNumber(input.value);
+                });
                 totalAmountEl.textContent = formatNumber(total);
             }
 
@@ -1291,7 +1332,8 @@ sidebarItems.forEach(item => {
                 amountInput.type = 'text';
                 amountInput.className = 'input-field amount-input';
                 amountInput.placeholder = 'المبلغ';
-                amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
+                const formattedAmount = amount ? formatNumber(parseNumber(amount)) : '';
+                amountInput.value = formattedAmount;
                 amountInput.setAttribute('inputmode', 'numeric');
                 setupKeyboardNavigation(amountInput);
                 amountTd.appendChild(amountInput);
@@ -1301,37 +1343,45 @@ sidebarItems.forEach(item => {
                 deleteBtn.tabIndex = -1;
                 deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
                 deleteBtn.addEventListener('click', function() {
-                    if (tbody.children.length > 1) { tr.remove();
+                    if (tbody.children.length > 1) {
+                        tr.remove();
                         updateTotal();
-                        saveToSystem(); } else { showSuccess('لا يمكن حذف الصف الأخير.'); }
+                        saveToSystem();
+                    } else {
+                        showSuccess('لا يمكن حذف الصف الأخير.');
+                    }
                 });
                 actionTd.appendChild(deleteBtn);
                 tr.appendChild(descTd);
                 tr.appendChild(amountTd);
                 tr.appendChild(actionTd);
-                descInput.addEventListener('input', function() {});
+                descInput.addEventListener('input', function() {
+                    saveToSystem();
+                });
                 amountInput.addEventListener('input', function() {
-                    let val = this.value.replace(/,/g, '');
-                    const num = parseFloat(val);
-                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
-                    else if (val === '') this.value = '';
                     updateTotal();
                 });
                 amountInput.addEventListener('blur', function() {
                     let val = this.value.replace(/,/g, '');
                     const num = parseFloat(val);
-                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
-                    else this.value = '';
+                    if (!isNaN(num) && val !== '') {
+                        this.value = formatNumber(num);
+                    } else {
+                        this.value = '';
+                    }
                     updateTotal();
+                    saveToSystem();
                 });
                 tbody.appendChild(tr);
                 updateTotal();
                 return tr;
             }
 
-            function clearAllRows() { tbody.innerHTML = '';
+            function clearAllRows() {
+                tbody.innerHTML = '';
                 addRow('', '');
-                updateTotal(); }
+                updateTotal();
+            }
 
             function getTableData() {
                 const rows = tbody.querySelectorAll('tr');
@@ -1339,8 +1389,10 @@ sidebarItems.forEach(item => {
                 rows.forEach(row => {
                     const descInput = row.querySelector('.desc-input');
                     const amountInput = row.querySelector('.amount-input');
-                    if (descInput && amountInput) data.push({ desc: descInput.value || '', amount: amountInput
-                            .value || '0' });
+                    if (descInput && amountInput) data.push({
+                        desc: descInput.value || '',
+                        amount: amountInput.value || '0'
+                    });
                 });
                 return data;
             }
@@ -1362,9 +1414,12 @@ sidebarItems.forEach(item => {
             function loadFromSystem() {
                 try {
                     const stored = localStorage.getItem('restaurantReportData');
-                    if (stored) { const payload = JSON.parse(stored);
+                    if (stored) {
+                        const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
-                        loadTableData(payload.rows || []); return true; }
+                        loadTableData(payload.rows || []);
+                        return true;
+                    }
                 } catch (e) {}
                 return false;
             }
@@ -1381,9 +1436,16 @@ sidebarItems.forEach(item => {
                 link.href = URL.createObjectURL(blob);
                 link.download = name + '_تقرير_' + new Date().toISOString().slice(0, 10) + '.csv';
                 link.click();
+                addRecentReport(name);
                 showSuccess('تم حفظ البيانات ورفعها كملف CSV.');
             }
-            document.getElementById('addRowBtn').addEventListener('click', function() { addRow('', ''); });
+            restaurantNameInput.addEventListener('input', function() {
+                saveToSystem();
+            });
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                addRow('', '');
+                saveToSystem();
+            });
             document.getElementById('addRowsBatchBtn').addEventListener('click', function() {
                 const countInput = document.getElementById('rowsCountInput');
                 let count = parseInt(countInput.value) || 1;
@@ -1391,34 +1453,48 @@ sidebarItems.forEach(item => {
                 if (count > 50) count = 50;
                 countInput.value = count;
                 for (let i = 0; i < count; i++) addRow('', '');
+                saveToSystem();
                 showSuccess('تم إضافة ' + count + ' صفوف جديدة.');
             });
             document.getElementById('clearRowsBtn').addEventListener('click', function() {
                 if (tbody.children.length === 0) return;
-                if (confirm('هل أنت متأكد من مسح جميع الصفوف؟')) { clearAllRows();
-                    saveToSystem(); }
+                if (confirm('هل أنت متأكد من مسح جميع الصفوف؟')) {
+                    clearAllRows();
+                    saveToSystem();
+                }
             });
-            document.getElementById('saveSystemBtn').addEventListener('click', function() { saveToSystem();
-                showSuccess('تم حفظ البيانات في النظام بنجاح.'); });
-            document.getElementById('saveUploadBtn').addEventListener('click', function() { saveAndUpload(); });
+            document.getElementById('saveSystemBtn').addEventListener('click', function() {
+                saveToSystem();
+                const name = restaurantNameInput.value || '';
+                addRecentReport(name);
+                showSuccess('تم حفظ البيانات في النظام بنجاح.');
+            });
+            document.getElementById('saveUploadBtn').addEventListener('click', function() {
+                saveAndUpload();
+            });
             document.getElementById('printInvoiceBtn').addEventListener('click', function() {
+                saveToSystem();
                 const printArea = document.getElementById('printArea');
                 const name = restaurantNameInput.value || '';
                 const now = new Date().toLocaleString('ar-EG');
                 let html = '';
-                html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:2mm; border:none;">';
+                html +=
+                    '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
                 html += '<tr>';
-                html += '<td style="width:60%; text-align:right; vertical-align:bottom; padding:0; border:none;">';
+                html +=
+                    '<td style="width:58%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
                 html += '<div class="restaurant-name">' + name + '</div>';
                 html += '<div class="print-date">' + now + '</div>';
                 html += '</td>';
-                html += '<td class="logo-cell" style="width:40%;">';
+                html +=
+                    '<td class="logo-cell" style="width:42%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
                 html += '<img src="' + LOGO_URL +
-                    '" style="max-width:14mm; height:auto; display:block;" alt="Logo" />';
+                    '" style="max-width:16mm; height:auto; display:block;" alt="Logo" />';
                 html += '</td>';
                 html += '</tr></table>';
                 html += '<table>';
-                html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+                html +=
+                    '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const descInput = row.querySelector('.desc-input');
@@ -1428,17 +1504,23 @@ sidebarItems.forEach(item => {
                             '0') + '</td></tr>';
                     }
                 });
-                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' +
+                html +=
+                    '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' +
                     totalAmountEl.textContent + '</strong></td></tr>';
                 html += '</tbody></table>';
                 html +=
                     '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
                 printArea.innerHTML = html;
                 printArea.style.display = 'block';
-                setTimeout(() => { window.print();
-                    printArea.style.display = 'none'; }, 300);
+                const nameForReport = name;
+                setTimeout(() => {
+                    window.print();
+                    printArea.style.display = 'none';
+                    addRecentReport(nameForReport);
+                }, 300);
             });
             document.getElementById('exportRestaurantBtn').addEventListener('click', function() {
+                saveToSystem();
                 const name = restaurantNameInput.value || '';
                 let csv = 'البيان,المبلغ (ج.م)\n';
                 const rows = tbody.querySelectorAll('tr');
@@ -1454,6 +1536,7 @@ sidebarItems.forEach(item => {
                 link.href = URL.createObjectURL(blob);
                 link.download = name + '_تقرير.csv';
                 link.click();
+                addRecentReport(name);
                 showSuccess('تم تصدير التقرير بصيغة CSV بنجاح.');
             });
             const userAvatarImg = document.getElementById('userAvatar');
@@ -1500,6 +1583,7 @@ sidebarItems.forEach(item => {
                     addRow('', '');
                     updateTotal();
                 }
+                loadRecentReports();
             });
         })();
     </script>
