@@ -874,7 +874,7 @@
                 position: static;
                 width: 82.5mm;
                 min-height: auto;
-                padding: 4mm 5mm 4mm 5mm;
+                padding: 3mm 4mm 4mm 4mm;
                 margin: 0 auto;
                 background: #ffffff;
                 color: #000000;
@@ -891,7 +891,7 @@
             #printArea .header-table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-bottom: 3mm;
+                margin-bottom: 4mm;
                 border: none;
             }
             #printArea .header-table td {
@@ -899,6 +899,13 @@
                 padding: 0;
                 background: transparent;
                 vertical-align: bottom;
+            }
+            #printArea .title-cell-print {
+                text-align: right;
+                vertical-align: bottom;
+                padding: 0;
+                border: none;
+                background: transparent;
             }
             #printArea .restaurant-name {
                 font-size: 20px;
@@ -923,7 +930,7 @@
                 background: transparent;
             }
             #printArea .logo-cell img {
-                max-width: 17mm;
+                max-width: 27mm;
                 height: auto;
                 display: block;
                 filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
@@ -983,6 +990,12 @@
                 font-weight: 600;
                 color: #111;
                 margin-top: 0.5mm;
+            }
+            #printArea .header-separator {
+                width: 100%;
+                height: 2px;
+                background: #000;
+                margin-bottom: 3mm;
             }
         }
     </style>
@@ -1236,33 +1249,43 @@
                 recentReportsCard.style.display = 'block';
                 currentViewReportId = null; }
             document.getElementById('closeReportViewBtn2').addEventListener('click', hideReportView);
-            document.getElementById('printStoredReportBtn2').addEventListener('click', function() { if (!currentViewReportId) return;
+
+            function buildPrintHTML(name, dateStr, rowsData, totalText) {
+                const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
+                let html = '';
+                html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
+                html += '<tr>';
+                html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<div class="restaurant-name">' + (name || '') + '</div>';
+                html += '<div class="print-date">' + (dateStr || '') + '</div>';
+                html += '</td>';
+                html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
+                html += '</td>';
+                html += '</tr></table>';
+                html += '<div class="header-separator"></div>';
+                html += '<table>';
+                html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+                if (rowsData && rowsData.length) {
+                    rowsData.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; });
+                }
+                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
+                html += '</tbody></table>';
+                html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
+                return html;
+            }
+            document.getElementById('printStoredReportBtn2').addEventListener('click', function() {
+                if (!currentViewReportId) return;
                 const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return;
                 const reports = JSON.parse(stored);
                 const report = reports.find(r => r.id === currentViewReportId); if (!report) return;
                 const printArea = document.getElementById('printArea');
-                const LOGO_URL = 'https://files.catbox.moe/e5m4e2.png';
-                let html = '';
-                html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
-                html += '<tr>';
-                html += '<td style="width:58%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<div class="restaurant-name">' + (report.name || '') + '</div>';
-                html += '<div class="print-date">' + (report.date || '') + '</div>';
-                html += '</td>';
-                html += '<td class="logo-cell" style="width:42%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<img src="' + LOGO_URL + '" style="max-width:17mm; height:auto; display:block;" alt="Logo" />';
-                html += '</td>';
-                html += '</tr></table>';
-                html += '<table>';
-                html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
-                if (report.rows && report.rows.length) { report.rows.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; }); }
-                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (report.total || '0') + '</strong></td></tr>';
-                html += '</tbody></table>';
-                html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
-                printArea.innerHTML = html;
+                const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ desc: r.desc || '', amount: r.amount || '0' })) : [];
+                printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
                 printArea.style.display = 'block';
                 setTimeout(() => { window.print();
-                    printArea.style.display = 'none'; }, 300); });
+                    printArea.style.display = 'none'; }, 300);
+            });
 
             function viewReportById(reportId) { const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return;
                 const reports = JSON.parse(stored);
@@ -1337,7 +1360,6 @@
             const tbody = document.getElementById('restaurantTbody');
             const totalAmountEl = document.getElementById('totalAmount');
             const restaurantNameInput = document.getElementById('restaurantNameInput');
-            const LOGO_URL = 'https://files.catbox.moe/27w55o.png';
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
@@ -1491,8 +1513,6 @@
                 tbody.appendChild(tr);
                 updateTotal(); return tr; }
 
-            function addRow(description, amount) { return addRowAtEnd(description, amount); }
-
             function clearAllRows() { tbody.innerHTML = '';
                 addRowAtEnd('', '');
                 updateTotal(); }
@@ -1561,39 +1581,19 @@
             document.getElementById('clearRowsBtn').addEventListener('click', function() { if (tbody.children.length === 0) return; if (
                     confirm('هل أنت متأكد من مسح جميع الصفوف؟')) { clearAllRows();
                     saveToSession(); } });
-            document.getElementById('printInvoiceBtn').addEventListener('click', function() { saveToSession();
+            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
+                saveToSession();
                 const printArea = document.getElementById('printArea');
                 const name = restaurantNameInput.value || '';
                 const dateStr = getReportDateString();
-                let html = '';
-                html +=
-                    '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
-                html += '<tr>';
-                html +=
-                    '<td style="width:58%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<div class="restaurant-name">' + name + '</div>';
-                html += '<div class="print-date">' + dateStr + '</div>';
-                html += '</td>';
-                html +=
-                    '<td class="logo-cell" style="width:42%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<img src="' + LOGO_URL + '" style="max-width:17mm; height:auto; display:block;" alt="Logo" />';
-                html += '</td>';
-                html += '</tr></table>';
-                html += '<table>';
-                html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+                const rowsData = [];
                 const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector(
-                        '.amount-input'); if (descInput && amountInput) { html += '<tr><td>' + (descInput.value || '') +
-                        '</td><td>' + (amountInput.value || '0') + '</td></tr>'; } });
-                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' +
-                    totalAmountEl.textContent + '</strong></td></tr>';
-                html += '</tbody></table>';
-                html +=
-                    '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
-                printArea.innerHTML = html;
+                rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) rowsData.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); });
+                printArea.innerHTML = buildPrintHTML(name, dateStr, rowsData, totalAmountEl.textContent);
                 printArea.style.display = 'block';
                 setTimeout(() => { window.print();
-                    printArea.style.display = 'none'; }, 300); });
+                    printArea.style.display = 'none'; }, 300);
+            });
             document.getElementById('exportRestaurantBtn').addEventListener('click', function() { saveToSession();
                 const name = restaurantNameInput.value || '';
                 let csv = 'البيان,المبلغ (ج.م)\n';
