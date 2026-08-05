@@ -887,18 +887,22 @@
             }
             #printArea * {
                 visibility: visible !important;
+                box-sizing: border-box;
             }
             #printArea .header-table {
                 width: 100%;
                 border-collapse: collapse;
                 margin-bottom: 4mm;
                 border: none;
+                table-layout: auto;
             }
             #printArea .header-table td {
                 border: none;
                 padding: 0;
                 background: transparent;
                 vertical-align: bottom;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
             #printArea .title-cell-print {
                 text-align: right;
@@ -914,6 +918,8 @@
                 text-align: right;
                 letter-spacing: -0.2px;
                 margin-bottom: 1mm;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
             #printArea .print-date {
                 font-size: 11px;
@@ -921,6 +927,7 @@
                 color: #222;
                 text-align: right;
                 margin-bottom: 2mm;
+                word-break: break-word;
             }
             #printArea .logo-cell {
                 text-align: left;
@@ -930,17 +937,20 @@
                 background: transparent;
             }
             #printArea .logo-cell img {
-                max-width: 27mm;
+                max-width: 30mm;
                 height: auto;
                 display: block;
-                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+                filter: grayscale(100%) contrast(1.8) brightness(0.7) drop-shadow(0.4px 0.4px 0px #000);
+                -webkit-filter: grayscale(100%) contrast(1.8) brightness(0.7) drop-shadow(0.4px 0.4px 0px #000);
             }
             #printArea table {
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 12px;
-                table-layout: auto;
+                table-layout: fixed;
                 border: 1px solid #000;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
             #printArea table td,
             #printArea table th {
@@ -949,6 +959,7 @@
                 text-align: right;
                 font-size: 12px;
                 word-break: break-word;
+                overflow-wrap: break-word;
                 color: #000;
                 background: #fff;
             }
@@ -1169,69 +1180,32 @@
     <script>
         (function() {
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
-
-            function convertArabicNumerals(str) {
-                return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; });
-            }
-
-            function parseNumber(val) {
-                const converted = convertArabicNumerals(String(val));
-                const cleaned = converted.replace(/,/g, '').trim();
-                const num = parseFloat(cleaned);
-                return isNaN(num) ? 0 : num;
-            }
-
-            function formatNumber(num) {
-                if (num === 0 || num === -0) return '0';
-                const abs = Math.abs(num);
-                const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-                return num < 0 ? '-' + formatted : formatted;
-            }
+            function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
+            function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
+            function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
-
-            function openSidebar() { sidebar.classList.add('mobile-open');
-                sidebar.classList.remove('mobile-closed'); }
-
-            function closeSidebar() { sidebar.classList.remove('mobile-open');
-                sidebar.classList.add('mobile-closed'); }
+            function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
+            function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
             window.addEventListener('resize', function() { if (window.innerWidth >= 1025) { sidebar.classList.remove('mobile-open', 'mobile-closed'); } else { if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed'); } });
             if (headerAvatar) { headerAvatar.addEventListener('click', function(e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
             document.addEventListener('click', function(e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
             const sidebarItems = document.querySelectorAll('.sidebar-item');
-            sidebarItems.forEach(item => { item.addEventListener('click', function() { if (this.id === 'logoutBtn') return;
-                    sidebarItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active'); if (window.innerWidth < 1025) { closeSidebar(); } }); });
+            sidebarItems.forEach(item => { item.addEventListener('click', function() { if (this.id === 'logoutBtn') return; sidebarItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); if (window.innerWidth < 1025) { closeSidebar(); } }); });
             const logoutBtn = document.getElementById('logoutBtn'); if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/'; }); }
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
             const navNotch = document.getElementById('navNotch');
-
-            function moveNotch(activeItem) { if (!navNotch || !activeItem) return;
-                const rect = activeItem.getBoundingClientRect();
-                const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2 - navRect.left;
-                navNotch.style.left = centerX + 'px'; }
-
-            function setBottomNavActive() { let activeItem = null;
-                bottomNavItems.forEach(item => { item.classList.remove('active');
-                    const tab = item.getAttribute('data-tab'); if (tab === 'reports') { item.classList.add('active');
-                        activeItem = item; } }); if (activeItem) moveNotch(activeItem); else if (bottomNavItems.length > 0) { bottomNavItems[0].classList.add('active');
-                    moveNotch(bottomNavItems[0]); } }
+            function moveNotch(activeItem) { if (!navNotch || !activeItem) return; const rect = activeItem.getBoundingClientRect(); const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect(); const centerX = rect.left + rect.width / 2 - navRect.left; navNotch.style.left = centerX + 'px'; }
+            function setBottomNavActive() { let activeItem = null; bottomNavItems.forEach(item => { item.classList.remove('active'); const tab = item.getAttribute('data-tab'); if (tab === 'reports') { item.classList.add('active'); activeItem = item; } }); if (activeItem) moveNotch(activeItem); else if (bottomNavItems.length > 0) { bottomNavItems[0].classList.add('active'); moveNotch(bottomNavItems[0]); } }
             setBottomNavActive();
             window.addEventListener('resize', () => { const activeItem = document.querySelector('.bottom-nav-item.active'); if (activeItem) moveNotch(activeItem); });
-            bottomNavItems.forEach(item => { item.addEventListener('click', function(e) { e.preventDefault();
-                    bottomNavItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    moveNotch(this); }); });
+            bottomNavItems.forEach(item => { item.addEventListener('click', function(e) { e.preventDefault(); bottomNavItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); moveNotch(this); }); });
             const successModal = document.getElementById('successModal');
             const closeSuccessModal = document.getElementById('closeSuccessModal');
             const okSuccessBtn = document.getElementById('okSuccessBtn');
             const successMessageEl = document.getElementById('successMessage');
-
-            function showSuccess(msg) { successMessageEl.textContent = msg;
-                successModal.classList.add('active'); }
-
+            function showSuccess(msg) { successMessageEl.textContent = msg; successModal.classList.add('active'); }
             function hideSuccess() { successModal.classList.remove('active'); }
             closeSuccessModal.addEventListener('click', hideSuccess);
             okSuccessBtn.addEventListener('click', hideSuccess);
@@ -1244,12 +1218,8 @@
             const recentReportsCard = document.getElementById('recentReportsCard');
             const recentReportsList = document.getElementById('recentReportsList');
             let currentViewReportId = null;
-
-            function hideReportView() { reportViewCard.style.display = 'none';
-                recentReportsCard.style.display = 'block';
-                currentViewReportId = null; }
+            function hideReportView() { reportViewCard.style.display = 'none'; recentReportsCard.style.display = 'block'; currentViewReportId = null; }
             document.getElementById('closeReportViewBtn2').addEventListener('click', hideReportView);
-
             function buildPrintHTML(name, dateStr, rowsData, totalText) {
                 const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
                 let html = '';
@@ -1260,15 +1230,13 @@
                 html += '<div class="print-date">' + (dateStr || '') + '</div>';
                 html += '</td>';
                 html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
+                html += '<img src="' + LOGO_URL + '" style="max-width:30mm; height:auto; display:block;" alt="Logo" />';
                 html += '</td>';
                 html += '</tr></table>';
                 html += '<div class="header-separator"></div>';
                 html += '<table>';
                 html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
-                if (rowsData && rowsData.length) {
-                    rowsData.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; });
-                }
+                if (rowsData && rowsData.length) { rowsData.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; }); }
                 html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
                 html += '</tbody></table>';
                 html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
@@ -1283,79 +1251,14 @@
                 const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ desc: r.desc || '', amount: r.amount || '0' })) : [];
                 printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
                 printArea.style.display = 'block';
-                setTimeout(() => { window.print();
-                    printArea.style.display = 'none'; }, 300);
+                setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300);
             });
-
-            function viewReportById(reportId) { const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return;
-                const reports = JSON.parse(stored);
-                const report = reports.find(r => r.id === reportId); if (!report) { showSuccess('التقرير غير موجود.'); return; }
-                currentViewReportId = reportId;
-                viewReportTitle2.textContent = report.name || 'تقرير';
-                viewReportDate2.textContent = report.date || '';
-                viewReportTbody2.innerHTML = ''; if (report.rows && report.rows.length) { report.rows.forEach(row => { const tr = document.createElement('tr');
-                    const tdDesc = document.createElement('td');
-                    tdDesc.textContent = row.desc || '';
-                    const tdAmount = document.createElement('td');
-                    tdAmount.textContent = row.amount || '0';
-                    tr.appendChild(tdDesc);
-                    tr.appendChild(tdAmount);
-                    viewReportTbody2.appendChild(tr); }); }
-                viewReportTotal2.textContent = report.total || '0';
-                reportViewCard.style.display = 'block';
-                recentReportsCard.style.display = 'none'; }
-
-            function loadRecentReports() { try { const stored = localStorage.getItem('restaurantStoredReports'); if (stored) { const reports = JSON.parse(stored); if (reports.length === 0) { recentReportsList.innerHTML =
-                            '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; return; }
-                        let html = '';
-                        reports.forEach((report) => { html += `
-                                <div class="report-list-item">
-                                    <div class="report-info">
-                                        <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
-                                        <div>
-                                            <p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p>
-                                            <p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p>
-                                        </div>
-                                    </div>
-                                    <div class="report-actions">
-                                        <button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>
-                                        <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>
-                                    </div>
-                                </div>`; });
-                        recentReportsList.innerHTML = html;
-                        document.querySelectorAll('.view-report-btn').forEach(btn => { btn.addEventListener('click', function() { const reportId = this.getAttribute('data-id');
-                                viewReportById(reportId); }); });
-                        document.querySelectorAll('.delete-report-btn').forEach(btn => { btn.addEventListener('click', function() { const reportId = this.getAttribute('data-id');
-                                deleteReportById(reportId); }); }); } else { recentReportsList.innerHTML =
-                            '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; } } catch (e) { recentReportsList.innerHTML =
-                        '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; } }
-
-            function deleteReportById(reportId) { if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return; try { const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return;
-                    let reports = JSON.parse(stored);
-                    reports = reports.filter(r => r.id !== reportId);
-                    localStorage.setItem('restaurantStoredReports', JSON.stringify(reports));
-                    loadRecentReports();
-                    showSuccess('تم حذف التقرير بنجاح.'); } catch (e) {} }
-
-            function getReportDateString() { const dateToggleBtn = document.getElementById('dateToggleBtn');
-                const reportDateInput = document.getElementById('reportDateInput'); if (dateToggleBtn.classList.contains('active') || !reportDateInput.value) { return new Date().toLocaleDateString('ar-EG', { year: 'numeric',
-                        month: 'numeric', day: 'numeric' }); } else { const d = new Date(reportDateInput.value + 'T00:00:00'); return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); } }
-
-            function storeCurrentReport() { const name = document.getElementById('restaurantNameInput').value || '';
-                const rows = getTableData();
-                const total = document.getElementById('totalAmount').textContent;
-                const dateStr = getReportDateString();
-                const report = { id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6), name: name, date: dateStr,
-                    timestamp: new Date().toISOString(), rows: rows, total: total }; try { let reports = [];
-                    const stored = localStorage.getItem('restaurantStoredReports'); if (stored) reports = JSON.parse(stored);
-                    reports.unshift(report); if (reports.length > 20) reports = reports.slice(0, 20);
-                    localStorage.setItem('restaurantStoredReports', JSON.stringify(reports));
-                    loadRecentReports();
-                    showSuccess('تم تخزين التقرير بنجاح.'); } catch (e) { showSuccess('حدث خطأ أثناء التخزين.'); } }
-            document.getElementById('clearReportsBtn').addEventListener('click', function() { if (!confirm('هل أنت متأكد من مسح جميع التقارير المخزنة؟')) return;
-                localStorage.removeItem('restaurantStoredReports');
-                recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
-                showSuccess('تم مسح سجل التقارير بنجاح.'); });
+            function viewReportById(reportId) { const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return; const reports = JSON.parse(stored); const report = reports.find(r => r.id === reportId); if (!report) { showSuccess('التقرير غير موجود.'); return; } currentViewReportId = reportId; viewReportTitle2.textContent = report.name || 'تقرير'; viewReportDate2.textContent = report.date || ''; viewReportTbody2.innerHTML = ''; if (report.rows && report.rows.length) { report.rows.forEach(row => { const tr = document.createElement('tr'); const tdDesc = document.createElement('td'); tdDesc.textContent = row.desc || ''; const tdAmount = document.createElement('td'); tdAmount.textContent = row.amount || '0'; tr.appendChild(tdDesc); tr.appendChild(tdAmount); viewReportTbody2.appendChild(tr); }); } viewReportTotal2.textContent = report.total || '0'; reportViewCard.style.display = 'block'; recentReportsCard.style.display = 'none'; }
+            function loadRecentReports() { try { const stored = localStorage.getItem('restaurantStoredReports'); if (stored) { const reports = JSON.parse(stored); if (reports.length === 0) { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; return; } let html = ''; reports.forEach((report) => { html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>`; }); recentReportsList.innerHTML = html; document.querySelectorAll('.view-report-btn').forEach(btn => { btn.addEventListener('click', function() { const reportId = this.getAttribute('data-id'); viewReportById(reportId); }); }); document.querySelectorAll('.delete-report-btn').forEach(btn => { btn.addEventListener('click', function() { const reportId = this.getAttribute('data-id'); deleteReportById(reportId); }); }); } else { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; } } catch (e) { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; } }
+            function deleteReportById(reportId) { if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return; try { const stored = localStorage.getItem('restaurantStoredReports'); if (!stored) return; let reports = JSON.parse(stored); reports = reports.filter(r => r.id !== reportId); localStorage.setItem('restaurantStoredReports', JSON.stringify(reports)); loadRecentReports(); showSuccess('تم حذف التقرير بنجاح.'); } catch (e) {} }
+            function getReportDateString() { const dateToggleBtn = document.getElementById('dateToggleBtn'); const reportDateInput = document.getElementById('reportDateInput'); if (dateToggleBtn.classList.contains('active') || !reportDateInput.value) { return new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); } else { const d = new Date(reportDateInput.value + 'T00:00:00'); return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); } }
+            function storeCurrentReport() { const name = document.getElementById('restaurantNameInput').value || ''; const rows = getTableData(); const total = document.getElementById('totalAmount').textContent; const dateStr = getReportDateString(); const report = { id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6), name: name, date: dateStr, timestamp: new Date().toISOString(), rows: rows, total: total }; try { let reports = []; const stored = localStorage.getItem('restaurantStoredReports'); if (stored) reports = JSON.parse(stored); reports.unshift(report); if (reports.length > 20) reports = reports.slice(0, 20); localStorage.setItem('restaurantStoredReports', JSON.stringify(reports)); loadRecentReports(); showSuccess('تم تخزين التقرير بنجاح.'); } catch (e) { showSuccess('حدث خطأ أثناء التخزين.'); } }
+            document.getElementById('clearReportsBtn').addEventListener('click', function() { if (!confirm('هل أنت متأكد من مسح جميع التقارير المخزنة؟')) return; localStorage.removeItem('restaurantStoredReports'); recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; showSuccess('تم مسح سجل التقارير بنجاح.'); });
             loadRecentReports();
             const tbody = document.getElementById('restaurantTbody');
             const totalAmountEl = document.getElementById('totalAmount');
@@ -1363,278 +1266,32 @@
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
-
-            function updateTotal() { let total = 0;
-                const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => { const input = row.querySelector('.amount-input'); if (input) { const val = parseNumber(input
-                            .value);
-                        total += val; } });
-                totalAmountEl.textContent = formatNumber(total); }
-
-            function focusInput(input) { if (input) { input.focus(); if (input.type === 'text' && input.value) input.setSelectionRange(
-                        input.value.length, input.value.length); } }
-
-            function getInputsInRow(tr) { const descInput = tr.querySelector('.desc-input'); const amountInput = tr.querySelector(
-                    '.amount-input'); return { descInput, amountInput }; }
-
-            function getCellIndex(input) { if (input.classList.contains('desc-input')) return 0; if (input.classList.contains(
-                    'amount-input')) return 1; return -1; }
-
-            function navigateCell(currentInput, rowDelta, cellDelta) { const currentTr = currentInput.closest('tr'); if (!currentTr)
-                    return;
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                const currentRowIndex = rows.indexOf(currentTr);
-                const currentCellIndex = getCellIndex(currentInput);
-                const targetRowIndex = currentRowIndex + rowDelta; if (targetRowIndex < 0 || targetRowIndex >= rows.length) return;
-                const targetRow = rows[targetRowIndex];
-                const { descInput, amountInput } = getInputsInRow(targetRow);
-                const targetCellIndex = cellDelta !== undefined ? cellDelta : currentCellIndex; if (targetCellIndex === 0 &&
-                    descInput) focusInput(descInput); else if (targetCellIndex === 1 && amountInput) focusInput(amountInput); }
-
-            function setupKeyboardNavigation(input) { input.addEventListener('keydown', function(e) { const key = e.key;
-                    const tr = this.closest('tr');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    const rowIndex = rows.indexOf(tr);
-                    const cellIndex = getCellIndex(this); if (key === 'Enter') { e.preventDefault();
-                        const isLastRow = rowIndex === rows.length - 1;
-                        const isAmountCell = cellIndex === 1; if (isLastRow && isAmountCell) { const newTr = addRowAtEnd('',
-                                '');
-                            const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(descInput);
-                            saveToSession(); } else if (isLastRow && cellIndex === 0) { const { amountInput } =
-                            getInputsInRow(tr); if (amountInput) focusInput(amountInput); } else { navigateCell(this, 1,
-                                cellIndex); } } else if (key === 'ArrowDown') { e.preventDefault();
-                        navigateCell(this, 1, cellIndex); } else if (key === 'ArrowUp') { e.preventDefault();
-                        navigateCell(this, -1, cellIndex); } else if (key === 'ArrowRight') { e.preventDefault(); if (
-                            cellIndex === 1) { navigateCell(this, 0, 0); } } else if (key === 'ArrowLeft') { e
-                        .preventDefault(); if (cellIndex === 0) { navigateCell(this, 0, 1); } } else if (key === 'Tab') { e
-                        .preventDefault(); if (e.shiftKey) { if (cellIndex === 1) { navigateCell(this, 0, 0); } else if (
-                                cellIndex === 0 && rowIndex > 0) { navigateCell(this, -1, 1); } } else { if (cellIndex ===
-                                0) { navigateCell(this, 0, 1); } else if (cellIndex === 1) { if (rowIndex < rows.length -
-                                    1) { navigateCell(this, 1, 0); } else { const newTr = addRowAtEnd('', '');
-                                    const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(
-                                    descInput);
-                                    saveToSession(); } } } } }); }
-
-            function updateSignButton(row) { const amountInput = row.querySelector('.amount-input'); const signBtn = row.querySelector(
-                    '.sign-btn'); if (!amountInput || !signBtn) return;
-                const val = parseNumber(amountInput.value); if (val < 0) { signBtn.classList.add('negative');
-                    signBtn.classList.remove('positive');
-                    signBtn.innerHTML = '<i class="las la-minus-circle"></i>';
-                    signBtn.title = 'القيمة سالبة - اضغط لجعلها موجبة'; } else { signBtn.classList.add('positive');
-                    signBtn.classList.remove('negative');
-                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                    signBtn.title = 'القيمة موجبة - اضغط لجعلها سالبة'; } }
-
-            function createRowElement(description, amount) { const tr = document.createElement('tr');
-                const descTd = document.createElement('td');
-                const descInput = document.createElement('input');
-                descInput.type = 'text';
-                descInput.className = 'input-field desc-input';
-                descInput.placeholder = 'أدخل البيان';
-                descInput.value = description || '';
-                setupKeyboardNavigation(descInput);
-                descTd.appendChild(descInput);
-                const amountTd = document.createElement('td');
-                const amountInput = document.createElement('input');
-                amountInput.type = 'text';
-                amountInput.className = 'input-field amount-input';
-                amountInput.placeholder = 'المبلغ';
-                const formattedAmount = amount ? formatNumber(parseNumber(amount)) : '';
-                amountInput.value = formattedAmount;
-                amountInput.setAttribute('inputmode', 'decimal');
-                setupKeyboardNavigation(amountInput);
-                amountTd.appendChild(amountInput);
-                const actionTd = document.createElement('td');
-                actionTd.style.whiteSpace = 'nowrap';
-                actionTd.style.textAlign = 'right';
-                const upBtn = document.createElement('button');
-                upBtn.className = 'row-action-btn arrow-btn';
-                upBtn.tabIndex = -1;
-                upBtn.title = 'إضافة صف للأعلى';
-                upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
-                upBtn.addEventListener('click', function() { const newTr = createRowElement('', '');
-                    tbody.insertBefore(newTr, tr);
-                    updateTotal();
-                    saveToSession();
-                    const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); });
-                const downBtn = document.createElement('button');
-                downBtn.className = 'row-action-btn arrow-btn';
-                downBtn.tabIndex = -1;
-                downBtn.title = 'إضافة صف للأسفل';
-                downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
-                downBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); if (tr.nextSibling) {
-                        tbody.insertBefore(newTr, tr.nextSibling); } else { tbody.appendChild(newTr); }
-                    updateTotal();
-                    saveToSession();
-                    const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); });
-                const signBtn = document.createElement('button');
-                signBtn.className = 'row-action-btn sign-btn positive';
-                signBtn.tabIndex = -1;
-                signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
-                signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                signBtn.addEventListener('click', function() { const currentVal = parseNumber(amountInput.value); if (currentVal ===
-                        0) { amountInput.value = '';
-                        updateSignButton(tr);
-                        updateTotal();
-                        saveToSession(); return; }
-                    const newVal = -currentVal;
-                    amountInput.value = formatNumber(newVal);
-                    updateSignButton(tr);
-                    updateTotal();
-                    saveToSession(); });
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'row-action-btn delete-btn';
-                deleteBtn.tabIndex = -1;
-                deleteBtn.title = 'حذف الصف';
-                deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                deleteBtn.addEventListener('click', function() { if (tbody.children.length > 1) { tr.remove();
-                    updateTotal();
-                    saveToSession(); } else { showSuccess('لا يمكن حذف الصف الأخير.'); } });
-                actionTd.appendChild(upBtn);
-                actionTd.appendChild(downBtn);
-                actionTd.appendChild(signBtn);
-                actionTd.appendChild(deleteBtn);
-                tr.appendChild(descTd);
-                tr.appendChild(amountTd);
-                tr.appendChild(actionTd);
-                amountInput.addEventListener('input', function() { updateTotal();
-                    updateSignButton(tr); });
-                amountInput.addEventListener('blur', function() { let val = convertArabicNumerals(this.value).replace(/,/g,
-                        '');
-                    const num = parseFloat(val); if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this
-                        .value = ''; }
-                    updateTotal();
-                    updateSignButton(tr);
-                    saveToSession(); });
-                descInput.addEventListener('input', function() { saveToSession(); });
-                updateSignButton(tr); return tr; }
-
-            function addRowAtEnd(description, amount) { const tr = createRowElement(description, amount);
-                tbody.appendChild(tr);
-                updateTotal(); return tr; }
-
-            function clearAllRows() { tbody.innerHTML = '';
-                addRowAtEnd('', '');
-                updateTotal(); }
-
-            function getTableData() { const rows = tbody.querySelectorAll('tr');
-                const data = [];
-                rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector(
-                        '.amount-input'); if (descInput && amountInput) data.push({ desc: descInput.value || '', amount: amountInput
-                        .value || '0' }); }); return data; }
-
-            function loadTableData(data) { tbody.innerHTML = ''; if (data.length === 0) addRowAtEnd('', ''); else data.forEach(item =>
-                    addRowAtEnd(item.desc, item.amount));
-                updateTotal(); }
-
-            function saveToSession() { const data = getTableData();
-                const name = restaurantNameInput.value || '';
-                const isAuto = dateToggleBtn.classList.contains('active');
-                const customDate = reportDateInput.value;
-                const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date()
-                        .toISOString() }; try { localStorage.setItem('restaurantReportData', JSON.stringify(payload)); } catch (
-                    e) {} }
-
-            function loadFromSession() { try { const stored = localStorage.getItem('restaurantReportData'); if (stored) { const
-                        payload = JSON.parse(stored);
-                        restaurantNameInput.value = payload.name || ''; if (payload.isAuto !== undefined) { if (payload.isAuto) {
-                            dateToggleBtn.classList.add('active');
-                            dateToggleText.textContent = 'تلقائي';
-                            dateToggleBtn.innerHTML =
-                                '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
-                            reportDateInput.disabled = true; } else { dateToggleBtn.classList.remove('active');
-                            dateToggleText.textContent = 'يدوي';
-                            dateToggleBtn.innerHTML =
-                                '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>';
-                            reportDateInput.disabled = false; } } else { dateToggleBtn.classList.add('active');
-                        dateToggleText.textContent = 'تلقائي';
-                        dateToggleBtn.innerHTML =
-                            '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
-                        reportDateInput.disabled = true; } if (payload.customDate) { reportDateInput.value = payload
-                            .customDate; } else { reportDateInput.value = formatDateForInput(new Date()); }
-                        loadTableData(payload.rows || []); return true; } } catch (e) {} return false; }
-
-            function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2,
-                    '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
-            dateToggleBtn.addEventListener('click', function() { if (this.classList.contains('active')) { this.classList.remove(
-                        'active');
-                    dateToggleText.textContent = 'يدوي';
-                    this.innerHTML = '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>';
-                    reportDateInput.disabled = false; } else { this.classList.add('active');
-                    dateToggleText.textContent = 'تلقائي';
-                    this.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
-                    reportDateInput.value = formatDateForInput(new Date());
-                    reportDateInput.disabled = true; }
-                saveToSession(); });
+            function updateTotal() { let total = 0; const rows = tbody.querySelectorAll('tr'); rows.forEach(row => { const input = row.querySelector('.amount-input'); if (input) { const val = parseNumber(input.value); total += val; } }); totalAmountEl.textContent = formatNumber(total); }
+            function focusInput(input) { if (input) { input.focus(); if (input.type === 'text' && input.value) input.setSelectionRange(input.value.length, input.value.length); } }
+            function getInputsInRow(tr) { const descInput = tr.querySelector('.desc-input'); const amountInput = tr.querySelector('.amount-input'); return { descInput, amountInput }; }
+            function getCellIndex(input) { if (input.classList.contains('desc-input')) return 0; if (input.classList.contains('amount-input')) return 1; return -1; }
+            function navigateCell(currentInput, rowDelta, cellDelta) { const currentTr = currentInput.closest('tr'); if (!currentTr) return; const rows = Array.from(tbody.querySelectorAll('tr')); const currentRowIndex = rows.indexOf(currentTr); const currentCellIndex = getCellIndex(currentInput); const targetRowIndex = currentRowIndex + rowDelta; if (targetRowIndex < 0 || targetRowIndex >= rows.length) return; const targetRow = rows[targetRowIndex]; const { descInput, amountInput } = getInputsInRow(targetRow); const targetCellIndex = cellDelta !== undefined ? cellDelta : currentCellIndex; if (targetCellIndex === 0 && descInput) focusInput(descInput); else if (targetCellIndex === 1 && amountInput) focusInput(amountInput); }
+            function setupKeyboardNavigation(input) { input.addEventListener('keydown', function(e) { const key = e.key; const tr = this.closest('tr'); const rows = Array.from(tbody.querySelectorAll('tr')); const rowIndex = rows.indexOf(tr); const cellIndex = getCellIndex(this); if (key === 'Enter') { e.preventDefault(); const isLastRow = rowIndex === rows.length - 1; const isAmountCell = cellIndex === 1; if (isLastRow && isAmountCell) { const newTr = addRowAtEnd('', ''); const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(descInput); saveToSession(); } else if (isLastRow && cellIndex === 0) { const { amountInput } = getInputsInRow(tr); if (amountInput) focusInput(amountInput); } else { navigateCell(this, 1, cellIndex); } } else if (key === 'ArrowDown') { e.preventDefault(); navigateCell(this, 1, cellIndex); } else if (key === 'ArrowUp') { e.preventDefault(); navigateCell(this, -1, cellIndex); } else if (key === 'ArrowRight') { e.preventDefault(); if (cellIndex === 1) { navigateCell(this, 0, 0); } } else if (key === 'ArrowLeft') { e.preventDefault(); if (cellIndex === 0) { navigateCell(this, 0, 1); } } else if (key === 'Tab') { e.preventDefault(); if (e.shiftKey) { if (cellIndex === 1) { navigateCell(this, 0, 0); } else if (cellIndex === 0 && rowIndex > 0) { navigateCell(this, -1, 1); } } else { if (cellIndex === 0) { navigateCell(this, 0, 1); } else if (cellIndex === 1) { if (rowIndex < rows.length - 1) { navigateCell(this, 1, 0); } else { const newTr = addRowAtEnd('', ''); const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(descInput); saveToSession(); } } } } }); }
+            function updateSignButton(row) { const amountInput = row.querySelector('.amount-input'); const signBtn = row.querySelector('.sign-btn'); if (!amountInput || !signBtn) return; const val = parseNumber(amountInput.value); if (val < 0) { signBtn.classList.add('negative'); signBtn.classList.remove('positive'); signBtn.innerHTML = '<i class="las la-minus-circle"></i>'; signBtn.title = 'القيمة سالبة - اضغط لجعلها موجبة'; } else { signBtn.classList.add('positive'); signBtn.classList.remove('negative'); signBtn.innerHTML = '<i class="las la-plus-circle"></i>'; signBtn.title = 'القيمة موجبة - اضغط لجعلها سالبة'; } }
+            function createRowElement(description, amount) { const tr = document.createElement('tr'); const descTd = document.createElement('td'); const descInput = document.createElement('input'); descInput.type = 'text'; descInput.className = 'input-field desc-input'; descInput.placeholder = 'أدخل البيان'; descInput.value = description || ''; setupKeyboardNavigation(descInput); descTd.appendChild(descInput); const amountTd = document.createElement('td'); const amountInput = document.createElement('input'); amountInput.type = 'text'; amountInput.className = 'input-field amount-input'; amountInput.placeholder = 'المبلغ'; const formattedAmount = amount ? formatNumber(parseNumber(amount)) : ''; amountInput.value = formattedAmount; amountInput.setAttribute('inputmode', 'decimal'); setupKeyboardNavigation(amountInput); amountTd.appendChild(amountInput); const actionTd = document.createElement('td'); actionTd.style.whiteSpace = 'nowrap'; actionTd.style.textAlign = 'right'; const upBtn = document.createElement('button'); upBtn.className = 'row-action-btn arrow-btn'; upBtn.tabIndex = -1; upBtn.title = 'إضافة صف للأعلى'; upBtn.innerHTML = '<i class="las la-arrow-up"></i>'; upBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); tbody.insertBefore(newTr, tr); updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const downBtn = document.createElement('button'); downBtn.className = 'row-action-btn arrow-btn'; downBtn.tabIndex = -1; downBtn.title = 'إضافة صف للأسفل'; downBtn.innerHTML = '<i class="las la-arrow-down"></i>'; downBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); if (tr.nextSibling) { tbody.insertBefore(newTr, tr.nextSibling); } else { tbody.appendChild(newTr); } updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const signBtn = document.createElement('button'); signBtn.className = 'row-action-btn sign-btn positive'; signBtn.tabIndex = -1; signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)'; signBtn.innerHTML = '<i class="las la-plus-circle"></i>'; signBtn.addEventListener('click', function() { const currentVal = parseNumber(amountInput.value); if (currentVal === 0) { amountInput.value = ''; updateSignButton(tr); updateTotal(); saveToSession(); return; } const newVal = -currentVal; amountInput.value = formatNumber(newVal); updateSignButton(tr); updateTotal(); saveToSession(); }); const deleteBtn = document.createElement('button'); deleteBtn.className = 'row-action-btn delete-btn'; deleteBtn.tabIndex = -1; deleteBtn.title = 'حذف الصف'; deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>'; deleteBtn.addEventListener('click', function() { if (tbody.children.length > 1) { tr.remove(); updateTotal(); saveToSession(); } else { showSuccess('لا يمكن حذف الصف الأخير.'); } }); actionTd.appendChild(upBtn); actionTd.appendChild(downBtn); actionTd.appendChild(signBtn); actionTd.appendChild(deleteBtn); tr.appendChild(descTd); tr.appendChild(amountTd); tr.appendChild(actionTd); amountInput.addEventListener('input', function() { updateTotal(); updateSignButton(tr); }); amountInput.addEventListener('blur', function() { let val = convertArabicNumerals(this.value).replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; } updateTotal(); updateSignButton(tr); saveToSession(); }); descInput.addEventListener('input', function() { saveToSession(); }); updateSignButton(tr); return tr; }
+            function addRowAtEnd(description, amount) { const tr = createRowElement(description, amount); tbody.appendChild(tr); updateTotal(); return tr; }
+            function clearAllRows() { tbody.innerHTML = ''; addRowAtEnd('', ''); updateTotal(); }
+            function getTableData() { const rows = tbody.querySelectorAll('tr'); const data = []; rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) data.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); }); return data; }
+            function loadTableData(data) { tbody.innerHTML = ''; if (data.length === 0) addRowAtEnd('', ''); else data.forEach(item => addRowAtEnd(item.desc, item.amount)); updateTotal(); }
+            function saveToSession() { const data = getTableData(); const name = restaurantNameInput.value || ''; const isAuto = dateToggleBtn.classList.contains('active'); const customDate = reportDateInput.value; const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() }; try { localStorage.setItem('restaurantReportData', JSON.stringify(payload)); } catch (e) {} }
+            function loadFromSession() { try { const stored = localStorage.getItem('restaurantReportData'); if (stored) { const payload = JSON.parse(stored); restaurantNameInput.value = payload.name || ''; if (payload.isAuto !== undefined) { if (payload.isAuto) { dateToggleBtn.classList.add('active'); dateToggleText.textContent = 'تلقائي'; dateToggleBtn.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>'; reportDateInput.disabled = true; } else { dateToggleBtn.classList.remove('active'); dateToggleText.textContent = 'يدوي'; dateToggleBtn.innerHTML = '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>'; reportDateInput.disabled = false; } } else { dateToggleBtn.classList.add('active'); dateToggleText.textContent = 'تلقائي'; dateToggleBtn.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>'; reportDateInput.disabled = true; } if (payload.customDate) { reportDateInput.value = payload.customDate; } else { reportDateInput.value = formatDateForInput(new Date()); } loadTableData(payload.rows || []); return true; } } catch (e) {} return false; }
+            function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
+            dateToggleBtn.addEventListener('click', function() { if (this.classList.contains('active')) { this.classList.remove('active'); dateToggleText.textContent = 'يدوي'; this.innerHTML = '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>'; reportDateInput.disabled = false; } else { this.classList.add('active'); dateToggleText.textContent = 'تلقائي'; this.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>'; reportDateInput.value = formatDateForInput(new Date()); reportDateInput.disabled = true; } saveToSession(); });
             reportDateInput.addEventListener('input', function() { saveToSession(); });
             restaurantNameInput.addEventListener('input', function() { saveToSession(); });
-            document.getElementById('storeBtn').addEventListener('click', function() { saveToSession();
-                storeCurrentReport(); });
-            document.getElementById('addRowBtn').addEventListener('click', function() { addRowAtEnd('', '');
-                saveToSession(); });
-            document.getElementById('addRowsBatchBtn').addEventListener('click', function() { const countInput = document.getElementById(
-                    'rowsCountInput'); let count = parseInt(countInput.value) || 1; if (count < 1) count = 1; if (count > 50)
-                    count = 50;
-                countInput.value = count; for (let i = 0; i < count; i++) addRowAtEnd('', '');
-                saveToSession();
-                showSuccess('تم إضافة ' + count + ' صفوف جديدة.'); });
-            document.getElementById('clearRowsBtn').addEventListener('click', function() { if (tbody.children.length === 0) return; if (
-                    confirm('هل أنت متأكد من مسح جميع الصفوف؟')) { clearAllRows();
-                    saveToSession(); } });
-            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
-                saveToSession();
-                const printArea = document.getElementById('printArea');
-                const name = restaurantNameInput.value || '';
-                const dateStr = getReportDateString();
-                const rowsData = [];
-                const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) rowsData.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); });
-                printArea.innerHTML = buildPrintHTML(name, dateStr, rowsData, totalAmountEl.textContent);
-                printArea.style.display = 'block';
-                setTimeout(() => { window.print();
-                    printArea.style.display = 'none'; }, 300);
-            });
-            document.getElementById('exportRestaurantBtn').addEventListener('click', function() { saveToSession();
-                const name = restaurantNameInput.value || '';
-                let csv = 'البيان,المبلغ (ج.م)\n';
-                const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector(
-                        '.amount-input'); if (descInput && amountInput) csv += (descInput.value || '') + ',' + (amountInput
-                        .value || '0') + '\n'; });
-                csv += 'الإجمالي,' + totalAmountEl.textContent + '\n';
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = name + '_تقرير.csv';
-                link.click();
-                showSuccess('تم تصدير التقرير بصيغة CSV بنجاح.'); });
-            const userAvatarImg = document.getElementById('userAvatar'); if (userAvatarImg) { userAvatarImg.addEventListener('click',
-                    () => { const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*';
-                        input.onchange = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader();
-                                reader.onload = (ev) => { userAvatarImg.src = ev.target.result; const headerAv = document
-                                        .getElementById('headerAvatar'); if (headerAv) headerAv.src = ev.target
-                                    .result;
-                                    showSuccess('تم تحديث الصورة الشخصية.'); };
-                                reader.readAsDataURL(file); } };
-                        input.click(); }); }
-            document.addEventListener('DOMContentLoaded', function() { const themeToggles = document.querySelectorAll(
-                    '.theme-toggle');
-                const body = document.body;
-                const applyTheme = (theme) => { const isDark = theme === 'dark';
-                    body.classList.toggle('light', !isDark);
-                    themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
-                    localStorage.setItem('theme', theme); };
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                applyTheme(savedTheme);
-                themeToggles.forEach(toggle => { toggle.addEventListener('click', () => { const isDark = body.classList
-                            .contains('light') === false;
-                        applyTheme(isDark ? 'light' : 'dark'); }); }); if (!loadFromSession()) { tbody.innerHTML = '';
-                    addRowAtEnd('', '');
-                    updateTotal();
-                    reportDateInput.value = formatDateForInput(new Date()); }
-                loadRecentReports(); });
+            document.getElementById('storeBtn').addEventListener('click', function() { saveToSession(); storeCurrentReport(); });
+            document.getElementById('addRowBtn').addEventListener('click', function() { addRowAtEnd('', ''); saveToSession(); });
+            document.getElementById('addRowsBatchBtn').addEventListener('click', function() { const countInput = document.getElementById('rowsCountInput'); let count = parseInt(countInput.value) || 1; if (count < 1) count = 1; if (count > 50) count = 50; countInput.value = count; for (let i = 0; i < count; i++) addRowAtEnd('', ''); saveToSession(); showSuccess('تم إضافة ' + count + ' صفوف جديدة.'); });
+            document.getElementById('clearRowsBtn').addEventListener('click', function() { if (tbody.children.length === 0) return; if (confirm('هل أنت متأكد من مسح جميع الصفوف؟')) { clearAllRows(); saveToSession(); } });
+            document.getElementById('printInvoiceBtn').addEventListener('click', function() { saveToSession(); const printArea = document.getElementById('printArea'); const name = restaurantNameInput.value || ''; const dateStr = getReportDateString(); const rowsData = []; const rows = tbody.querySelectorAll('tr'); rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) rowsData.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); }); printArea.innerHTML = buildPrintHTML(name, dateStr, rowsData, totalAmountEl.textContent); printArea.style.display = 'block'; setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300); });
+            document.getElementById('exportRestaurantBtn').addEventListener('click', function() { saveToSession(); const name = restaurantNameInput.value || ''; let csv = 'البيان,المبلغ (ج.م)\n'; const rows = tbody.querySelectorAll('tr'); rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) csv += (descInput.value || '') + ',' + (amountInput.value || '0') + '\n'; }); csv += 'الإجمالي,' + totalAmountEl.textContent + '\n'; const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = name + '_تقرير.csv'; link.click(); showSuccess('تم تصدير التقرير بصيغة CSV بنجاح.'); });
+            const userAvatarImg = document.getElementById('userAvatar'); if (userAvatarImg) { userAvatarImg.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { userAvatarImg.src = ev.target.result; const headerAv = document.getElementById('headerAvatar'); if (headerAv) headerAv.src = ev.target.result; showSuccess('تم تحديث الصورة الشخصية.'); }; reader.readAsDataURL(file); } }; input.click(); }); }
+            document.addEventListener('DOMContentLoaded', function() { const themeToggles = document.querySelectorAll('.theme-toggle'); const body = document.body; const applyTheme = (theme) => { const isDark = theme === 'dark'; body.classList.toggle('light', !isDark); themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark)); localStorage.setItem('theme', theme); }; const savedTheme = localStorage.getItem('theme') || 'dark'; applyTheme(savedTheme); themeToggles.forEach(toggle => { toggle.addEventListener('click', () => { const isDark = body.classList.contains('light') === false; applyTheme(isDark ? 'light' : 'dark'); }); }); if (!loadFromSession()) { tbody.innerHTML = ''; addRowAtEnd('', ''); updateTotal(); reportDateInput.value = formatDateForInput(new Date()); } loadRecentReports(); });
         })();
     </script>
 </body>
