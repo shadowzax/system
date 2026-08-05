@@ -850,13 +850,13 @@
             flex-shrink: 0;
         }
         @page {
-            size: 82.5mm 297mm;
+            size: 80.5mm 297mm;
             margin: 0;
         }
         @media print {
             html,
             body {
-                width: 82.5mm;
+                width: 80.5mm;
                 margin: 0;
                 padding: 0;
                 background: #ffffff;
@@ -872,9 +872,9 @@
             #printArea {
                 display: block !important;
                 position: static;
-                width: 82.5mm;
+                width: 80.5mm;
                 min-height: auto;
-                padding: 3mm 4mm 4mm 4mm;
+                padding: 3mm 6mm 4mm 2mm;
                 margin: 0 auto;
                 background: #ffffff;
                 color: #000000;
@@ -937,7 +937,7 @@
                 background: transparent;
             }
             #printArea .logo-cell img {
-                max-width: 30mm;
+                max-width: 27mm;
                 height: auto;
                 display: block;
                 filter: grayscale(100%) contrast(1.8) brightness(0.7) drop-shadow(0.4px 0.4px 0px #000);
@@ -1230,7 +1230,7 @@
                 html += '<div class="print-date">' + (dateStr || '') + '</div>';
                 html += '</td>';
                 html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<img src="' + LOGO_URL + '" style="max-width:30mm; height:auto; display:block;" alt="Logo" />';
+                html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
                 html += '</td>';
                 html += '</tr></table>';
                 html += '<div class="header-separator"></div>';
