@@ -108,7 +108,7 @@ app.get("/cash", (req, res) => {
         description: ""
     });
 });
-app.get("/advance", (req, res) => {
+app.get("/advances", (req, res) => {
     if (req.isAuthenticated) {
         return res.redirect("/");
     }
