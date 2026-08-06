@@ -108,6 +108,16 @@ app.get("/cash", (req, res) => {
         description: ""
     });
 });
+app.get("/advance", (req, res) => {
+    if (req.isAuthenticated) {
+        return res.redirect("/");
+    }
+
+    res.render("system/salary-advance", {
+        title: "تحويلات كاش",
+        description: ""
+    });
+});
 app.get("/settings", (req, res) => {
     if (req.isAuthenticated) {
         return res.redirect("/");
