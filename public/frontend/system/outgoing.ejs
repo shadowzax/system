@@ -1243,8 +1243,7 @@
                 if (rowsData && rowsData.length) { rowsData.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; }); }
                 html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
                 html += '</tbody></table>';
-                html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
-                return html;
+html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';                return html;
             }
             document.getElementById('printStoredReportBtn2').addEventListener('click', function() {
                 if (!currentViewReportId) return;
