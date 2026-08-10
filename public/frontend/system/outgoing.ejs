@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -1030,10 +1031,10 @@
                 <a href="/outgoing" class="sidebar-item active" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
                 <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
-<a href="/advances" class="sidebar-item" data-page="advances">
-    <i class="las la-hand-holding-usd"></i>
-    <span>السلف</span>
-</a>
+                <a href="/advances" class="sidebar-item" data-page="advances">
+                    <i class="las la-hand-holding-usd"></i>
+                    <span>السلف</span>
+                </a>
                 <div class="sidebar-section-title">الإدارة</div>
                 <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
                 <div class="sidebar-section-title">النظام</div>
@@ -1080,6 +1081,10 @@
                         <h3>الخوارج</h3>
                         <input type="text" class="restaurant-name-input" id="restaurantNameInput" placeholder="ابن حميدو السلام">
                         <div class="mr-auto flex items-center gap-2">
+                            <button type="button" id="langToggleBtn" class="date-toggle-btn active" title="تبديل لغة الإدخال (عربي / إنجليزي)">
+                                <i class="las la-language"></i>
+                                <span id="langToggleText">عربي</span>
+                            </button>
                             <button type="button" id="dateToggleBtn" class="date-toggle-btn active" title="تبديل بين التاريخ التلقائي واليدوي">
                                 <i class="las la-calendar-check"></i>
                                 <span id="dateToggleText">تلقائي</span>
@@ -1243,7 +1248,8 @@
                 if (rowsData && rowsData.length) { rowsData.forEach(row => { html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>'; }); }
                 html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
                 html += '</tbody></table>';
-html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';                return html;
+                html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+                return html;
             }
             document.getElementById('printStoredReportBtn2').addEventListener('click', function() {
                 if (!currentViewReportId) return;
@@ -1263,6 +1269,92 @@ html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; 
             function storeCurrentReport() { const name = document.getElementById('restaurantNameInput').value || ''; const rows = getTableData(); const total = document.getElementById('totalAmount').textContent; const dateStr = getReportDateString(); const report = { id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6), name: name, date: dateStr, timestamp: new Date().toISOString(), rows: rows, total: total }; try { let reports = []; const stored = localStorage.getItem('restaurantStoredReports'); if (stored) reports = JSON.parse(stored); reports.unshift(report); if (reports.length > 20) reports = reports.slice(0, 20); localStorage.setItem('restaurantStoredReports', JSON.stringify(reports)); loadRecentReports(); showSuccess('تم تخزين التقرير بنجاح.'); } catch (e) { showSuccess('حدث خطأ أثناء التخزين.'); } }
             document.getElementById('clearReportsBtn').addEventListener('click', function() { if (!confirm('هل أنت متأكد من مسح جميع التقارير المخزنة؟')) return; localStorage.removeItem('restaurantStoredReports'); recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; showSuccess('تم مسح سجل التقارير بنجاح.'); });
             loadRecentReports();
+            const arabicMap = {
+                'a': 'ا', 'A': 'أ',
+                'b': 'ب', 'B': 'ب',
+                't': 'ت', 'T': 'ط',
+                's': 'س', 'S': 'ص',
+                'j': 'ج', 'J': 'ج',
+                'h': 'ه', 'H': 'ح',
+                'd': 'د', 'D': 'ض',
+                'z': 'ز', 'Z': 'ظ',
+                'r': 'ر', 'R': 'ر',
+                'f': 'ف', 'F': 'ف',
+                'q': 'ق', 'Q': 'ق',
+                'k': 'ك', 'K': 'خ',
+                'l': 'ل', 'L': 'ل',
+                'm': 'م', 'M': 'م',
+                'n': 'ن', 'N': 'ن',
+                'w': 'و', 'W': 'و',
+                'y': 'ى', 'Y': 'ي',
+                'g': 'ج', 'G': 'غ',
+                'c': 'س', 'C': 'س',
+                'v': 'ف', 'V': 'ف',
+                'o': 'و', 'O': 'و',
+                'u': 'و', 'U': 'و',
+                'i': 'ي', 'I': 'ي',
+                'e': 'ي', 'E': 'ي',
+                'p': 'ب', 'P': 'ب',
+                '3': 'ع', '7': 'ح', '5': 'خ', '9': 'ص', '6': 'ط', '8': 'ق', '4': 'ذ', '2': 'أ',
+                '?': '؟', ',': '،', ';': '؛'
+            };
+            let arabicInputMode = true;
+            function convertToArabic(str) {
+                let result = '';
+                for (let i = 0; i < str.length; i++) {
+                    const char = str[i];
+                    result += arabicMap[char] || char;
+                }
+                return result;
+            }
+            const langToggleBtn = document.getElementById('langToggleBtn');
+            const langToggleText = document.getElementById('langToggleText');
+            function updateLangButtonState() {
+                if (arabicInputMode) {
+                    langToggleBtn.classList.add('active');
+                    if (langToggleText) langToggleText.textContent = 'عربي';
+                } else {
+                    langToggleBtn.classList.remove('active');
+                    if (langToggleText) langToggleText.textContent = 'إنجليزي';
+                }
+            }
+            const savedLangMode = localStorage.getItem('arabicInputMode');
+            if (savedLangMode !== null) {
+                arabicInputMode = savedLangMode === 'true';
+            }
+            updateLangButtonState();
+            langToggleBtn.addEventListener('click', function() {
+                arabicInputMode = !arabicInputMode;
+                updateLangButtonState();
+                localStorage.setItem('arabicInputMode', arabicInputMode);
+            });
+            function handleArabicKeydown(e) {
+                if (!arabicInputMode) return;
+                if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && arabicMap[e.key]) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    const arChar = arabicMap[e.key];
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const oldVal = this.value;
+                    this.value = oldVal.substring(0, start) + arChar + oldVal.substring(end);
+                    this.selectionStart = this.selectionEnd = start + arChar.length;
+                    this.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+            function handleArabicInput(e) {
+                if (!arabicInputMode) return;
+                if (this._converting) return;
+                const oldVal = this.value;
+                const newVal = convertToArabic(oldVal);
+                if (newVal !== oldVal) {
+                    this._converting = true;
+                    const cursorPos = this.selectionStart;
+                    this.value = newVal;
+                    this.selectionStart = this.selectionEnd = Math.min(cursorPos, newVal.length);
+                    this._converting = false;
+                }
+            }
             const tbody = document.getElementById('restaurantTbody');
             const totalAmountEl = document.getElementById('totalAmount');
             const restaurantNameInput = document.getElementById('restaurantNameInput');
@@ -1276,7 +1368,7 @@ html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; 
             function navigateCell(currentInput, rowDelta, cellDelta) { const currentTr = currentInput.closest('tr'); if (!currentTr) return; const rows = Array.from(tbody.querySelectorAll('tr')); const currentRowIndex = rows.indexOf(currentTr); const currentCellIndex = getCellIndex(currentInput); const targetRowIndex = currentRowIndex + rowDelta; if (targetRowIndex < 0 || targetRowIndex >= rows.length) return; const targetRow = rows[targetRowIndex]; const { descInput, amountInput } = getInputsInRow(targetRow); const targetCellIndex = cellDelta !== undefined ? cellDelta : currentCellIndex; if (targetCellIndex === 0 && descInput) focusInput(descInput); else if (targetCellIndex === 1 && amountInput) focusInput(amountInput); }
             function setupKeyboardNavigation(input) { input.addEventListener('keydown', function(e) { const key = e.key; const tr = this.closest('tr'); const rows = Array.from(tbody.querySelectorAll('tr')); const rowIndex = rows.indexOf(tr); const cellIndex = getCellIndex(this); if (key === 'Enter') { e.preventDefault(); const isLastRow = rowIndex === rows.length - 1; const isAmountCell = cellIndex === 1; if (isLastRow && isAmountCell) { const newTr = addRowAtEnd('', ''); const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(descInput); saveToSession(); } else if (isLastRow && cellIndex === 0) { const { amountInput } = getInputsInRow(tr); if (amountInput) focusInput(amountInput); } else { navigateCell(this, 1, cellIndex); } } else if (key === 'ArrowDown') { e.preventDefault(); navigateCell(this, 1, cellIndex); } else if (key === 'ArrowUp') { e.preventDefault(); navigateCell(this, -1, cellIndex); } else if (key === 'ArrowRight') { e.preventDefault(); if (cellIndex === 1) { navigateCell(this, 0, 0); } } else if (key === 'ArrowLeft') { e.preventDefault(); if (cellIndex === 0) { navigateCell(this, 0, 1); } } else if (key === 'Tab') { e.preventDefault(); if (e.shiftKey) { if (cellIndex === 1) { navigateCell(this, 0, 0); } else if (cellIndex === 0 && rowIndex > 0) { navigateCell(this, -1, 1); } } else { if (cellIndex === 0) { navigateCell(this, 0, 1); } else if (cellIndex === 1) { if (rowIndex < rows.length - 1) { navigateCell(this, 1, 0); } else { const newTr = addRowAtEnd('', ''); const { descInput } = getInputsInRow(newTr); if (descInput) focusInput(descInput); saveToSession(); } } } } }); }
             function updateSignButton(row) { const amountInput = row.querySelector('.amount-input'); const signBtn = row.querySelector('.sign-btn'); if (!amountInput || !signBtn) return; const val = parseNumber(amountInput.value); if (val < 0) { signBtn.classList.add('negative'); signBtn.classList.remove('positive'); signBtn.innerHTML = '<i class="las la-minus-circle"></i>'; signBtn.title = 'القيمة سالبة - اضغط لجعلها موجبة'; } else { signBtn.classList.add('positive'); signBtn.classList.remove('negative'); signBtn.innerHTML = '<i class="las la-plus-circle"></i>'; signBtn.title = 'القيمة موجبة - اضغط لجعلها سالبة'; } }
-            function createRowElement(description, amount) { const tr = document.createElement('tr'); const descTd = document.createElement('td'); const descInput = document.createElement('input'); descInput.type = 'text'; descInput.className = 'input-field desc-input'; descInput.placeholder = 'أدخل البيان'; descInput.value = description || ''; setupKeyboardNavigation(descInput); descTd.appendChild(descInput); const amountTd = document.createElement('td'); const amountInput = document.createElement('input'); amountInput.type = 'text'; amountInput.className = 'input-field amount-input'; amountInput.placeholder = 'المبلغ'; const formattedAmount = amount ? formatNumber(parseNumber(amount)) : ''; amountInput.value = formattedAmount; amountInput.setAttribute('inputmode', 'decimal'); setupKeyboardNavigation(amountInput); amountTd.appendChild(amountInput); const actionTd = document.createElement('td'); actionTd.style.whiteSpace = 'nowrap'; actionTd.style.textAlign = 'right'; const upBtn = document.createElement('button'); upBtn.className = 'row-action-btn arrow-btn'; upBtn.tabIndex = -1; upBtn.title = 'إضافة صف للأعلى'; upBtn.innerHTML = '<i class="las la-arrow-up"></i>'; upBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); tbody.insertBefore(newTr, tr); updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const downBtn = document.createElement('button'); downBtn.className = 'row-action-btn arrow-btn'; downBtn.tabIndex = -1; downBtn.title = 'إضافة صف للأسفل'; downBtn.innerHTML = '<i class="las la-arrow-down"></i>'; downBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); if (tr.nextSibling) { tbody.insertBefore(newTr, tr.nextSibling); } else { tbody.appendChild(newTr); } updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const signBtn = document.createElement('button'); signBtn.className = 'row-action-btn sign-btn positive'; signBtn.tabIndex = -1; signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)'; signBtn.innerHTML = '<i class="las la-plus-circle"></i>'; signBtn.addEventListener('click', function() { const currentVal = parseNumber(amountInput.value); if (currentVal === 0) { amountInput.value = ''; updateSignButton(tr); updateTotal(); saveToSession(); return; } const newVal = -currentVal; amountInput.value = formatNumber(newVal); updateSignButton(tr); updateTotal(); saveToSession(); }); const deleteBtn = document.createElement('button'); deleteBtn.className = 'row-action-btn delete-btn'; deleteBtn.tabIndex = -1; deleteBtn.title = 'حذف الصف'; deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>'; deleteBtn.addEventListener('click', function() { if (tbody.children.length > 1) { tr.remove(); updateTotal(); saveToSession(); } else { showSuccess('لا يمكن حذف الصف الأخير.'); } }); actionTd.appendChild(upBtn); actionTd.appendChild(downBtn); actionTd.appendChild(signBtn); actionTd.appendChild(deleteBtn); tr.appendChild(descTd); tr.appendChild(amountTd); tr.appendChild(actionTd); amountInput.addEventListener('input', function() { updateTotal(); updateSignButton(tr); }); amountInput.addEventListener('blur', function() { let val = convertArabicNumerals(this.value).replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; } updateTotal(); updateSignButton(tr); saveToSession(); }); descInput.addEventListener('input', function() { saveToSession(); }); updateSignButton(tr); return tr; }
+            function createRowElement(description, amount) { const tr = document.createElement('tr'); const descTd = document.createElement('td'); const descInput = document.createElement('input'); descInput.type = 'text'; descInput.className = 'input-field desc-input'; descInput.placeholder = 'أدخل البيان'; descInput.value = description || ''; descInput.addEventListener('keydown', handleArabicKeydown); setupKeyboardNavigation(descInput); descTd.appendChild(descInput); const amountTd = document.createElement('td'); const amountInput = document.createElement('input'); amountInput.type = 'text'; amountInput.className = 'input-field amount-input'; amountInput.placeholder = 'المبلغ'; const formattedAmount = amount ? formatNumber(parseNumber(amount)) : ''; amountInput.value = formattedAmount; amountInput.setAttribute('inputmode', 'decimal'); setupKeyboardNavigation(amountInput); amountTd.appendChild(amountInput); const actionTd = document.createElement('td'); actionTd.style.whiteSpace = 'nowrap'; actionTd.style.textAlign = 'right'; const upBtn = document.createElement('button'); upBtn.className = 'row-action-btn arrow-btn'; upBtn.tabIndex = -1; upBtn.title = 'إضافة صف للأعلى'; upBtn.innerHTML = '<i class="las la-arrow-up"></i>'; upBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); tbody.insertBefore(newTr, tr); updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const downBtn = document.createElement('button'); downBtn.className = 'row-action-btn arrow-btn'; downBtn.tabIndex = -1; downBtn.title = 'إضافة صف للأسفل'; downBtn.innerHTML = '<i class="las la-arrow-down"></i>'; downBtn.addEventListener('click', function() { const newTr = createRowElement('', ''); if (tr.nextSibling) { tbody.insertBefore(newTr, tr.nextSibling); } else { tbody.appendChild(newTr); } updateTotal(); saveToSession(); const { descInput: newDesc } = getInputsInRow(newTr); if (newDesc) focusInput(newDesc); }); const signBtn = document.createElement('button'); signBtn.className = 'row-action-btn sign-btn positive'; signBtn.tabIndex = -1; signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)'; signBtn.innerHTML = '<i class="las la-plus-circle"></i>'; signBtn.addEventListener('click', function() { const currentVal = parseNumber(amountInput.value); if (currentVal === 0) { amountInput.value = ''; updateSignButton(tr); updateTotal(); saveToSession(); return; } const newVal = -currentVal; amountInput.value = formatNumber(newVal); updateSignButton(tr); updateTotal(); saveToSession(); }); const deleteBtn = document.createElement('button'); deleteBtn.className = 'row-action-btn delete-btn'; deleteBtn.tabIndex = -1; deleteBtn.title = 'حذف الصف'; deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>'; deleteBtn.addEventListener('click', function() { if (tbody.children.length > 1) { tr.remove(); updateTotal(); saveToSession(); } else { showSuccess('لا يمكن حذف الصف الأخير.'); } }); actionTd.appendChild(upBtn); actionTd.appendChild(downBtn); actionTd.appendChild(signBtn); actionTd.appendChild(deleteBtn); tr.appendChild(descTd); tr.appendChild(amountTd); tr.appendChild(actionTd); amountInput.addEventListener('input', function() { updateTotal(); updateSignButton(tr); }); amountInput.addEventListener('blur', function() { let val = convertArabicNumerals(this.value).replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; } updateTotal(); updateSignButton(tr); saveToSession(); }); descInput.addEventListener('input', function(e) { handleArabicInput.call(this, e); saveToSession(); }); updateSignButton(tr); return tr; }
             function addRowAtEnd(description, amount) { const tr = createRowElement(description, amount); tbody.appendChild(tr); updateTotal(); return tr; }
             function clearAllRows() { tbody.innerHTML = ''; addRowAtEnd('', ''); updateTotal(); }
             function getTableData() { const rows = tbody.querySelectorAll('tr'); const data = []; rows.forEach(row => { const descInput = row.querySelector('.desc-input'); const amountInput = row.querySelector('.amount-input'); if (descInput && amountInput) data.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); }); return data; }
