@@ -20,7 +20,7 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "public", "frontend"));
 
-const API_BASE_URL = "http://108.181.221.18:7049";
+const API_BASE_URL = "https://xsysx.shadowza.space";
 
 app.use(cookieParser());
 
