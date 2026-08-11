@@ -20,67 +20,119 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "public", "frontend"));
 
-// const API_BASE_URL = "http://108.181.221.18:7023";
+const API_BASE_URL = "http://108.181.221.18:7049";
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
-// (async () => {
-//     const response = await fetch("http://108.181.221.18:7023/api/courses/1");
-//     const data = await response.json();
-//     console.log(data);
-// })();
 
-// app.use(async (req, res, next) => {
-//     const token = req.cookies.session;
-//     if (!token) {
-//         req.isAuthenticated = false;
-//         req.user = null;
-//     } else {
-//         try {
-//             const response = await fetch(`${API_BASE_URL}/api/auth/check-token`, {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify({ token })
-//             });
+app.use(async (req, res, next) => {
+    const token = req.cookies?.token;
 
-//             const data = await response.json();
+    console.log("========== AUTH CHECK ==========");
+    console.log("URL:", req.originalUrl);
+    console.log("Token:", token ? "موجود" : "غير موجود");
 
-//             if (data.success) {
-//                 req.isAuthenticated = true;
-//                 req.user = data.user;
-//             } else {
-//                 req.isAuthenticated = false;
-//                 req.user = null;
-//             }
-//         } catch (err) {
-//             req.isAuthenticated = false;
-//             req.user = null;
-//         }
-//     }
+    req.isAuthenticated = false;
+    req.user = null;
 
-//     next();
-// });
+    if (!token) {
+        console.log("Authentication: غير مسجل دخول");
+        console.log("================================");
 
-// app.use((req, res, next) => {
-//     res.locals.title = "My App";
-//     res.locals.api = API_BASE_URL;
-//     res.locals.description = "";
-//     res.locals.isAuthenticated = req.isAuthenticated;
-//     res.locals.user = req.user;
+        return next();
+    }
 
-//     next();
-// });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/check-token`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        });
+
+        console.log("API Status:", response.status);
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {
+                success: false,
+                message: "استجابة غير صالحة من API"
+            };
+        }
+
+        console.log("API Response:", data);
+
+        if (response.ok && data.success === true) {
+            req.isAuthenticated = true;
+            req.user = data.user || null;
+
+            console.log("Authentication: ناجح");
+            console.log("User:", req.user);
+        } else {
+            req.isAuthenticated = false;
+            req.user = null;
+
+            console.log("Authentication: فاشل");
+            console.log("Message:", data.message || "التوكن غير صالح");
+        }
+    } catch (err) {
+        req.isAuthenticated = false;
+        req.user = null;
+
+        console.error("Auth Check Error:", err.message);
+    }
+
+    console.log("================================");
+
+    next();
+});
+
+app.use((req, res, next) => {
+    res.locals.title = "My App";
+    res.locals.api = API_BASE_URL;
+    res.locals.description = "";
+    res.locals.isAuthenticated = req.isAuthenticated;
+    res.locals.user = req.user;
+
+    next();
+});
 app.get("/", (req, res) => {
     res.render("index", {
         title: "سيستم",
         description: ""
     });
 });
+app.get("/login", (req, res) => {
+    if (req.isAuthenticated) {
+        return res.redirect("/");
+    }
+
+    res.render("auth/login", {
+        title: "تسجيل الدخول",
+        description: "قم بتسجيل الدخول إلى حسابك"
+    });
+});
+app.get("/admin/acount", (req, res) => {
+    // if (!req.isAuthenticated) {
+    //     return res.redirect("/login");
+    // }
+
+    res.render("mangment/acount", {
+        title: "",
+        description: ""
+    });
+});
 
 /*-----------------------------------------*/
 app.get("/outgoing", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("system/outgoing", {
@@ -88,9 +140,10 @@ app.get("/outgoing", (req, res) => {
         description: ""
     });
 });
+
 app.get("/visa", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("system/visa", {
@@ -98,9 +151,10 @@ app.get("/visa", (req, res) => {
         description: ""
     });
 });
+
 app.get("/cash", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("system/cash", {
@@ -109,8 +163,8 @@ app.get("/cash", (req, res) => {
     });
 });
 app.get("/advances", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("system/salary-advance", {
@@ -119,35 +173,38 @@ app.get("/advances", (req, res) => {
     });
 });
 app.get("/settings", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("settings/settings", {
         title: "تحويلات كاش",
         description: ""
     });
-}); 
+});
+
 app.get("/activity", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("settings/activity", {
         title: "تحويلات كاش",
         description: ""
     });
-}); 
+});
+
 app.get("/payments", (req, res) => {
-    if (req.isAuthenticated) {
-        return res.redirect("/");
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
     }
 
     res.render("settings/payments", {
         title: "تحويلات كاش",
         description: ""
     });
-}); 
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 Server is running at http://${HOST}:${PORT}`);
 });
