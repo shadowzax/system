@@ -1017,29 +1017,43 @@
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+
+                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
+
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">
+                            <%= user?.name || "مستخدم" %>
+                        </p>
+
+                        <p class="text-xs text-[var(--color-muted)]" id="role">
+                            <%= user?.job_title || user?.account_type || "مستخدم" %>
+                        </p>
                     </div>
+
                 </div>
             </div>
             <nav class="flex-1">
-                <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
+                <!-- <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
+                        التحكم</span></a> -->
                 <div class="sidebar-section-title">الكاش</div>
-                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i
+                        class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
-                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
-<a href="/advances" class="sidebar-item active" data-page="advances">
-    <i class="las la-hand-holding-usd"></i>
-    <span>السلف</span>
-</a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i
+                        class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                        
+                <a href="/advances" class="sidebar-item active" data-page="advances">
+                    <i class="las la-hand-holding-usd"></i>
+                    <span>السلف</span></a>
+<!-- 
                 <div class="sidebar-section-title">الإدارة</div>
                 <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
                 <div class="sidebar-section-title">النظام</div>
                 <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a> -->
                 <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
                     <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
@@ -1066,7 +1080,7 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                    <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
                 </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">

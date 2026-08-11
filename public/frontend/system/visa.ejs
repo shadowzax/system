@@ -1,16 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0d99ff">
     <title>تقرير فيزا</title>
-    <meta name="description" content="تقرير تسجيل معاملات الفيزا">
+    <meta name="description" content="تقرير معاملات الفيزا">
     <link rel="icon" type="image/png" href="/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com">
     </script>
     <script>
@@ -49,6 +51,7 @@
             --bottom-nav-height: 68px;
             --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
         }
+
         .light {
             --color-background: #f1f5f9;
             --color-card: #ffffff;
@@ -62,11 +65,13 @@
             --darker-bg: #e2e8f0;
             --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Alexandria', system-ui, sans-serif;
             background-color: var(--color-background);
@@ -75,21 +80,26 @@
             overflow-x: hidden;
             padding-bottom: 0;
         }
+
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
         }
+
         ::-webkit-scrollbar-track {
             background: var(--color-background);
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #0563a7;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #0d99ff;
         }
+
         .dashboard-sidebar {
             width: var(--sidebar-width);
             background: var(--card-bg);
@@ -106,14 +116,17 @@
             padding: 24px 16px;
             transform: translateX(0);
         }
+
         .dashboard-sidebar.mobile-closed {
             transform: translateX(100%);
         }
+
         @media (max-width: 1024px) {
             .dashboard-sidebar.mobile-open {
                 z-index: 105;
             }
         }
+
         .sidebar-item {
             display: flex;
             align-items: center;
@@ -128,21 +141,25 @@
             text-decoration: none;
             font-size: 0.95rem;
         }
+
         .sidebar-item i {
             font-size: 22px;
             width: 28px;
             flex-shrink: 0;
         }
+
         .sidebar-item:hover {
             background: rgba(13, 153, 255, 0.08);
             color: var(--color-primary);
         }
+
         .sidebar-item.active {
             background: linear-gradient(135deg, rgba(13, 153, 255, 0.15), rgba(124, 58, 237, 0.1));
             color: var(--color-primary);
             border-right: 3px solid var(--color-primary);
             font-weight: 600;
         }
+
         .sidebar-section-title {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -151,37 +168,45 @@
             padding: 16px 16px 8px;
             font-weight: 600;
         }
+
         @media (max-width: 1024px) {
             .dashboard-sidebar {
                 transform: translateX(100%);
                 width: 260px;
                 z-index: 45;
             }
+
             .dashboard-sidebar.mobile-open {
                 transform: translateX(0);
                 z-index: 105;
             }
+
             .dashboard-sidebar.mobile-closed {
                 transform: translateX(100%);
                 z-index: 45;
             }
+
             body {
                 padding-bottom: 0;
             }
         }
+
         @media (min-width: 1025px) {
             .dashboard-sidebar {
                 transform: translateX(0) !important;
                 z-index: 30;
             }
+
             .dashboard-sidebar.mobile-open,
             .dashboard-sidebar.mobile-closed {
                 transform: translateX(0) !important;
             }
+
             body {
                 padding-bottom: 0;
             }
         }
+
         .info-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -191,6 +216,46 @@
             -webkit-backdrop-filter: blur(4px);
             box-shadow: var(--shadow-glow);
         }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #10b981;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ef4444;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         #mainHeader {
             position: fixed;
             top: 0;
@@ -208,6 +273,7 @@
             z-index: 110;
             transition: background-color 0.3s;
         }
+
         .header-avatar {
             width: 44px;
             height: 44px;
@@ -218,13 +284,130 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
+
         .header-avatar:hover {
             transform: scale(1.05);
             border-color: #f59e0b;
         }
+
         main {
             padding-top: var(--header-height);
         }
+
+        .bottom-mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        @media (max-width: 1024px) {
+            .bottom-mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            padding: 6px 4px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .bottom-nav-item span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            font-size: 0.68rem;
+        }
+
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+        }
+
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+            background: rgba(13, 153, 255, 0.12);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .bottom-nav-item.active i {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 102;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            color: var(--color-primary);
+        }
+
+        .bottom-nav-item.active span {
+            margin-top: 18px;
+        }
+
+        .nav-notch {
+            position: absolute;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--color-background);
+            border-radius: 50%;
+            z-index: 101;
+            transform: translate(-50%, -50%);
+            transition: left 0.3s ease;
+            pointer-events: none;
+        }
+
         .input-field {
             width: 100%;
             background: var(--darker-bg);
@@ -236,27 +419,86 @@
             transition: border-color 0.2s;
             font-size: 0.9rem;
         }
+
         .input-field:focus {
             outline: none;
             border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
         }
+
+        .datetime-input {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 10px;
+            color: var(--color-white);
+            font-family: 'Alexandria', system-ui, sans-serif;
+            transition: border-color 0.2s;
+            font-size: 0.85rem;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        .datetime-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+
+        select.input-field {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 36px;
+            cursor: pointer;
+        }
+
         @media (max-width: 640px) {
             .input-field {
                 padding: 14px 18px;
                 font-size: 1rem;
             }
+
+            .datetime-input {
+                padding: 14px 10px;
+                font-size: 0.9rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 14px;
+            }
+
             .info-card {
                 padding: 18px;
             }
+
             .btn-sm {
                 padding: 10px 16px;
                 font-size: 0.85rem;
             }
+
             .add-rows-section input {
                 width: 80px;
             }
+
+            .restaurant-card .flex-wrap.justify-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .restaurant-card .flex-wrap.gap-3 {
+                flex-direction: column;
+            }
+
+            .restaurant-header .restaurant-name-input {
+                width: 100%;
+            }
         }
+
         .btn-primary {
             background: var(--color-primary);
             color: #fff;
@@ -272,14 +514,17 @@
             font-family: inherit;
             font-size: 0.9rem;
         }
+
         .btn-primary:hover {
             background: #0b85e0;
             transform: translateY(-1px);
             box-shadow: 0 8px 25px rgba(13, 153, 255, 0.25);
         }
+
         .btn-primary:active {
             transform: scale(0.97);
         }
+
         .btn-outline {
             background: transparent;
             color: var(--color-white);
@@ -295,16 +540,44 @@
             font-family: inherit;
             font-size: 0.85rem;
         }
+
         .btn-outline:hover {
             border-color: var(--color-primary);
             color: var(--color-primary);
             background: rgba(13, 153, 255, 0.05);
         }
+
         .btn-sm {
             padding: 6px 14px;
             font-size: 0.78rem;
             border-radius: 8px;
         }
+
+        .btn-xs {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+        }
+
+        .delete-row-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-row-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -320,29 +593,41 @@
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
+
         .modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
+
         .modal-content {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 24px;
             padding: 36px 32px;
             width: 100%;
-            max-width: 500px;
+            max-width: 800px;
             max-height: 85vh;
             overflow-y: auto;
             position: relative;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
         }
+
+        .modal-content.wide {
+            max-width: 900px;
+        }
+
         @media (max-width: 640px) {
             .modal-content {
                 padding: 24px 20px;
                 border-radius: 18px;
                 max-width: 95vw;
             }
+
+            .modal-content.wide {
+                max-width: 95vw;
+            }
         }
+
         .modal-close {
             position: absolute;
             top: 14px;
@@ -361,10 +646,12 @@
             transition: 0.2s;
             z-index: 5;
         }
+
         .modal-close:hover {
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
         }
+
         .title-cell {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -374,44 +661,132 @@
             box-shadow: var(--shadow-glow);
             margin-bottom: 28px;
         }
+
         .title-cell h1 {
             font-size: 2rem;
             font-weight: 700;
             color: var(--color-white);
         }
+
         .title-cell p {
             color: var(--color-muted);
             font-size: 1rem;
             margin-top: 6px;
         }
+
         .title-cell .title-icon {
             font-size: 2.4rem;
             color: var(--color-primary);
             margin-bottom: 8px;
         }
+
         @media (max-width: 640px) {
             .title-cell {
                 padding: 20px 16px;
             }
+
             .title-cell h1 {
                 font-size: 1.5rem;
             }
+
             .title-cell p {
                 font-size: 0.85rem;
             }
         }
-        .visa-table {
+
+        .restaurant-table {
             width: 100%;
             border-collapse: collapse;
             font-family: 'Alexandria', sans-serif;
         }
-        .visa-table th,
-        .visa-table td {
+
+        .restaurant-table th,
+        .restaurant-table td {
             padding: 10px 12px;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
+            vertical-align: middle;
         }
-        .visa-table th {
+
+        .restaurant-table th {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .restaurant-table td .input-field {
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            font-size: 0.95rem;
+            color: var(--color-white);
+            width: 100%;
+            border-radius: 6px;
+        }
+
+        .restaurant-table td .input-field:focus {
+            border-bottom: 1px solid var(--color-primary);
+            box-shadow: none;
+            background: rgba(13, 153, 255, 0.04);
+        }
+
+        .restaurant-table td .datetime-input {
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: var(--color-white);
+            width: 100%;
+            border-radius: 6px;
+        }
+
+        .restaurant-table td .datetime-input:focus {
+            border-bottom: 1px solid var(--color-primary);
+            box-shadow: none;
+            background: rgba(13, 153, 255, 0.04);
+        }
+
+        .restaurant-table .serial-cell {
+            text-align: center;
+            font-weight: 600;
+            color: var(--color-muted);
+            font-size: 0.9rem;
+            padding: 10px 6px;
+            user-select: none;
+        }
+
+        .restaurant-table .total-row td {
+            border-top: 2px solid var(--color-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            background: var(--darker-bg);
+        }
+
+        .restaurant-table .total-row td:first-child {
+            color: var(--color-muted);
+        }
+
+        .view-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Alexandria', sans-serif;
+            margin-top: 16px;
+        }
+
+        .view-table th,
+        .view-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+            color: var(--color-white);
+        }
+
+        .view-table th {
             background: var(--darker-bg);
             color: var(--color-muted);
             font-weight: 600;
@@ -419,65 +794,16 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .visa-table td .input-field {
-            background: transparent;
-            border: none;
-            padding: 4px 0;
-            font-size: 0.95rem;
-            color: var(--color-white);
-            width: 100%;
-        }
-        .visa-table td .input-field:focus {
-            border-bottom: 1px solid var(--color-primary);
-            box-shadow: none;
-        }
-        .visa-table .total-row td {
+
+        .view-table .total-row td {
             border-top: 2px solid var(--color-primary);
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--color-primary);
+            background: var(--darker-bg);
         }
-        .visa-table .serial-cell {
-            text-align: center;
-            font-weight: 700;
-            color: var(--color-primary);
-            font-size: 0.95rem;
-            min-width: 40px;
-            width: 8%;
-        }
-        .datetime-input {
-            background: transparent;
-            border: none;
-            border-bottom: 1px dashed var(--border-color);
-            color: var(--color-white);
-            font-family: inherit;
-            font-size: 0.8rem;
-            text-align: center;
-            direction: ltr;
-            width: 100%;
-            min-width: 140px;
-            padding: 2px 4px;
-            transition: border-color 0.2s;
-        }
-        .datetime-input:focus {
-            outline: none;
-            border-bottom: 1px solid var(--color-primary);
-        }
-        .datetime-input::placeholder {
-            color: var(--color-muted);
-            opacity: 0.5;
-        }
-        @media (max-width: 640px) {
-            .datetime-input {
-                font-size: 0.7rem;
-                min-width: 100px;
-            }
-            .visa-table .serial-cell {
-                font-size: 0.8rem;
-                min-width: 30px;
-            }
-        }
-        .visa-card {
+
+        .restaurant-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
@@ -485,7 +811,8 @@
             box-shadow: var(--shadow-glow);
             margin-top: 28px;
         }
-        .visa-header {
+
+        .restaurant-header {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -494,16 +821,19 @@
             padding-bottom: 12px;
             flex-wrap: wrap;
         }
-        .visa-header i {
+
+        .restaurant-header i {
             font-size: 2rem;
             color: var(--color-primary);
         }
-        .visa-header h3 {
+
+        .restaurant-header h3 {
             font-size: 1.4rem;
             font-weight: 700;
             color: var(--color-white);
         }
-        .visa-header .visa-name-input {
+
+        .restaurant-header .restaurant-name-input {
             flex: 1;
             min-width: 150px;
             background: var(--darker-bg);
@@ -515,29 +845,17 @@
             font-size: 1rem;
             font-weight: 600;
         }
-        .visa-header .visa-name-input:focus {
+
+        .restaurant-header .restaurant-name-input:focus {
             outline: none;
             border-color: var(--color-primary);
         }
-        .delete-row-btn {
-            background: transparent;
-            border: none;
-            color: var(--color-muted);
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: 0.2s;
-            padding: 4px 8px;
-            border-radius: 8px;
-        }
-        .delete-row-btn:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
-        .time-toggle-btn {
+
+        .date-toggle-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 5px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
@@ -549,18 +867,72 @@
             font-family: inherit;
             white-space: nowrap;
         }
-        .time-toggle-btn.active {
+
+        .date-toggle-btn.active {
             background: rgba(13, 153, 255, 0.15);
             border-color: var(--color-primary);
             color: var(--color-primary);
         }
-        .time-toggle-btn i {
+
+        .date-toggle-btn i {
             font-size: 1rem;
             transition: all 0.25s ease;
         }
-        .time-toggle-btn.active i {
+
+        .date-toggle-btn.active i {
             color: var(--color-primary);
         }
+
+        .add-rows-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .add-rows-section input {
+            width: 100px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 12px;
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .add-rows-section input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .report-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-list-item .report-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .report-list-item .report-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
         .theme-toggle {
             position: relative;
             width: 70px;
@@ -573,6 +945,7 @@
             box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
             transition: all .4s ease;
         }
+
         .theme-toggle .toggle-circle {
             position: absolute;
             top: 4px;
@@ -587,6 +960,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
             transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
         }
+
         .theme-toggle .icon {
             position: absolute;
             font-size: 14px;
@@ -595,267 +969,277 @@
             justify-content: center;
             transition: all .4s ease;
         }
+
         .theme-toggle .sun-icon {
             color: #ff6b35;
             opacity: 1;
             transform: rotate(0deg) scale(1);
         }
+
         .theme-toggle .moon-icon {
             color: #a78bfa;
             opacity: 0;
             transform: rotate(180deg) scale(.5);
         }
+
         .theme-toggle.dark {
             background: linear-gradient(45deg, #475569, #1e293b);
             box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
         }
+
         .theme-toggle.dark .toggle-circle {
             right: calc(100% - 31px);
             background: #1e293b;
             box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
         }
+
         .theme-toggle.dark .sun-icon {
             opacity: 0;
             transform: rotate(-180deg) scale(.5);
         }
+
         .theme-toggle.dark .moon-icon {
             opacity: 1;
             transform: rotate(0deg) scale(1);
         }
-        .add-rows-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .add-rows-section input {
-            width: 100px;
-            background: var(--darker-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 6px 12px;
-            color: var(--color-white);
-            font-family: inherit;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        .add-rows-section input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-        .report-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            border-radius: 14px;
-            background: var(--darker-bg);
-            border: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 12px;
-            transition: all 0.2s;
-        }
-        .report-list-item:hover {
-            border-color: rgba(13, 153, 255, 0.3);
-            background: rgba(13, 153, 255, 0.03);
-        }
-        .report-list-item .report-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 180px;
-        }
-        .report-list-item .report-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
+
         @page {
-            size: 82.5mm 297mm;
+            size: 80.5mm 297mm;
             margin: 0;
         }
+
         @media print {
+
             html,
             body {
-                width: 82.5mm;
-                height: 297mm;
+                width: 80.5mm;
                 margin: 0;
                 padding: 0;
-                background: white;
+                background: #ffffff;
                 font-family: 'Alexandria', sans-serif;
                 direction: rtl;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                color-adjust: exact;
             }
-            body * {
-                visibility: hidden;
+
+            body>:not(#printArea) {
+                display: none !important;
             }
-            #printArea,
-            #printArea * {
-                visibility: visible;
-            }
+
             #printArea {
                 display: block !important;
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 82.5mm;
-                min-height: 297mm;
-                padding: 4mm 5mm 4mm 5mm;
+                position: static;
+                width: 80.5mm;
+                min-height: auto;
+                padding: 3mm 6mm 4mm 2mm;
                 margin: 0 auto;
-                background: white;
-                color: #000;
+                background: #ffffff;
+                color: #000000;
                 direction: rtl;
                 overflow: hidden;
                 box-sizing: border-box;
                 font-family: 'Alexandria', sans-serif;
+                visibility: visible !important;
+                line-height: 1.45;
             }
-            #printArea .print-header-section {
-                margin-bottom: 3mm;
-                padding-bottom: 2mm;
-                border-bottom: 2px solid #000;
+
+            #printArea * {
+                visibility: visible !important;
+                box-sizing: border-box;
             }
+
+            #printArea .header-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 4mm;
+                border: none;
+                table-layout: auto;
+            }
+
+            #printArea .header-table td {
+                border: none;
+                padding: 0;
+                background: transparent;
+                vertical-align: bottom;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            #printArea .title-cell-print {
+                text-align: right;
+                vertical-align: bottom;
+                padding: 0;
+                border: none;
+                background: transparent;
+            }
+
             #printArea .restaurant-name {
-                font-size: 22px;
+                font-size: 20px;
                 font-weight: 800;
-                margin-bottom: 1mm;
                 color: #000;
                 text-align: right;
-                line-height: 1.2;
+                letter-spacing: -0.2px;
+                margin-bottom: 1mm;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
+
             #printArea .print-date {
-                font-size: 13px;
+                font-size: 11px;
                 font-weight: 600;
-                color: #000;
-                margin-bottom: 1mm;
+                color: #222;
                 text-align: right;
+                margin-bottom: 2mm;
+                word-break: break-word;
             }
+
             #printArea .logo-cell {
                 text-align: left;
                 vertical-align: bottom;
                 padding: 0;
                 border: none;
+                background: transparent;
             }
+
             #printArea .logo-cell img {
-                max-width: 15mm;
+                max-width: 27mm;
                 height: auto;
                 display: block;
+                filter: grayscale(100%) contrast(1.8) brightness(0.7) drop-shadow(0.4px 0.4px 0px #000);
+                -webkit-filter: grayscale(100%) contrast(1.8) brightness(0.7) drop-shadow(0.4px 0.4px 0px #000);
             }
+
             #printArea table {
                 width: 100%;
                 border-collapse: collapse;
+                font-size: 12px;
                 table-layout: fixed;
-                border: 1.5px solid #000;
-            }
-            #printArea table th,
-            #printArea table td {
-                padding: 5px 4px;
                 border: 1px solid #000;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            #printArea table td,
+            #printArea table th {
+                padding: 4px 5px;
+                border: 0.5px solid #000;
                 text-align: right;
                 font-size: 12px;
                 word-break: break-word;
-                line-height: 1.3;
+                overflow-wrap: break-word;
+                color: #000;
+                background: #fff;
             }
-            #printArea table th {
-                font-size: 11px;
-                background: #e0e0e0;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-            }
-            #printArea .print-serial {
-                width: 10%;
-                text-align: center;
-                font-weight: 700;
-            }
-            #printArea .print-amount {
-                width: 38%;
-                text-align: right;
-                font-weight: 600;
-            }
-            #printArea .print-datetime {
-                width: 52%;
-                text-align: center;
-                direction: ltr;
-                font-size: 11px;
-            }
-            #printArea .header-table td {
-                border: none;
-                padding: 0;
-            }
-            #printArea .total-row td {
-                border-top: 2.5px solid #000;
-                border-bottom: 2.5px solid #000;
-                font-weight: 800;
-                font-size: 16px;
+
+            #printArea table thead th {
                 background: #e8e8e8;
-                padding: 6px 4px;
+                font-weight: 700;
+                font-size: 11px;
+                color: #000;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-bottom: 1px solid #000;
             }
-            #printArea .total-row td:first-child {
-                text-align: center;
+
+            #printArea .total-row td {
+                border-top: 2px solid #000;
+                border-bottom: 2px solid #000;
+                font-weight: 800;
+                font-size: 14px;
+                background: #f4f4f4;
+                color: #000;
             }
+
             #printArea .footer {
-                margin-top: 5mm;
-                padding-top: 3mm;
-                border-top: 1.5px dashed #000;
+                margin-top: 6mm;
+                padding-top: 2mm;
+                border-top: 1px dashed #333;
                 text-align: center;
-                font-size: 12px;
+                font-size: 11px;
                 color: #000;
                 font-weight: 700;
-                line-height: 1.7;
+                line-height: 1.5;
             }
+
             #printArea .footer .dev {
                 font-size: 10px;
                 font-weight: 600;
-                color: #000;
-                margin-top: 2mm;
+                color: #111;
+                margin-top: 1mm;
             }
+
             #printArea .footer .dev-version {
-                font-size: 9px;
+                font-size: 10px;
                 font-weight: 600;
-                color: #000;
+                color: #111;
                 margin-top: 0.5mm;
+            }
+
+            #printArea .header-separator {
+                width: 100%;
+                height: 2px;
+                background: #000;
+                margin-bottom: 3mm;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+
+                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
+
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">
+                            <%= user?.name || "مستخدم" %>
+                        </p>
+
+                        <p class="text-xs text-[var(--color-muted)]" id="role">
+                            <%= user?.job_title || user?.account_type || "مستخدم" %>
+                        </p>
                     </div>
+
                 </div>
             </div>
             <nav class="flex-1">
-                <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
+                <!-- <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
+                        التحكم</span></a> -->
                 <div class="sidebar-section-title">الكاش</div>
-                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
-                <a href="/visa" class="sidebar-item active" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
-                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
-<a href="/advances" class="sidebar-item" data-page="advances">
-    <i class="las la-hand-holding-usd"></i>
-    <span>السلف</span>
-</a>
+                <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i
+                        class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item active" data-page="visa"><i
+                        class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i
+                        class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances">
+                    <i class="las la-hand-holding-usd"></i>
+                    <span>السلف</span>
+                    <!-- </a>
                 <div class="sidebar-section-title">الإدارة</div>
                 <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
                 <div class="sidebar-section-title">النظام</div>
                 <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
-                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
-                </div>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a> -->
+                    <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                        <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i
+                                class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                    </div>
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
-                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed
+                    by</span>
                 <div>
-                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer"
+                        class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman
+                        Mohamed</a>
                 </div>
                 <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
             </div>
@@ -864,7 +1248,8 @@
             <header id="mainHeader">
                 <div class="flex items-center gap-6 mr-4">
                     <a class="flex w-fit select-none items-center" href="/">
-                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo"
+                            class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
                     </a>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -874,28 +1259,33 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                    <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
                 </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon"><i class="las la-credit-card"></i></div>
-                    <h1>الفيز</h1>
-                    <p>تسجيل معاملات الفيز</p>
+                    <h1>فيزا</h1>
+                    <p>تسجيل معاملات الفيزا</p>
                 </div>
-                <div class="visa-card">
-                    <div class="visa-header">
+                <div class="restaurant-card">
+                    <div class="restaurant-header">
                         <i class="las la-credit-card"></i>
-                        <h3>الفيز</h3>
-                        <input type="text" class="visa-name-input" id="visaNameInput" placeholder="عنوان التقرير">
-                        <button type="button" id="timeToggleBtn" class="time-toggle-btn active" title="تبديل بين الوقت التلقائي واليدوي">
-                            <i class="las la-clock"></i>
-                            <span id="timeToggleText">تلقائي</span>
-                        </button>
-                        <span class="mr-auto text-xs text-[var(--color-muted)]" id="lastUpdateSpan">آخر تحديث: اليوم</span>
+                        <h3>فيزا</h3>
+                        <input type="text" class="restaurant-name-input" id="restaurantNameInput"
+                            placeholder="اسم المعاملة (فيزا)">
+                        <div class="mr-auto flex items-center gap-2">
+                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active"
+                                title="تبديل بين التاريخ التلقائي واليدوي">
+                                <i class="las la-calendar-check"></i>
+                                <span id="dateToggleText">تلقائي</span>
+                            </button>
+                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2"
+                                style="width:140px;" disabled>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="visa-table" id="visaTable">
+                        <table class="restaurant-table" id="restaurantTable">
                             <thead>
                                 <tr>
                                     <th style="width:8%;text-align:center;">#</th>
@@ -904,7 +1294,7 @@
                                     <th style="width:20%;"></th>
                                 </tr>
                             </thead>
-                            <tbody id="visaTbody"></tbody>
+                            <tbody id="restaurantTbody"></tbody>
                             <tfoot>
                                 <tr class="total-row" id="totalRow">
                                     <td style="text-align:center;">-</td>
@@ -917,61 +1307,88 @@
                     </div>
                     <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
                         <div class="flex flex-wrap gap-3 items-center">
-                            <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
+                            <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة
+                                صف</button>
                             <div class="add-rows-section">
                                 <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
                                 <input type="number" id="rowsCountInput" value="3" min="1" max="50">
-                                <button class="btn-outline btn-sm" id="addRowsBatchBtn"><i class="las la-plus-circle"></i> إضافة</button>
+                                <button class="btn-outline btn-sm" id="addRowsBatchBtn"><i
+                                        class="las la-plus-circle"></i> إضافة</button>
                             </div>
-                            <button class="btn-outline btn-sm" id="clearRowsBtn"><i class="las la-trash-alt"></i> مسح الكل</button>
+                            <button class="btn-outline btn-sm" id="clearRowsBtn"><i class="las la-trash-alt"></i> مسح
+                                الكل</button>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <button class="btn-primary btn-sm" id="storeBtn"><i class="las la-save"></i> تخزين</button>
-                            <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة (80mm)</button>
-                            <button class="btn-outline btn-sm" id="exportVisaBtn"><i class="las la-file-excel"></i> CSV</button>
+                            <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة
+                                (82.5mm)</button>
+                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i
+                                    class="las la-file-excel"></i> CSV</button>
                         </div>
                     </div>
                 </div>
+                <div class="info-card mt-6" id="reportViewCard" style="display:none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-center w-full">
+                            <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
+                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير فيزا
+                            </h3>
+                            <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="view-table" id="viewReportTable2">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%;text-align:center;">#</th>
+                                    <th style="width:45%;">المبلغ (ج.م)</th>
+                                    <th style="width:45%;text-align:center;">التاريخ والوقت</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewReportTbody2"></tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td style="text-align:center;">-</td>
+                                    <td id="viewReportTotal2">0</td>
+                                    <td style="text-align:center;">الإجمالي</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
+                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة
+                            هذا التقرير</button>
+                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i>
+                            إغلاق</button>
+                    </div>
+                </div>
                 <div class="mt-6 info-card" id="recentReportsCard">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-history text-primary"></i> آخر التقارير المنشأة</h3>
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i
+                                    class="las la-history text-primary"></i> آخر التقارير المنشأة</h3>
                             <p class="text-sm text-[var(--color-muted)]">عرض آخر التقارير التي تم تخزينها</p>
                         </div>
-                        <button class="btn-outline btn-sm" id="clearReportsBtn"><i class="las la-trash-alt"></i> مسح السجل</button>
+                        <button class="btn-outline btn-sm" id="clearReportsBtn"><i class="las la-trash-alt"></i> مسح
+                            السجل</button>
                     </div>
-                    <div id="recentReportsListView" class="space-y-3"></div>
-                    <div id="reportViewInline" style="display:none;">
-                        <div class="border-t border-[var(--border-color)] pt-4 mt-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle">تقرير سابق</h3>
-                                    <p class="text-sm text-[var(--color-muted)]" id="viewReportDate"></p>
-                                </div>
-                                <button class="btn-outline btn-sm" id="closeInlineViewBtn"><i class="las la-times"></i> إغلاق</button>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="visa-table" id="viewReportTable">
-                                    <thead>
-                                        <tr><th style="width:8%;text-align:center;">#</th><th style="width:46%;">المبلغ (ج.م)</th><th style="width:46%;text-align:center;">التاريخ والوقت</th></tr>
-                                    </thead>
-                                    <tbody id="viewReportTbody"></tbody>
-                                    <tfoot>
-                                        <tr class="total-row">
-                                            <td style="text-align:center;">-</td>
-                                            <td id="viewReportTotal">0</td>
-                                            <td style="text-align:center;">الإجمالي</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="mt-4 space-y-3" id="recentReportsList"></div>
                 </div>
             </div>
         </main>
     </div>
     <div id="printArea" style="display:none;"></div>
+    <div class="bottom-mobile-nav" id="bottomMobileNav">
+        <div class="nav-notch" id="navNotch"></div>
+        <a href="#" class="bottom-nav-item" data-tab="dashboard"><i
+                class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
+        <a href="#" class="bottom-nav-item active" data-tab="reports"><i
+                class="las la-file-alt"></i><span>التقارير</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="tickets"><i
+                class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+    </div>
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
             <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
@@ -982,376 +1399,480 @@
         </div>
     </div>
     <script>
-        (function() {
-            const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
-            function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
-            function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
-            function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
-            function formatDateTime12(isoString) { const d = new Date(isoString); if (isNaN(d.getTime())) return ''; let hours = d.getHours(); const minutes = String(d.getMinutes()).padStart(2, '0'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12; hours = hours ? hours : 12; const hStr = String(hours).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); const month = String(d.getMonth() + 1).padStart(2, '0'); return day + '-' + month + ' ' + hStr + ':' + minutes + ' ' + ampm; }
-            function getNowISO() { return new Date().toISOString(); }
-            function getNowFormatted12() { return formatDateTime12(getNowISO()); }
-            function getFormattedDateArabic() { return new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); }
-            function updateLastUpdateSpan() { const span = document.getElementById('lastUpdateSpan'); if (span) span.textContent = 'آخر تحديث: ' + getFormattedDateArabic(); }
+            (function () {
+                const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
 
-            const sidebar = document.getElementById('dashboardSidebar');
-            const headerAvatar = document.getElementById('headerAvatar');
-            function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
-            function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
-            if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
-            window.addEventListener('resize', function() { if (window.innerWidth >= 1025) { sidebar.classList.remove('mobile-open', 'mobile-closed'); } else { if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed'); } });
-            if (headerAvatar) { headerAvatar.addEventListener('click', function(e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
-            document.addEventListener('click', function(e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            sidebarItems.forEach(item => { item.addEventListener('click', function() { if (this.id === 'logoutBtn') return; sidebarItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); if (window.innerWidth < 1025) { closeSidebar(); } }); });
-            const logoutBtn = document.getElementById('logoutBtn'); if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/'; }); }
+                function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function (match) { return arabicToEnglishMap[match] || match; }); }
 
-            const successModal = document.getElementById('successModal');
-            const closeSuccessModal = document.getElementById('closeSuccessModal');
-            const okSuccessBtn = document.getElementById('okSuccessBtn');
-            const successMessageEl = document.getElementById('successMessage');
-            function showSuccess(msg) { successMessageEl.textContent = msg; successModal.classList.add('active'); }
-            function hideSuccess() { successModal.classList.remove('active'); }
-            closeSuccessModal.addEventListener('click', hideSuccess);
-            okSuccessBtn.addEventListener('click', hideSuccess);
-            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+                function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
 
-            let autoTimeMode = true;
-            const timeToggleBtn = document.getElementById('timeToggleBtn');
-            const timeToggleText = document.getElementById('timeToggleText');
-            timeToggleBtn.addEventListener('click', function() {
-                autoTimeMode = !autoTimeMode;
-                if (autoTimeMode) {
-                    this.classList.add('active');
-                    timeToggleText.textContent = 'تلقائي';
-                    this.querySelector('i').className = 'las la-clock';
-                } else {
-                    this.classList.remove('active');
-                    timeToggleText.textContent = 'يدوي';
-                    this.querySelector('i').className = 'las la-clock';
+                function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
+
+                function formatDateTime(isoString) { if (!isoString) return ''; const d = new Date(isoString); if (isNaN(d.getTime())) return ''; const day = String(d.getDate()).padStart(2, '0'); const month = String(d.getMonth() + 1).padStart(2, '0'); let hours = d.getHours(); const minutes = String(d.getMinutes()).padStart(2, '0'); const ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12; if (hours === 0) hours = 12; hours = String(hours).padStart(2, '0'); return day + '-' + month + ' ' + hours + ':' + minutes + ' ' + ampm; }
+
+                function parseDateTime(str) { const regex = /^(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i; const match = str.trim().match(regex); if (!match) return null; let day = parseInt(match[1]); let month = parseInt(match[2]); let hours = parseInt(match[3]); const minutes = parseInt(match[4]); const ampm = match[5].toUpperCase(); if (month < 1 || month > 12) return null; if (day < 1 || day > 31) return null; if (hours < 1 || hours > 12) return null; if (minutes < 0 || minutes > 59) return null; if (ampm === 'PM' && hours !== 12) hours += 12; if (ampm === 'AM' && hours === 12) hours = 0; const now = new Date(); const result = new Date(now.getFullYear(), month - 1, day, hours, minutes, 0, 0); if (isNaN(result.getTime())) return null; return result; }
+
+                function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
+
+                const sidebar = document.getElementById('dashboardSidebar');
+                const headerAvatar = document.getElementById('headerAvatar');
+
+                function openSidebar() {
+                    sidebar.classList.add('mobile-open');
+                    sidebar.classList.remove('mobile-closed');
                 }
-                saveToSession();
-            });
 
-            const recentReportsListView = document.getElementById('recentReportsListView');
-            const reportViewInline = document.getElementById('reportViewInline');
-            const viewReportTitle = document.getElementById('viewReportTitle');
-            const viewReportDate = document.getElementById('viewReportDate');
-            const viewReportTbody = document.getElementById('viewReportTbody');
-            const viewReportTotal = document.getElementById('viewReportTotal');
-            const closeInlineViewBtn = document.getElementById('closeInlineViewBtn');
-
-            function openReportInline(report) {
-                viewReportTitle.textContent = report.name || 'تقرير فيز';
-                viewReportDate.textContent = report.date || '';
-                viewReportTbody.innerHTML = '';
-                if (report.rows && report.rows.length) {
-                    report.rows.forEach((row, idx) => {
-                        const tr = document.createElement('tr');
-                        const tdNum = document.createElement('td'); tdNum.style.textAlign = 'center'; tdNum.textContent = idx + 1;
-                        const tdAmount = document.createElement('td'); tdAmount.textContent = row.amount || '0';
-                        const tdDate = document.createElement('td'); tdDate.style.textAlign = 'center'; tdDate.textContent = row.displayDate || '';
-                        tr.appendChild(tdNum); tr.appendChild(tdAmount); tr.appendChild(tdDate);
-                        viewReportTbody.appendChild(tr);
+                function closeSidebar() {
+                    sidebar.classList.remove('mobile-open');
+                    sidebar.classList.add('mobile-closed');
+                }
+                if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+                window.addEventListener('resize', function () { if (window.innerWidth >= 1025) { sidebar.classList.remove('mobile-open', 'mobile-closed'); } else { if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed'); } });
+                if (headerAvatar) { headerAvatar.addEventListener('click', function (e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
+                document.addEventListener('click', function (e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
+                const sidebarItems = document.querySelectorAll('.sidebar-item');
+                sidebarItems.forEach(item => {
+                    item.addEventListener('click', function () {
+                        if (this.id === 'logoutBtn') return;
+                        sidebarItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active'); if (window.innerWidth < 1025) { closeSidebar(); }
                     });
-                }
-                viewReportTotal.textContent = report.total || '0';
-                reportViewInline.style.display = 'block';
-                recentReportsListView.style.display = 'none';
-            }
-            function closeInlineView() {
-                reportViewInline.style.display = 'none';
-                recentReportsListView.style.display = '';
-            }
-            closeInlineViewBtn.addEventListener('click', closeInlineView);
+                });
+                const logoutBtn = document.getElementById('logoutBtn'); if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/'; }); }
+                const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+                const navNotch = document.getElementById('navNotch');
 
-            function loadRecentReports() {
-                try {
-                    const stored = localStorage.getItem('visaStoredReports');
-                    if (stored) {
-                        const reports = JSON.parse(stored);
-                        if (reports.length === 0) {
-                            recentReportsListView.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
-                            return;
+                function moveNotch(activeItem) {
+                    if (!navNotch || !activeItem) return; const rect = activeItem.getBoundingClientRect(); const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect(); const centerX = rect.left + rect.width / 2 - navRect.left;
+                    navNotch.style.left = centerX + 'px';
+                }
+
+                function setBottomNavActive() {
+                    let activeItem = null;
+                    bottomNavItems.forEach(item => {
+                        item.classList.remove('active'); const tab = item.getAttribute('data-tab'); if (tab === 'reports') {
+                            item.classList.add('active');
+                            activeItem = item;
                         }
-                        let html = '';
-                        reports.forEach((report) => {
-                            html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيز') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + ' | الإجمالي: ' + (report.total || '0') + ' ج.م</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
-                        });
-                        recentReportsListView.innerHTML = html;
-                        reportViewInline.style.display = 'none';
-                        recentReportsListView.style.display = '';
-                        document.querySelectorAll('.view-report-btn').forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                const reportId = this.getAttribute('data-id');
-                                const stored = localStorage.getItem('visaStoredReports');
-                                if (stored) {
-                                    const reports = JSON.parse(stored);
-                                    const report = reports.find(r => r.id === reportId);
-                                    if (report) openReportInline(report);
-                                    else showSuccess('التقرير غير موجود.');
-                                }
-                            });
-                        });
-                        document.querySelectorAll('.delete-report-btn').forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                const reportId = this.getAttribute('data-id');
-                                deleteReportById(reportId);
-                            });
-                        });
-                    } else {
-                        recentReportsListView.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                    }); if (activeItem) moveNotch(activeItem); else if (bottomNavItems.length > 0) {
+                        bottomNavItems[0].classList.add('active');
+                        moveNotch(bottomNavItems[0]);
                     }
-                } catch (e) {
-                    recentReportsListView.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
                 }
-            }
-            function deleteReportById(reportId) {
-                if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return;
-                try {
-                    const stored = localStorage.getItem('visaStoredReports');
-                    if (!stored) return;
-                    let reports = JSON.parse(stored);
-                    reports = reports.filter(r => r.id !== reportId);
-                    localStorage.setItem('visaStoredReports', JSON.stringify(reports));
-                    loadRecentReports();
-                    showSuccess('تم حذف التقرير بنجاح.');
-                } catch (e) {}
-            }
-            function storeReportToHistory(name, rows, total) {
-                const report = {
-                    id: 'visa_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-                    name: name,
-                    date: getFormattedDateArabic(),
-                    timestamp: new Date().toISOString(),
-                    rows: rows,
-                    total: total
-                };
-                try {
-                    let reports = [];
-                    const stored = localStorage.getItem('visaStoredReports');
-                    if (stored) reports = JSON.parse(stored);
-                    reports.unshift(report);
-                    if (reports.length > 20) reports = reports.slice(0, 20);
-                    localStorage.setItem('visaStoredReports', JSON.stringify(reports));
-                    loadRecentReports();
-                } catch (e) {}
-            }
-            document.getElementById('clearReportsBtn').addEventListener('click', function() {
-                if (!confirm('هل أنت متأكد من مسح جميع التقارير المخزنة؟')) return;
-                localStorage.removeItem('visaStoredReports');
-                recentReportsListView.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
-                showSuccess('تم مسح سجل التقارير بنجاح.');
-            });
-            loadRecentReports();
+                setBottomNavActive();
+                window.addEventListener('resize', () => { const activeItem = document.querySelector('.bottom-nav-item.active'); if (activeItem) moveNotch(activeItem); });
+                bottomNavItems.forEach(item => {
+                    item.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        bottomNavItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        moveNotch(this);
+                    });
+                });
+                const successModal = document.getElementById('successModal');
+                const closeSuccessModal = document.getElementById('closeSuccessModal');
+                const okSuccessBtn = document.getElementById('okSuccessBtn');
+                const successMessageEl = document.getElementById('successMessage');
 
-            const tbody = document.getElementById('visaTbody');
-            const totalAmountEl = document.getElementById('totalAmount');
-            const visaNameInput = document.getElementById('visaNameInput');
-            const LOGO_URL = 'https://files.catbox.moe/27w55o.png';
-            let printPending = false;
-
-            function updateTotal() { let total = 0; const rows = tbody.querySelectorAll('tr'); rows.forEach(row => { const input = row.querySelector('.amount-input'); if (input) { const val = parseNumber(input.value); total += val; } }); totalAmountEl.textContent = formatNumber(total); }
-            function updateAllSerialNumbers() { const rows = tbody.querySelectorAll('tr'); rows.forEach((row, index) => { const serialCell = row.querySelector('.serial-cell'); if (serialCell) { serialCell.textContent = index + 1; } }); }
-            function focusInput(input) { if (input) { input.focus(); if (input.type === 'text' && input.value) input.setSelectionRange(input.value.length, input.value.length); } }
-            function setRowDateTime(tr) { const amountInput = tr.querySelector('.amount-input'); const datetimeInput = tr.querySelector('.datetime-input'); if (!amountInput || !datetimeInput) return; const val = amountInput.value.replace(/,/g, '').trim(); if (val !== '' && parseFloat(val) >= 0) { const nowISO = getNowISO(); const nowFormatted = getNowFormatted12(); datetimeInput.value = nowFormatted; datetimeInput.setAttribute('data-iso', nowISO); } else if (val === '') { datetimeInput.value = ''; datetimeInput.setAttribute('data-iso', ''); } }
-
-            function createRowElement(amountStr, isoString) {
-                const tr = document.createElement('tr');
-                const serialTd = document.createElement('td');
-                serialTd.className = 'serial-cell';
-                serialTd.textContent = '0';
-                const amountTd = document.createElement('td');
-                const amountInput = document.createElement('input');
-                amountInput.type = 'text';
-                amountInput.className = 'input-field amount-input';
-                amountInput.placeholder = 'أدخل المبلغ';
-                amountInput.setAttribute('inputmode', 'decimal');
-                const formattedAmount = amountStr ? formatNumber(parseNumber(amountStr)) : '';
-                amountInput.value = formattedAmount;
-                const datetimeTd = document.createElement('td');
-                datetimeTd.style.textAlign = 'center';
-                const datetimeInput = document.createElement('input');
-                datetimeInput.type = 'text';
-                datetimeInput.className = 'datetime-input';
-                datetimeInput.placeholder = 'DD-MM HH:MM AM/PM';
-                datetimeInput.dir = 'ltr';
-                if (isoString && isoString.trim() !== '') {
-                    datetimeInput.value = formatDateTime12(isoString);
-                    datetimeInput.setAttribute('data-iso', isoString);
-                } else {
-                    datetimeInput.value = '';
-                    datetimeInput.setAttribute('data-iso', '');
+                function showSuccess(msg) {
+                    successMessageEl.textContent = msg;
+                    successModal.classList.add('active');
                 }
-                const actionTd = document.createElement('td');
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-row-btn';
-                deleteBtn.tabIndex = -1;
-                deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                deleteBtn.addEventListener('click', function() {
-                    if (tbody.children.length <= 1) { showSuccess('لا يمكن حذف الصف الأخير.'); return; }
-                    tr.remove();
-                    updateTotal();
-                    updateAllSerialNumbers();
-                    saveToSession();
-                });
-                amountTd.appendChild(amountInput);
-                datetimeTd.appendChild(datetimeInput);
-                actionTd.appendChild(deleteBtn);
-                tr.appendChild(serialTd);
-                tr.appendChild(amountTd);
-                tr.appendChild(datetimeTd);
-                tr.appendChild(actionTd);
-                amountInput.addEventListener('input', function() {
-                    let val = this.value.replace(/,/g, '');
-                    const num = parseFloat(val);
-                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
-                    else if (val === '') this.value = '';
-                    updateTotal();
-                    saveToSession();
-                    updateLastUpdateSpan();
-                });
-                amountInput.addEventListener('blur', function() {
-                    if (autoTimeMode) {
-                        setRowDateTime(tr);
+
+                function hideSuccess() { successModal.classList.remove('active'); }
+                closeSuccessModal.addEventListener('click', hideSuccess);
+                okSuccessBtn.addEventListener('click', hideSuccess);
+                window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+                const reportViewCard = document.getElementById('reportViewCard');
+                const viewReportTitle2 = document.getElementById('viewReportTitle2');
+                const viewReportDate2 = document.getElementById('viewReportDate2');
+                const viewReportTbody2 = document.getElementById('viewReportTbody2');
+                const viewReportTotal2 = document.getElementById('viewReportTotal2');
+                const recentReportsCard = document.getElementById('recentReportsCard');
+                const recentReportsList = document.getElementById('recentReportsList');
+                let currentViewReportId = null;
+
+                function hideReportView() {
+                    reportViewCard.style.display = 'none';
+                    recentReportsCard.style.display = 'block';
+                    currentViewReportId = null;
+                }
+                document.getElementById('closeReportViewBtn2').addEventListener('click', hideReportView);
+
+                function buildPrintHTML(name, dateStr, rowsData, totalText) {
+                    const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
+                    let html = '';
+                    html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
+                    html += '<tr>';
+                    html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                    html += '<div class="restaurant-name">' + (name || 'تقرير فيزا') + '</div>';
+                    html += '<div class="print-date">' + (dateStr || '') + '</div>';
+                    html += '</td>';
+                    html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                    html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
+                    html += '</td>';
+                    html += '</tr></table>';
+                    html += '<div class="header-separator"></div>';
+                    html += '<table>';
+                    html += '<thead><tr><th style="width:10%;text-align:center;">#</th><th style="width:50%;">المبلغ (ج.م)</th><th style="width:40%;text-align:center;">التاريخ والوقت</th></tr></thead><tbody>';
+                    if (rowsData && rowsData.length) {
+                        rowsData.forEach((row, idx) => {
+                            html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + (row.amount || '0') + '</td><td style="text-align:center;">' + (row.datetime ? formatDateTime(row.datetime) : '') + '</td></tr>';
+                        });
                     }
-                    updateTotal();
-                    saveToSession();
-                    updateLastUpdateSpan();
+                    html += '<tr class="total-row"><td style="text-align:center;">-</td><td><strong>' + (totalText || '0') + '</strong></td><td style="text-align:center;"><strong>الإجمالي</strong></td></tr>';
+                    html += '</tbody></table>';
+                    html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+                    return html;
+                }
+                document.getElementById('printStoredReportBtn2').addEventListener('click', function () {
+                    if (!currentViewReportId) return;
+                    const stored = localStorage.getItem('visaStoredReports'); if (!stored) return;
+                    const reports = JSON.parse(stored);
+                    const report = reports.find(r => r.id === currentViewReportId); if (!report) return;
+                    const printArea = document.getElementById('printArea');
+                    const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ amount: r.amount || '0', datetime: r.datetime || '' })) : [];
+                    printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
+                    printArea.style.display = 'block';
+                    setTimeout(() => {
+                        window.print();
+                        printArea.style.display = 'none';
+                    }, 300);
                 });
-                amountInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') { e.preventDefault(); if (autoTimeMode) { setRowDateTime(tr); } else { focusInput(datetimeInput); return; } const rows = Array.from(tbody.querySelectorAll('tr')); const rowIndex = rows.indexOf(tr); const isLastRow = rowIndex === rows.length - 1; if (isLastRow) { const newTr = addRowAtEnd('', ''); const newAmount = newTr.querySelector('.amount-input'); if (newAmount) focusInput(newAmount); } else { const nextAmount = rows[rowIndex + 1].querySelector('.amount-input'); if (nextAmount) focusInput(nextAmount); } saveToSession(); updateLastUpdateSpan(); }
-                    else if (e.key === 'ArrowDown') { e.preventDefault(); if (autoTimeMode) { setRowDateTime(tr); } const nextRow = tr.nextElementSibling; if (nextRow) { const nextAmount = nextRow.querySelector('.amount-input'); if (nextAmount) focusInput(nextAmount); } }
-                    else if (e.key === 'ArrowUp') { e.preventDefault(); if (autoTimeMode) { setRowDateTime(tr); } const prevRow = tr.previousElementSibling; if (prevRow) { const prevAmount = prevRow.querySelector('.amount-input'); if (prevAmount) focusInput(prevAmount); } }
+
+                function viewReportById(reportId) {
+                    const stored = localStorage.getItem('visaStoredReports'); if (!stored) return; const reports = JSON.parse(stored); const report = reports.find(r => r.id === reportId); if (!report) { showSuccess('التقرير غير موجود.'); return; }
+                    currentViewReportId = reportId;
+                    viewReportTitle2.textContent = report.name || 'تقرير فيزا';
+                    viewReportDate2.textContent = report.date || '';
+                    viewReportTbody2.innerHTML = ''; if (report.rows && report.rows.length) {
+                        report.rows.forEach((row, idx) => {
+                            const tr = document.createElement('tr'); const tdSerial = document.createElement('td');
+                            tdSerial.textContent = idx + 1;
+                            tdSerial.style.textAlign = 'center'; const tdAmount = document.createElement('td');
+                            tdAmount.textContent = row.amount || '0'; const tdDatetime = document.createElement('td');
+                            tdDatetime.textContent = row.datetime ? formatDateTime(row.datetime) : '';
+                            tdDatetime.style.textAlign = 'center';
+                            tr.appendChild(tdSerial);
+                            tr.appendChild(tdAmount);
+                            tr.appendChild(tdDatetime);
+                            viewReportTbody2.appendChild(tr);
+                        });
+                    }
+                    viewReportTotal2.textContent = report.total || '0';
+                    reportViewCard.style.display = 'block';
+                    recentReportsCard.style.display = 'none';
+                }
+
+                function loadRecentReports() {
+                    try {
+                        const stored = localStorage.getItem('visaStoredReports'); if (stored) {
+                            const reports = JSON.parse(stored); if (reports.length === 0) { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; return; } let html = '';
+                            reports.forEach((report) => { html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيزا') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>'; });
+                            recentReportsList.innerHTML = html;
+                            document.querySelectorAll('.view-report-btn').forEach(btn => {
+                                btn.addEventListener('click', function () {
+                                    const reportId = this.getAttribute('data-id');
+                                    viewReportById(reportId);
+                                });
+                            });
+                            document.querySelectorAll('.delete-report-btn').forEach(btn => {
+                                btn.addEventListener('click', function () {
+                                    const reportId = this.getAttribute('data-id');
+                                    deleteReportById(reportId);
+                                });
+                            });
+                        } else { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; }
+                    } catch (e) { recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>'; }
+                }
+
+                function deleteReportById(reportId) {
+                    if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return; try {
+                        const stored = localStorage.getItem('visaStoredReports'); if (!stored) return; let reports = JSON.parse(stored);
+                        reports = reports.filter(r => r.id !== reportId);
+                        localStorage.setItem('visaStoredReports', JSON.stringify(reports));
+                        loadRecentReports();
+                        showSuccess('تم حذف التقرير بنجاح.');
+                    } catch (e) { }
+                }
+
+                function getReportDateString() { const dateToggleBtn = document.getElementById('dateToggleBtn'); const reportDateInput = document.getElementById('reportDateInput'); if (dateToggleBtn.classList.contains('active') || !reportDateInput.value) { return new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); } else { const d = new Date(reportDateInput.value + 'T00:00:00'); return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'numeric', day: 'numeric' }); } }
+
+                function storeCurrentReport() {
+                    const name = document.getElementById('restaurantNameInput').value || ''; const rows = getTableData(); const total = document.getElementById('totalAmount').textContent; const dateStr = getReportDateString(); const report = { id: 'visa_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6), name: name, date: dateStr, timestamp: new Date().toISOString(), rows: rows, total: total }; try {
+                        let reports = []; const stored = localStorage.getItem('visaStoredReports'); if (stored) reports = JSON.parse(stored);
+                        reports.unshift(report); if (reports.length > 20) reports = reports.slice(0, 20);
+                        localStorage.setItem('visaStoredReports', JSON.stringify(reports));
+                        loadRecentReports();
+                        showSuccess('تم تخزين التقرير بنجاح.');
+                    } catch (e) { showSuccess('حدث خطأ أثناء التخزين.'); }
+                }
+                document.getElementById('clearReportsBtn').addEventListener('click', function () {
+                    if (!confirm('هل أنت متأكد من مسح جميع التقارير المخزنة؟')) return;
+                    localStorage.removeItem('visaStoredReports');
+                    recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                    showSuccess('تم مسح سجل التقارير بنجاح.');
                 });
-                datetimeInput.addEventListener('blur', function() {
-                    const amountInput = tr.querySelector('.amount-input');
-                    if (amountInput && amountInput.value.trim() !== '') {
-                        const iso = this.getAttribute('data-iso') || '';
-                        if (!iso) {
-                            const nowISO = getNowISO();
-                            this.value = getNowFormatted12();
-                            this.setAttribute('data-iso', nowISO);
+                loadRecentReports();
+                const tbody = document.getElementById('restaurantTbody');
+                const totalAmountEl = document.getElementById('totalAmount');
+                const restaurantNameInput = document.getElementById('restaurantNameInput');
+                const dateToggleBtn = document.getElementById('dateToggleBtn');
+                const dateToggleText = document.getElementById('dateToggleText');
+                const reportDateInput = document.getElementById('reportDateInput');
+
+                function updateTotal() {
+                    let total = 0; const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const input = row.querySelector('.amount-input'); if (input) {
+                            const val = parseNumber(input.value);
+                            total += val;
                         }
-                    }
-                    saveToSession();
-                    updateLastUpdateSpan();
-                });
-                datetimeInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') { e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const rowIndex = rows.indexOf(tr); const isLastRow = rowIndex === rows.length - 1; if (isLastRow) { const newTr = addRowAtEnd('', ''); const newAmount = newTr.querySelector('.amount-input'); if (newAmount) focusInput(newAmount); } else { const nextAmount = rows[rowIndex + 1].querySelector('.amount-input'); if (nextAmount) focusInput(nextAmount); } saveToSession(); updateLastUpdateSpan(); }
-                    else if (e.key === 'ArrowDown') { e.preventDefault(); const nextRow = tr.nextElementSibling; if (nextRow) { const nextDt = nextRow.querySelector('.datetime-input'); if (nextDt) focusInput(nextDt); } }
-                    else if (e.key === 'ArrowUp') { e.preventDefault(); const prevRow = tr.previousElementSibling; if (prevRow) { const prevDt = prevRow.querySelector('.datetime-input'); if (prevDt) focusInput(prevDt); } }
-                });
-                datetimeInput.addEventListener('input', function() { saveToSession(); updateLastUpdateSpan(); });
-                updateAllSerialNumbers();
-                return tr;
-            }
+                    });
+                    totalAmountEl.textContent = formatNumber(total);
+                }
 
-            function addRowAtEnd(amountStr, isoString) { const tr = createRowElement(amountStr, isoString); tbody.appendChild(tr); updateTotal(); updateAllSerialNumbers(); return tr; }
-            function clearAllRows() { tbody.innerHTML = ''; addRowAtEnd('', ''); updateTotal(); updateAllSerialNumbers(); }
-            function getTableData() { const rows = tbody.querySelectorAll('tr'); const data = []; rows.forEach(row => { const amountInput = row.querySelector('.amount-input'); const datetimeInput = row.querySelector('.datetime-input'); if (amountInput && datetimeInput) { data.push({ amount: amountInput.value || '0', iso: datetimeInput.getAttribute('data-iso') || '', displayDate: datetimeInput.value || '' }); } }); return data; }
-            function loadTableData(data) { tbody.innerHTML = ''; if (data.length === 0) addRowAtEnd('', ''); else data.forEach(item => addRowAtEnd(item.amount, item.iso)); updateTotal(); updateAllSerialNumbers(); }
-            function saveToSession() { const data = getTableData(); const name = visaNameInput.value || ''; const payload = { name: name, rows: data, autoTime: autoTimeMode, timestamp: new Date().toISOString() }; try { localStorage.setItem('visaReportData', JSON.stringify(payload)); } catch (e) {} }
-            function loadFromSession() { try { const stored = localStorage.getItem('visaReportData'); if (stored) { const payload = JSON.parse(stored); visaNameInput.value = payload.name || ''; if (payload.autoTime !== undefined) { autoTimeMode = payload.autoTime; timeToggleBtn.classList.toggle('active', autoTimeMode); timeToggleText.textContent = autoTimeMode ? 'تلقائي' : 'يدوي'; timeToggleBtn.querySelector('i').className = 'las la-clock'; } loadTableData(payload.rows || []); return true; } } catch (e) {} return false; }
+                function updateSerials() {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row, index) => { const serialCell = row.querySelector('.serial-cell'); if (serialCell) { serialCell.textContent = index + 1; } });
+                }
 
-            visaNameInput.addEventListener('input', function() { saveToSession(); updateLastUpdateSpan(); });
-            document.getElementById('storeBtn').addEventListener('click', function() {
-                saveToSession();
-                const name = visaNameInput.value || '';
-                const rows = getTableData();
-                const total = totalAmountEl.textContent;
-                storeReportToHistory(name, rows, total);
-                showSuccess('تم تخزين التقرير بنجاح.');
-                updateLastUpdateSpan();
-            });
-            document.getElementById('addRowBtn').addEventListener('click', function() { addRowAtEnd('', ''); saveToSession(); updateLastUpdateSpan(); });
-            document.getElementById('addRowsBatchBtn').addEventListener('click', function() { const countInput = document.getElementById('rowsCountInput'); let count = parseInt(countInput.value) || 1; if (count < 1) count = 1; if (count > 50) count = 50; countInput.value = count; for (let i = 0; i < count; i++) addRowAtEnd('', ''); saveToSession(); updateLastUpdateSpan(); showSuccess('تم إضافة ' + count + ' صفوف جديدة.'); });
-            document.getElementById('clearRowsBtn').addEventListener('click', function() { if (tbody.children.length === 0) return; if (confirm('هل أنت متأكد من مسح جميع الصفوف؟')) { clearAllRows(); saveToSession(); updateLastUpdateSpan(); } });
-            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
-                if (printPending) return;
-                printPending = true;
-                saveToSession();
-                const printArea = document.getElementById('printArea');
-                const name = visaNameInput.value || '';
-                const dateStr = getFormattedDateArabic();
-                let html = '';
-                html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:2mm; border:none;">';
-                html += '<tr>';
-                html += '<td style="width:60%; text-align:right; vertical-align:bottom; padding:0; border:none;">';
-                html += '<div class="print-header-section">';
-                html += '<div class="restaurant-name">' + name + '</div>';
-                html += '<div class="print-date">' + dateStr + '</div>';
-                html += '</div>';
-                html += '</td>';
-                html += '<td class="logo-cell" style="width:40%;">';
-                html += '<img src="' + LOGO_URL + '" style="max-width:15mm; height:auto; display:block;" alt="Logo" />';
-                html += '</td>';
-                html += '</tr></table>';
-                html += '<table>';
-                html += '<thead><tr><th class="print-serial">#</th><th class="print-amount">المبلغ (ج.م)</th><th class="print-datetime">التاريخ والوقت</th></tr></thead><tbody>';
-                const rows = tbody.querySelectorAll('tr');
-                rows.forEach((row, index) => {
-                    const amountInput = row.querySelector('.amount-input');
-                    const datetimeInput = row.querySelector('.datetime-input');
-                    if (amountInput && datetimeInput) {
-                        html += '<tr><td class="print-serial">' + (index + 1) + '</td><td class="print-amount">' + (amountInput.value || '0') + '</td><td class="print-datetime">' + (datetimeInput.value || '') + '</td></tr>';
-                    }
-                });
-                html += '<tr class="total-row"><td class="print-serial">-</td><td class="print-amount"><strong>' + totalAmountEl.textContent + '</strong></td><td class="print-datetime"><strong>الإجمالي</strong></td></tr>';
-                html += '</tbody></table>';
-                html += '<div class="footer"><div></div><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v3.2</div></div>';
-                printArea.innerHTML = html;
-                printArea.style.display = 'block';
-                window.addEventListener('afterprint', function onAfterPrint() {
-                    printArea.style.display = 'none';
-                    printPending = false;
-                    window.removeEventListener('afterprint', onAfterPrint);
-                }, { once: true });
-                window.print();
-            });
-            document.getElementById('exportVisaBtn').addEventListener('click', function() {
-                saveToSession();
-                const name = visaNameInput.value || '';
-                let csv = '#,المبلغ (ج.م),التاريخ والوقت\n';
-                const rows = tbody.querySelectorAll('tr');
-                let rowIndex = 1;
-                rows.forEach(row => {
-                    const amountInput = row.querySelector('.amount-input');
-                    const datetimeInput = row.querySelector('.datetime-input');
-                    if (amountInput && datetimeInput) {
-                        csv += rowIndex + ',' + (amountInput.value || '0') + ',' + (datetimeInput.value || '') + '\n';
-                        rowIndex++;
-                    }
-                });
-                csv += '-,الإجمالي,' + totalAmountEl.textContent + '\n';
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = (name || 'تقرير_فيزا') + '.csv';
-                link.click();
-                showSuccess('تم تصدير التقرير بصيغة CSV بنجاح.');
-            });
+                function focusInput(input) { if (input) { input.focus(); if (input.type === 'text' && input.value) input.setSelectionRange(input.value.length, input.value.length); } }
 
-            const userAvatarImg = document.getElementById('userAvatar'); if (userAvatarImg) { userAvatarImg.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { userAvatarImg.src = ev.target.result; const headerAv = document.getElementById('headerAvatar'); if (headerAv) headerAv.src = ev.target.result; showSuccess('تم تحديث الصورة الشخصية.'); }; reader.readAsDataURL(file); } }; input.click(); }); }
+                function createRowElement(amount, isoDatetime) {
+                    const tr = document.createElement('tr'); const serialTd = document.createElement('td');
+                    serialTd.className = 'serial-cell';
+                    serialTd.textContent = '0';
+                    tr.appendChild(serialTd); const amountTd = document.createElement('td'); const amountInput = document.createElement('input');
+                    amountInput.type = 'text';
+                    amountInput.className = 'input-field amount-input';
+                    amountInput.placeholder = 'أدخل المبلغ';
+                    amountInput.setAttribute('inputmode', 'decimal');
+                    amountInput.value = amount || '';
+                    amountTd.appendChild(amountInput);
+                    tr.appendChild(amountTd); const datetimeTd = document.createElement('td');
+                    datetimeTd.style.textAlign = 'center'; const datetimeInput = document.createElement('input');
+                    datetimeInput.type = 'text';
+                    datetimeInput.className = 'datetime-input';
+                    datetimeInput.placeholder = 'DD-MM HH:MM AM/PM';
+                    datetimeInput.dir = 'ltr';
+                    datetimeInput.setAttribute('data-iso', isoDatetime || '');
+                    datetimeInput.value = isoDatetime ? formatDateTime(isoDatetime) : '';
+                    datetimeTd.appendChild(datetimeInput);
+                    tr.appendChild(datetimeTd); const actionTd = document.createElement('td'); const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-row-btn';
+                    deleteBtn.tabIndex = -1;
+                    deleteBtn.title = 'حذف الصف';
+                    deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                    deleteBtn.addEventListener('click', function () {
+                        if (tbody.children.length > 1) {
+                            tr.remove();
+                            updateSerials();
+                            updateTotal();
+                            saveToSession();
+                        } else { showSuccess('لا يمكن حذف الصف الأخير.'); }
+                    });
+                    actionTd.appendChild(deleteBtn);
+                    tr.appendChild(actionTd);
+                    amountInput.addEventListener('input', function () {
+                        updateTotal();
+                        saveToSession();
+                    });
+                    amountInput.addEventListener('blur', function () {
+                        let val = convertArabicNumerals(this.value).replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; }
+                        updateTotal();
+                        saveToSession();
+                    });
+                    datetimeInput.addEventListener('blur', function () {
+                        const userValue = this.value.trim(); if (userValue === '') {
+                            this.setAttribute('data-iso', '');
+                            saveToSession(); return;
+                        } const parsed = parseDateTime(userValue); if (parsed) {
+                            this.setAttribute('data-iso', parsed.toISOString());
+                            this.value = formatDateTime(parsed.toISOString());
+                        } else {
+                            const iso = this.getAttribute('data-iso');
+                            this.value = iso ? formatDateTime(iso) : '';
+                        }
+                        saveToSession();
+                    });
+                    amountInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); const now = new Date();
+                            datetimeInput.setAttribute('data-iso', now.toISOString());
+                            datetimeInput.value = formatDateTime(now.toISOString()); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex === rows.length - 1) {
+                                const newTr = addRowAtEnd('', '');
+                                updateSerials(); const newAmountInput = newTr.querySelector('.amount-input'); if (newAmountInput) focusInput(newAmountInput);
+                            } else { const nextRow = rows[currentIndex + 1]; const nextAmountInput = nextRow.querySelector('.amount-input'); if (nextAmountInput) focusInput(nextAmountInput); }
+                            updateTotal();
+                            saveToSession();
+                        } else if (e.key === 'ArrowDown') { e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex < rows.length - 1) { const nextRow = rows[currentIndex + 1]; const nextAmountInput = nextRow.querySelector('.amount-input'); if (nextAmountInput) focusInput(nextAmountInput); } } else if (e.key === 'ArrowUp') { e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex > 0) { const prevRow = rows[currentIndex - 1]; const prevAmountInput = prevRow.querySelector('.amount-input'); if (prevAmountInput) focusInput(prevAmountInput); } }
+                    });
+                    datetimeInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex < rows.length - 1) { const nextRow = rows[currentIndex + 1]; const nextAmountInput = nextRow.querySelector('.amount-input'); if (nextAmountInput) focusInput(nextAmountInput); } else {
+                                const newTr = addRowAtEnd('', '');
+                                updateSerials(); const newAmountInput = newTr.querySelector('.amount-input'); if (newAmountInput) focusInput(newAmountInput);
+                            }
+                            saveToSession();
+                        } else if (e.key === 'ArrowDown') { e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex < rows.length - 1) { const nextRow = rows[currentIndex + 1]; const nextDtInput = nextRow.querySelector('.datetime-input'); if (nextDtInput) focusInput(nextDtInput); } } else if (e.key === 'ArrowUp') { e.preventDefault(); const rows = Array.from(tbody.querySelectorAll('tr')); const currentIndex = rows.indexOf(tr); if (currentIndex > 0) { const prevRow = rows[currentIndex - 1]; const prevDtInput = prevRow.querySelector('.datetime-input'); if (prevDtInput) focusInput(prevDtInput); } }
+                    });
+                    return tr;
+                }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const themeToggles = document.querySelectorAll('.theme-toggle');
-                const body = document.body;
-                const applyTheme = (theme) => { const isDark = theme === 'dark'; body.classList.toggle('light', !isDark); themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark)); localStorage.setItem('theme', theme); };
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                applyTheme(savedTheme);
-                themeToggles.forEach(toggle => { toggle.addEventListener('click', () => { const isDark = body.classList.contains('light') === false; applyTheme(isDark ? 'light' : 'dark'); }); });
-                if (!loadFromSession()) {
+                function addRowAtEnd(amount, isoDatetime) {
+                    const tr = createRowElement(amount || '', isoDatetime || '');
+                    tbody.appendChild(tr);
+                    updateSerials();
+                    updateTotal(); return tr;
+                }
+
+                function clearAllRows() {
                     tbody.innerHTML = '';
                     addRowAtEnd('', '');
-                    addRowAtEnd('', '');
-                    addRowAtEnd('', '');
+                    updateSerials();
                     updateTotal();
-                    updateAllSerialNumbers();
                 }
-                loadRecentReports();
-                updateLastUpdateSpan();
-            });
-        })();
+
+                function getTableData() {
+                    const rows = tbody.querySelectorAll('tr'); const data = [];
+                    rows.forEach(row => { const amountInput = row.querySelector('.amount-input'); const datetimeInput = row.querySelector('.datetime-input'); if (amountInput && datetimeInput) { data.push({ amount: amountInput.value || '0', datetime: datetimeInput.getAttribute('data-iso') || '' }); } }); return data;
+                }
+
+                function loadTableData(data) {
+                    tbody.innerHTML = ''; if (data.length === 0) addRowAtEnd('', ''); else data.forEach(item => addRowAtEnd(item.amount || '', item.datetime || ''));
+                    updateSerials();
+                    updateTotal();
+                }
+
+                function saveToSession() { const data = getTableData(); const name = restaurantNameInput.value || ''; const isAuto = dateToggleBtn.classList.contains('active'); const customDate = reportDateInput.value; const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() }; try { localStorage.setItem('visaReportData', JSON.stringify(payload)); } catch (e) { } }
+
+                function loadFromSession() {
+                    try {
+                        const stored = localStorage.getItem('visaReportData'); if (stored) {
+                            const payload = JSON.parse(stored);
+                            restaurantNameInput.value = payload.name || ''; if (payload.isAuto !== undefined) {
+                                if (payload.isAuto) {
+                                    dateToggleBtn.classList.add('active');
+                                    dateToggleText.textContent = 'تلقائي';
+                                    dateToggleBtn.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
+                                    reportDateInput.disabled = true;
+                                } else {
+                                    dateToggleBtn.classList.remove('active');
+                                    dateToggleText.textContent = 'يدوي';
+                                    dateToggleBtn.innerHTML = '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>';
+                                    reportDateInput.disabled = false;
+                                }
+                            } else {
+                                dateToggleBtn.classList.add('active');
+                                dateToggleText.textContent = 'تلقائي';
+                                dateToggleBtn.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
+                                reportDateInput.disabled = true;
+                            } if (payload.customDate) { reportDateInput.value = payload.customDate; } else { reportDateInput.value = formatDateForInput(new Date()); }
+                            loadTableData(payload.rows || []); return true;
+                        }
+                    } catch (e) { } return false;
+                }
+                dateToggleBtn.addEventListener('click', function () {
+                    if (this.classList.contains('active')) {
+                        this.classList.remove('active');
+                        dateToggleText.textContent = 'يدوي';
+                        this.innerHTML = '<i class="las la-calendar-alt"></i><span id="dateToggleText">يدوي</span>';
+                        reportDateInput.disabled = false;
+                    } else {
+                        this.classList.add('active');
+                        dateToggleText.textContent = 'تلقائي';
+                        this.innerHTML = '<i class="las la-calendar-check"></i><span id="dateToggleText">تلقائي</span>';
+                        reportDateInput.value = formatDateForInput(new Date());
+                        reportDateInput.disabled = true;
+                    }
+                    saveToSession();
+                });
+                reportDateInput.addEventListener('input', function () { saveToSession(); });
+                restaurantNameInput.addEventListener('input', function () { saveToSession(); });
+                document.getElementById('storeBtn').addEventListener('click', function () {
+                    saveToSession();
+                    storeCurrentReport();
+                });
+                document.getElementById('addRowBtn').addEventListener('click', function () {
+                    addRowAtEnd('', '');
+                    updateSerials();
+                    saveToSession();
+                });
+                document.getElementById('addRowsBatchBtn').addEventListener('click', function () {
+                    const countInput = document.getElementById('rowsCountInput'); let count = parseInt(countInput.value) || 1; if (count < 1) count = 1; if (count > 50) count = 50;
+                    countInput.value = count; for (let i = 0; i < count; i++) addRowAtEnd('', '');
+                    updateSerials();
+                    saveToSession();
+                    showSuccess('تم إضافة ' + count + ' صفوف جديدة.');
+                });
+                document.getElementById('clearRowsBtn').addEventListener('click', function () {
+                    if (tbody.children.length === 0) return; if (confirm('هل أنت متأكد من مسح جميع الصفوف؟')) {
+                        clearAllRows();
+                        saveToSession();
+                    }
+                });
+                document.getElementById('printInvoiceBtn').addEventListener('click', function () {
+                    saveToSession(); const printArea = document.getElementById('printArea'); const name = restaurantNameInput.value || ''; const dateStr = getReportDateString(); const rowsData = []; const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => { const amountInput = row.querySelector('.amount-input'); const datetimeInput = row.querySelector('.datetime-input'); if (amountInput && datetimeInput) { rowsData.push({ amount: amountInput.value || '0', datetime: datetimeInput.getAttribute('data-iso') || '' }); } });
+                    printArea.innerHTML = buildPrintHTML(name, dateStr, rowsData, totalAmountEl.textContent);
+                    printArea.style.display = 'block';
+                    setTimeout(() => {
+                        window.print();
+                        printArea.style.display = 'none';
+                    }, 300);
+                });
+                document.getElementById('exportRestaurantBtn').addEventListener('click', function () {
+                    saveToSession(); const name = restaurantNameInput.value || ''; let csv = '#,المبلغ (ج.م),التاريخ والوقت\n'; const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row, idx) => { const amountInput = row.querySelector('.amount-input'); const datetimeInput = row.querySelector('.datetime-input'); if (amountInput && datetimeInput) { csv += (idx + 1) + ',' + (amountInput.value || '0') + ',' + (datetimeInput.value || '') + '\n'; } });
+                    csv += '-,الإجمالي,' + totalAmountEl.textContent + '\n'; const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = name + '_تقرير_فيزا.csv';
+                    link.click();
+                    showSuccess('تم تصدير التقرير بصيغة CSV بنجاح.');
+                });
+                const userAvatarImg = document.getElementById('userAvatar'); if (userAvatarImg) {
+                    userAvatarImg.addEventListener('click', () => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => {
+                            const file = e.target.files[0]; if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (ev) => {
+                                    userAvatarImg.src = ev.target.result; const headerAv = document.getElementById('headerAvatar'); if (headerAv) headerAv.src = ev.target.result;
+                                    showSuccess('تم تحديث الصورة الشخصية.');
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        };
+                        input.click();
+                    });
+                }
+                document.addEventListener('DOMContentLoaded', function () {
+                    const themeToggles = document.querySelectorAll('.theme-toggle'); const body = document.body; const applyTheme = (theme) => {
+                        const isDark = theme === 'dark';
+                        body.classList.toggle('light', !isDark);
+                        themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
+                        localStorage.setItem('theme', theme);
+                    }; const savedTheme = localStorage.getItem('theme') || 'dark';
+                    applyTheme(savedTheme);
+                    themeToggles.forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const isDark = body.classList.contains('light') === false;
+                            applyTheme(isDark ? 'light' : 'dark');
+                        });
+                    }); if (!loadFromSession()) {
+                        tbody.innerHTML = '';
+                        addRowAtEnd('', '');
+                        updateSerials();
+                        updateTotal();
+                        reportDateInput.value = formatDateForInput(new Date());
+                    }
+                    loadRecentReports();
+                });
+            })();
     </script>
 </body>
+
 </html>
