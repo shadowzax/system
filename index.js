@@ -102,12 +102,14 @@ app.use((req, res, next) => {
 
     next();
 });
+/*
 app.get("/", (req, res) => {
     res.render("index", {
         title: "سيستم",
         description: ""
     });
 });
+*/
 app.get("/login", (req, res) => {
     if (req.isAuthenticated) {
         return res.redirect("/");
@@ -140,7 +142,16 @@ app.get("/outgoing", (req, res) => {
         description: ""
     });
 });
+app.get("/", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
 
+    res.render("system/outgoing", {
+        title: "خوارج",
+        description: ""
+    });
+});
 app.get("/visa", (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect("/login");
