@@ -1,1 +1,2487 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>إضافة حساب - الصلاحيات</title>
+    <meta name="description" content="إضافة حساب جديد مع تحديد الصلاحيات">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 68px;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
+            --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        }
 
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
+            --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Alexandria', system-ui, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-background);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0563a7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d99ff;
+        }
+
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border-color);
+            position: fixed;
+            right: 0;
+            top: var(--header-height);
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease, z-index 0.3s;
+            z-index: 30;
+            padding: 24px 16px;
+            transform: translateX(0);
+        }
+        .dashboard-sidebar.mobile-closed {
+            transform: translateX(100%);
+        }
+        @media (max-width: 1024px) {
+            .dashboard-sidebar.mobile-open {
+                z-index: 105;
+            }
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--color-muted);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .sidebar-item i {
+            font-size: 22px;
+            width: 28px;
+            flex-shrink: 0;
+        }
+        .sidebar-item:hover {
+            background: rgba(13, 153, 255, 0.08);
+            color: var(--color-primary);
+        }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(13, 153, 255, 0.15), rgba(124, 58, 237, 0.1));
+            color: var(--color-primary);
+            border-right: 3px solid var(--color-primary);
+            font-weight: 600;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-muted);
+            padding: 16px 16px 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-sidebar {
+                transform: translateX(100%);
+                width: 260px;
+                z-index: 45;
+            }
+            .dashboard-sidebar.mobile-open {
+                transform: translateX(0);
+                z-index: 105;
+            }
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(100%);
+                z-index: 45;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+        @media (min-width: 1025px) {
+            .dashboard-sidebar {
+                transform: translateX(0) !important;
+                z-index: 30;
+            }
+            .dashboard-sidebar.mobile-open,
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(0) !important;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: var(--shadow-glow);
+        }
+        .badge-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #10b981;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ef4444;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-info {
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #06b6d4;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--color-background);
+            z-index: 110;
+            transition: background-color 0.3s;
+        }
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .header-avatar:hover {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+
+        main {
+            padding-top: var(--header-height);
+        }
+
+        .bottom-mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        @media (max-width: 1024px) {
+            .bottom-mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            padding: 6px 4px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .bottom-nav-item span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            font-size: 0.68rem;
+        }
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+        }
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+            background: rgba(13, 153, 255, 0.12);
+        }
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        .bottom-nav-item.active i {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 102;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            color: var(--color-primary);
+        }
+        .bottom-nav-item.active span {
+            margin-top: 18px;
+        }
+        .nav-notch {
+            position: absolute;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--color-background);
+            border-radius: 50%;
+            z-index: 101;
+            transform: translate(-50%, -50%);
+            transition: left 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--color-white);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+        .input-field::placeholder {
+            color: var(--color-muted);
+            opacity: 0.7;
+        }
+        .input-field.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        .input-field.valid {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
+        }
+        .validation-msg {
+            font-size: 0.72rem;
+            margin-top: 4px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .validation-msg.error {
+            color: #ef4444;
+            display: flex;
+        }
+        .validation-msg.valid {
+            color: #10b981;
+            display: flex;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover {
+            background: #0b85e0;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.25);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--color-white);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .btn-outline:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.05);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+        }
+        .btn-xs {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            transform: translateY(-1px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: var(--color-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            z-index: 5;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .title-cell {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 32px;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 28px;
+        }
+        .title-cell h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+        .title-cell p {
+            color: var(--color-muted);
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+        .title-cell .title-icon {
+            font-size: 2.4rem;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all .4s ease;
+        }
+        .theme-toggle .toggle-circle {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
+            transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
+        }
+        .theme-toggle .icon {
+            position: absolute;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .4s ease;
+        }
+        .theme-toggle .sun-icon {
+            color: #ff6b35;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .theme-toggle .moon-icon {
+            color: #a78bfa;
+            opacity: 0;
+            transform: rotate(180deg) scale(.5);
+        }
+        .theme-toggle.dark {
+            background: linear-gradient(45deg, #475569, #1e293b);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .toggle-circle {
+            right: calc(100% - 31px);
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .sun-icon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(.5);
+        }
+        .theme-toggle.dark .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            right: 4px;
+            bottom: 3px;
+            background: var(--color-muted);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-switch input:checked+.toggle-slider {
+            background: rgba(13, 153, 255, 0.3);
+            border-color: var(--color-primary);
+        }
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(-22px);
+            background: var(--color-primary);
+            box-shadow: 0 0 8px rgba(13, 153, 255, 0.5);
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            gap: 12px;
+            transition: all 0.2s;
+        }
+        .permission-item:hover {
+            border-color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.03);
+        }
+        .permission-item .perm-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+        .permission-item .perm-icon {
+            font-size: 1.3rem;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+        .permission-item .perm-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--color-white);
+        }
+        .permission-item .perm-desc {
+            font-size: 0.7rem;
+            color: var(--color-muted);
+            margin-top: 2px;
+        }
+
+        .select-field {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            padding-left: 40px;
+            color: var(--color-white);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            font-size: 0.9rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            background-image: var(--select-arrow);
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            background-size: 12px 12px;
+            line-height: 1.5;
+            min-height: 48px;
+            text-align: right;
+        }
+        .select-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+        .select-field option {
+            background: var(--card-bg);
+            color: var(--color-white);
+            padding: 12px 16px;
+            font-family: 'Alexandria', system-ui, sans-serif;
+            font-size: 0.9rem;
+            min-height: 36px;
+            line-height: 1.6;
+            text-align: right;
+            direction: rtl;
+        }
+        .select-field optgroup {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 700;
+            font-family: 'Alexandria', system-ui, sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 16px;
+        }
+        .select-field::-ms-expand {
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .select-field {
+                font-size: 1rem;
+                padding: 14px 16px;
+                padding-left: 44px;
+                min-height: 50px;
+            }
+            .select-field option {
+                font-size: 1rem;
+                padding: 14px 16px;
+            }
+        }
+
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Alexandria', sans-serif;
+            margin-top: 16px;
+        }
+        .accounts-table th,
+        .accounts-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+            color: var(--color-white);
+        }
+        .accounts-table th {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .accounts-table tbody tr {
+            transition: background 0.2s;
+        }
+        .accounts-table tbody tr:hover {
+            background: rgba(13, 153, 255, 0.04);
+        }
+
+        .role-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .role-badge.admin {
+            background: rgba(124, 58, 237, 0.15);
+            color: #7c3aed;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        .role-badge.manager {
+            background: rgba(13, 153, 255, 0.15);
+            color: #0d99ff;
+            border: 1px solid rgba(13, 153, 255, 0.3);
+        }
+        .role-badge.user {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .role-badge.viewer {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-white);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title i {
+            color: var(--color-primary);
+        }
+        .form-divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1">
+                <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
+                <div class="sidebar-section-title">الكاش</div>
+                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <div class="sidebar-section-title">الإدارة</div>
+                <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
+                <a href="/accounts" class="sidebar-item active" data-page="accounts"><i class="las la-users-cog"></i><span>الحسابات والصلاحيات</span></a>
+                <div class="sidebar-section-title">النظام</div>
+                <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                </div>
+            </nav>
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer"
+                        class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                </div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
+            </div>
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo"
+                            class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                </div>
+            </header>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="title-cell">
+                    <div class="title-icon"><i class="las la-user-plus"></i></div>
+                    <h1>إضافة حساب جديد</h1>
+                    <p>إنشاء حساب مع تحديد الدور والصلاحيات المخصصة</p>
+                </div>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div class="info-card" id="accFormCard">
+                            <h3 class="text-lg font-bold text-[var(--color-white)] mb-2 flex items-center gap-2"><i class="las la-user-circle text-primary"></i> بيانات الحساب</h3>
+                            <p class="text-sm text-[var(--color-muted)] mb-6">أدخل بيانات المستخدم الأساسية</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">الاسم الكامل <span class="text-error">*</span></label>
+                                    <input type="text" class="input-field" id="accFullName" placeholder="أدخل الاسم الكامل" autocomplete="name">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">البريد الإلكتروني <span class="text-error">*</span></label>
+                                    <input type="email" class="input-field" id="accEmail" placeholder="gamesy500@gmail.com" autocomplete="email" dir="ltr">
+                                    <span class="validation-msg" id="emailMsg"></span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">رقم الهاتف <span class="text-error">*</span></label>
+                                    <input type="tel" class="input-field" id="accPhone" placeholder="+20 1xx xxxx xxx" autocomplete="tel">
+                                    <span class="validation-msg" id="phoneMsg"></span>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">المسمى الوظيفي</label>
+                                    <input type="text" class="input-field" id="accJobTitle" placeholder="المسمى الوظيفي">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">كلمة المرور <span class="text-error">*</span></label>
+                                    <div class="relative">
+                                        <input type="password" class="input-field" id="accPassword" placeholder="أدخل كلمة المرور" style="padding-left:44px;" autocomplete="new-password">
+                                        <button type="button" id="togglePassBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-[var(--color-muted)] cursor-pointer p-2 rounded-lg hover:text-[var(--color-primary)] transition-colors" title="إظهار كلمة المرور"><i class="las la-eye"></i></button>
+                                    </div>
+                                    <span class="validation-msg" id="passMsg"></span>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">تأكيد كلمة المرور <span class="text-error">*</span></label>
+                                    <div class="relative">
+                                        <input type="password" class="input-field" id="accConfirmPass" placeholder="أعد كتابة كلمة المرور" style="padding-left:44px;" autocomplete="new-password">
+                                        <button type="button" id="toggleConfPassBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-[var(--color-muted)] cursor-pointer p-2 rounded-lg hover:text-[var(--color-primary)] transition-colors" title="إظهار كلمة المرور"><i class="las la-eye"></i></button>
+                                    </div>
+                                    <span class="validation-msg" id="confPassMsg"></span>
+                                </div>
+                            </div>
+                            <hr class="form-divider">
+                            <h3 class="form-section-title"><i class="las la-user-tag"></i> الدور والصلاحيات</h3>
+                            <p class="text-sm text-[var(--color-muted)] mb-4">حدد دور المستخدم وصلاحياته في النظام</p>
+                            <div class="mb-4">
+                                <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">الدور الأساسي <span class="text-error">*</span></label>
+                                <select class="select-field" id="accRole">
+                                    <option value="">-- اختر الدور --</option>
+                                    <option value="admin">مدير النظام (Admin)</option>
+                                    <option value="manager">مدير (Manager)</option>
+                                    <option value="user">مستخدم (User)</option>
+                                    <option value="viewer">مشاهد فقط (Viewer)</option>
+                                </select>
+                                <span class="validation-msg" id="roleMsg"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label class="text-sm text-[var(--color-muted)] block mb-2 font-medium">الصلاحيات المخصصة</label>
+                                <div class="space-y-2" id="permissionsContainer">
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-tachometer-alt perm-icon"></i><div><div class="perm-label">عرض لوحة التحكم</div><div class="perm-desc">الوصول إلى الإحصائيات والملخصات</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="dashboard_view" checked><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-file-invoice-dollar perm-icon"></i><div><div class="perm-label">إدارة الخوارج</div><div class="perm-desc">إنشاء وتعديل وحذف فواتير الخوارج</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="outgoing_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-credit-card perm-icon"></i><div><div class="perm-label">إدارة الفيز</div><div class="perm-desc">إنشاء وتعديل وحذف معاملات الفيز</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="visa_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-exchange-alt perm-icon"></i><div><div class="perm-label">إدارة التحويلات</div><div class="perm-desc">إنشاء وتعديل وحذف التحويلات المالية</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="transfers_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-hand-holding-usd perm-icon"></i><div><div class="perm-label">إدارة السلف</div><div class="perm-desc">إنشاء وتعديل وحذف سلف الموظفين</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="advances_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-credit-card perm-icon"></i><div><div class="perm-label">إدارة المدفوعات</div><div class="perm-desc">الوصول إلى سجل المدفوعات وإدارتها</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="payments_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-users-cog perm-icon"></i><div><div class="perm-label">إدارة الحسابات</div><div class="perm-desc">إنشاء وتعديل وحذف حسابات المستخدمين</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="accounts_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-history perm-icon"></i><div><div class="perm-label">عرض سجل النشاط</div><div class="perm-desc">الاطلاع على سجل نشاط المستخدمين</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="logs_view"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-cog perm-icon"></i><div><div class="perm-label">الإعدادات</div><div class="perm-desc">الوصول إلى إعدادات النظام وتعديلها</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="settings_manage"><span class="toggle-slider"></span></label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <div class="perm-info"><i class="las la-print perm-icon"></i><div><div class="perm-label">طباعة التقارير</div><div class="perm-desc">السماح بطباعة التقارير والفواتير</div></div></div>
+                                        <label class="toggle-switch"><input type="checkbox" class="perm-checkbox" data-perm="print_reports"><span class="toggle-slider"></span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium">حالة الحساب</label>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <label class="toggle-switch"><input type="checkbox" id="accStatus" checked><span class="toggle-slider"></span></label>
+                                    <span class="text-sm font-medium" id="accStatusLbl">نشط</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-3 mt-6">
+                                <button class="btn-primary" id="saveAccBtn"><i class="las la-save"></i> حفظ الحساب</button>
+                                <button class="btn-outline" id="resetAccBtn"><i class="las la-undo-alt"></i> إعادة تعيين</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <div class="info-card mb-4">
+                            <h3 class="text-lg font-bold text-[var(--color-white)] mb-3 flex items-center gap-2"><i class="las la-info-circle text-primary"></i> الأدوار المتاحة</h3>
+                            <div class="space-y-3">
+                                <div class="p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-2 mb-1"><span class="role-badge admin">مدير النظام</span></div>
+                                    <p class="text-xs text-[var(--color-muted)]">صلاحية كاملة لجميع أقسام النظام وإدارة الحسابات والإعدادات.</p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-2 mb-1"><span class="role-badge manager">مدير</span></div>
+                                    <p class="text-xs text-[var(--color-muted)]">إدارة المعاملات اليومية وعرض التقارير بدون صلاحية إدارة الحسابات.</p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-2 mb-1"><span class="role-badge user">مستخدم</span></div>
+                                    <p class="text-xs text-[var(--color-muted)]">إنشاء المعاملات والفواتير فقط بدون صلاحية الحذف أو التعديل على السجلات الأخرى.</p>
+                                </div>
+                                <div class="p-3 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
+                                    <div class="flex items-center gap-2 mb-1"><span class="role-badge viewer">مشاهد فقط</span></div>
+                                    <p class="text-xs text-[var(--color-muted)]">صلاحية عرض فقط دون إمكانية إنشاء أو تعديل أي بيانات.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <h3 class="text-lg font-bold text-[var(--color-white)] mb-3 flex items-center gap-2"><i class="las la-shield-alt text-primary"></i> نصائح الأمان</h3>
+                            <ul class="space-y-2 text-sm text-[var(--color-muted)]">
+                                <li class="flex items-start gap-2"><i class="las la-check-circle text-success mt-0.5"></i> استخدم كلمة مرور قوية تحتوي على رموز وأرقام.</li>
+                                <li class="flex items-start gap-2"><i class="las la-check-circle text-success mt-0.5"></i> لا تمنح صلاحيات أعلى من المطلوب للدور الوظيفي.</li>
+                                <li class="flex items-start gap-2"><i class="las la-check-circle text-success mt-0.5"></i> راجع صلاحيات المستخدمين بشكل دوري.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <style>
+.account-details-swal {
+    width: min(720px, 94vw) !important;
+    max-width: 720px !important;
+    border-radius: 24px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    direction: rtl !important;
+}
+
+.account-details-swal .swal2-title {
+    margin: 0 !important;
+    padding: 24px 28px 18px !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    text-align: right !important;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15) !important;
+}
+
+.account-details-swal .swal2-html-container {
+    margin: 0 !important;
+    padding: 24px 28px 10px !important;
+}
+
+.account-details-swal .swal2-actions {
+    margin: 0 !important;
+    padding: 12px 28px 24px !important;
+    justify-content: flex-start !important;
+}
+
+.account-details-swal .swal2-confirm {
+    min-width: 120px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+.account-details-wrapper {
+    direction: rtl;
+    text-align: right;
+}
+
+.account-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        rgba(240, 128, 128, 0.12),
+        rgba(254, 200, 154, 0.10)
+    );
+    border: 1px solid rgba(240, 128, 128, 0.16);
+}
+
+.account-profile-image-wrapper {
+    flex-shrink: 0;
+    width: 86px;
+    height: 86px;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f08080, #fec89a);
+}
+
+.account-profile-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+}
+
+.account-profile-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.account-profile-name {
+    margin: 0 0 6px;
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--text-dark, #2d2d2d);
+}
+
+.account-profile-phone {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted, #8a8a8a);
+    direction: ltr;
+    text-align: right;
+}
+
+.account-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.account-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 72px;
+    padding: 13px 15px;
+    border-radius: 15px;
+    background: rgba(128, 128, 128, 0.055);
+    border: 1px solid rgba(128, 128, 128, 0.10);
+    transition: all 0.2s ease;
+}
+
+.account-detail-item:hover {
+    border-color: rgba(240, 128, 128, 0.25);
+    background: rgba(240, 128, 128, 0.055);
+}
+
+.account-detail-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(240, 128, 128, 0.12);
+    color: #f08080;
+    font-size: 20px;
+}
+
+.account-detail-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.account-detail-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted, #8a8a8a);
+}
+
+.account-detail-value {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark, #2d2d2d);
+    overflow-wrap: anywhere;
+}
+
+.account-detail-value.ltr {
+    direction: ltr;
+    text-align: right;
+}
+
+.account-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.account-status-badge::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.account-status-active {
+    color: #1f9d55;
+    background: rgba(31, 157, 85, 0.10);
+}
+
+.account-status-inactive {
+    color: #8a8a8a;
+    background: rgba(138, 138, 138, 0.10);
+}
+
+.account-status-suspended {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.10);
+}
+
+.account-status-pending {
+    color: #d99a00;
+    background: rgba(217, 154, 0, 0.10);
+}
+
+@media (max-width: 600px) {
+    .account-details-swal {
+        width: 94vw !important;
+        max-width: 94vw !important;
+        border-radius: 20px !important;
+    }
+
+    .account-details-swal .swal2-title {
+        padding: 20px 18px 15px !important;
+        font-size: 20px !important;
+    }
+
+    .account-details-swal .swal2-html-container {
+        padding: 18px !important;
+    }
+
+    .account-details-swal .swal2-actions {
+        padding: 8px 18px 18px !important;
+    }
+
+    .account-profile-header {
+        padding: 14px;
+        gap: 13px;
+    }
+
+    .account-profile-image-wrapper {
+        width: 70px;
+        height: 70px;
+    }
+
+    .account-profile-name {
+        font-size: 18px;
+    }
+
+    .account-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+<div class="info-card mt-6" id="accountsListCard">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2">
+                <i class="las la-users text-primary"></i>
+                الحسابات الحالية
+            </h3>
+            <p class="text-sm text-[var(--color-muted)]" id="accountsCountLabel">
+                جاري التحميل...
+            </p>
+        </div>
+
+        <div class="flex gap-2">
+            <button class="btn-outline btn-sm" id="refreshAccountsBtn">
+                <i class="las la-sync-alt"></i>
+                تحديث
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="accounts-table" id="accountsTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>الدور</th>
+                    <th>الحالة</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+
+            <tbody id="accountsTableBody"></tbody>
+        </table>
+    </div>
+
+    <div
+        class="text-center py-6 text-[var(--color-muted)] text-sm"
+        id="noAccountsMsg"
+        style="display:none;"
+    >
+        <i class="las la-users-slash text-4xl block mb-3 opacity-40"></i>
+        لا توجد حسابات مضافة بعد
+    </div>
+
+    <div
+        class="text-center py-6 text-[var(--color-muted)] text-sm"
+        id="accountsLoadingMsg"
+    >
+        <i class="las la-spinner la-spin text-4xl block mb-3 opacity-40"></i>
+        جاري تحميل الحسابات...
+    </div>
+</div>
+
+
+<script>
+const accountsApiUrl = "http://108.181.221.18:7049/api/admin/create/users";
+
+const accountsTable = document.getElementById("accountsTable");
+const accountsTableBody = document.getElementById("accountsTableBody");
+const accountsCountLabel = document.getElementById("accountsCountLabel");
+const accountsLoadingMsg = document.getElementById("accountsLoadingMsg");
+const noAccountsMsg = document.getElementById("noAccountsMsg");
+const refreshAccountsBtn = document.getElementById("refreshAccountsBtn");
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function getAccountTypeLabel(accountType) {
+    const types = {
+        admin: "مدير",
+        assistant: "اسيستانت",
+        user: "مستخدم"
+    };
+
+    return types[accountType] || accountType || "غير محدد";
+}
+
+function getAccountStatusLabel(status) {
+    const statuses = {
+        active: "نشط",
+        inactive: "غير نشط",
+        suspended: "موقوف",
+        pending: "معلق"
+    };
+
+    return statuses[status] || status || "غير محدد";
+}
+
+function getAccountStatusClass(status) {
+    const classes = {
+        active: "status-active",
+        inactive: "status-inactive",
+        suspended: "status-suspended",
+        pending: "status-pending"
+    };
+
+    return classes[status] || "status-inactive";
+}
+
+function getAccountStatusSwalClass(status) {
+    const classes = {
+        active: "account-status-active",
+        inactive: "account-status-inactive",
+        suspended: "account-status-suspended",
+        pending: "account-status-pending"
+    };
+
+    return classes[status] || "account-status-inactive";
+}
+
+function formatDate(dateValue) {
+    if (!dateValue) {
+        return "غير متوفر";
+    }
+
+    const date = new Date(dateValue.replace(" ", "T"));
+
+    if (isNaN(date.getTime())) {
+        return escapeHtml(dateValue);
+    }
+
+    return date.toLocaleString("ar-EG", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function getProfilePicture(user) {
+    if (user.profile_picture) {
+        return escapeHtml(user.profile_picture);
+    }
+
+    return "https://via.placeholder.com/80x80?text=User";
+}
+
+function renderAccounts(users) {
+    accountsTableBody.innerHTML = "";
+
+    if (!Array.isArray(users) || users.length === 0) {
+        accountsTable.style.display = "none";
+        noAccountsMsg.style.display = "block";
+        accountsCountLabel.textContent = "لا توجد حسابات";
+        return;
+    }
+
+    noAccountsMsg.style.display = "none";
+    accountsTable.style.display = "table";
+    accountsCountLabel.textContent = `إجمالي الحسابات: ${users.length}`;
+
+    users.forEach(user => {
+        const accountType = getAccountTypeLabel(user.account_type);
+        const accountStatus = getAccountStatusLabel(user.account_status);
+        const statusClass = getAccountStatusClass(user.account_status);
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>
+                <div class="flex items-center gap-3">
+                    <img
+                        src="${getProfilePicture(user)}"
+                        alt="${escapeHtml(user.name)}"
+                        class="w-10 h-10 rounded-full object-cover"
+                        onerror="this.src='https://via.placeholder.com/80x80?text=User';"
+                    >
+                    <div>
+                        <div class="font-semibold text-[var(--color-white)]">
+                            ${escapeHtml(user.name || "بدون اسم")}
+                        </div>
+                        <div class="text-xs text-[var(--color-muted)]">
+                            ${escapeHtml(user.phone_number || "بدون رقم")}
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td>
+                <span class="text-sm">
+                    ${escapeHtml(user.email || "غير متوفر")}
+                </span>
+            </td>
+
+            <td>
+                <span class="text-sm">
+                    ${escapeHtml(accountType)}
+                </span>
+            </td>
+
+            <td>
+                <span class="account-status ${statusClass}">
+                    ${escapeHtml(accountStatus)}
+                </span>
+            </td>
+
+            <td>
+                <span class="text-sm">
+                    ${formatDate(user.created_at)}
+                </span>
+            </td>
+
+            <td>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="btn-outline btn-sm"
+                        onclick="viewAccount('${escapeHtml(user.id)}')"
+                        title="عرض الحساب"
+                    >
+                        <i class="las la-eye"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+
+        accountsTableBody.appendChild(row);
+    });
+}
+
+async function loadAccounts() {
+    accountsLoadingMsg.style.display = "block";
+    noAccountsMsg.style.display = "none";
+    accountsTable.style.display = "none";
+    accountsCountLabel.textContent = "جاري التحميل...";
+
+    try {
+        const response = await fetch(accountsApiUrl, {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || "Failed to load accounts");
+        }
+
+        renderAccounts(data.users || []);
+    } catch (error) {
+        console.error("Failed to load accounts:", error);
+
+        accountsTable.style.display = "none";
+        noAccountsMsg.style.display = "none";
+        accountsCountLabel.textContent = "تعذر تحميل الحسابات";
+    } finally {
+        accountsLoadingMsg.style.display = "none";
+    }
+}
+
+function viewAccount(id) {
+    const account = window.accountsData?.find(
+        user => String(user.id) === String(id)
+    );
+
+    if (!account) {
+        return;
+    }
+
+    const profilePicture = account.profile_picture
+        ? escapeHtml(account.profile_picture)
+        : "https://via.placeholder.com/80x80?text=User";
+
+    const accountStatus = getAccountStatusLabel(account.account_status);
+    const accountStatusClass = getAccountStatusSwalClass(account.account_status);
+
+    Swal.fire({
+        title: "تفاصيل الحساب",
+        html: `
+            <div class="account-details-wrapper">
+                <div class="account-profile-header">
+                    <div class="account-profile-image-wrapper">
+                        <img
+                            src="${profilePicture}"
+                            alt="${escapeHtml(account.name || "المستخدم")}"
+                            class="account-profile-image"
+                            onerror="this.src='https://via.placeholder.com/80x80?text=User';"
+                        >
+                    </div>
+
+                    <div class="account-profile-info">
+                        <h3 class="account-profile-name">
+                            ${escapeHtml(account.name || "بدون اسم")}
+                        </h3>
+
+                        <p class="account-profile-phone">
+                            ${escapeHtml(account.phone_number || "بدون رقم")}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="account-details-grid">
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-user"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">الاسم</span>
+                            <span class="account-detail-value">
+                                ${escapeHtml(account.name || "غير متوفر")}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-envelope"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">البريد الإلكتروني</span>
+                            <span class="account-detail-value ltr">
+                                ${escapeHtml(account.email || "غير متوفر")}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-phone"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">رقم الهاتف</span>
+                            <span class="account-detail-value ltr">
+                                ${escapeHtml(account.phone_number || "غير متوفر")}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-briefcase"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">المسمى الوظيفي</span>
+                            <span class="account-detail-value">
+                                ${escapeHtml(account.job_title || "غير متوفر")}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-user-shield"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">الدور</span>
+                            <span class="account-detail-value">
+                                ${escapeHtml(getAccountTypeLabel(account.account_type))}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item">
+                        <div class="account-detail-icon">
+                            <i class="las la-toggle-on"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">الحالة</span>
+                            <span class="account-detail-value">
+                                <span class="account-status-badge ${accountStatusClass}">
+                                    ${escapeHtml(accountStatus)}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="account-detail-item" style="grid-column: 1 / -1;">
+                        <div class="account-detail-icon">
+                            <i class="las la-calendar-alt"></i>
+                        </div>
+                        <div class="account-detail-content">
+                            <span class="account-detail-label">تاريخ إنشاء الحساب</span>
+                            <span class="account-detail-value">
+                                ${formatDate(account.created_at)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        confirmButtonText: "إغلاق",
+        confirmButtonColor: "#f08080",
+        width: "720px",
+        padding: "0",
+        background: "var(--color-light, #f9f7f7)",
+        color: "var(--text-dark, #2d2d2d)",
+        showCloseButton: true,
+        customClass: {
+            popup: "account-details-swal",
+            confirmButton: "btn-swal-confirm"
+        }
+    });
+}
+
+async function loadAccountsWithData() {
+    accountsLoadingMsg.style.display = "block";
+    noAccountsMsg.style.display = "none";
+    accountsTable.style.display = "none";
+    accountsCountLabel.textContent = "جاري التحميل...";
+
+    try {
+        const response = await fetch(accountsApiUrl, {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || "Failed to load accounts");
+        }
+
+        window.accountsData = Array.isArray(data.users)
+            ? data.users
+            : [];
+
+        renderAccounts(window.accountsData);
+    } catch (error) {
+        console.error("Failed to load accounts:", error);
+
+        accountsTable.style.display = "none";
+        noAccountsMsg.style.display = "none";
+        accountsCountLabel.textContent = "تعذر تحميل الحسابات";
+    } finally {
+        accountsLoadingMsg.style.display = "none";
+    }
+}
+
+refreshAccountsBtn.addEventListener("click", loadAccountsWithData);
+
+loadAccountsWithData();
+</script>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="editAccountModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeEditAccountModal"><i class="las la-times"></i></button>
+            <i class="las la-user-edit text-4xl text-primary mb-4 block text-center"></i>
+            <h3 class="text-xl font-bold mb-6 text-center text-[var(--color-white)]">تعديل الحساب</h3>
+            <div class="space-y-4">
+                <input type="hidden" id="editAccountId">
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم الكامل</label>
+                    <input type="text" class="input-field" id="editAccountFullName" placeholder="أدخل الاسم الكامل">
+                </div>
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">البريد الإلكتروني</label>
+                    <input type="email" class="input-field" id="editAccountEmail" placeholder="example@domain.com" dir="ltr">
+                </div>
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">رقم الهاتف</label>
+                    <input type="tel" class="input-field" id="editAccountPhone" placeholder="+20 1xx xxxx xxx">
+                </div>
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">المسمى الوظيفي</label>
+                    <input type="text" class="input-field" id="editAccountJobTitle" placeholder="المسمى الوظيفي">
+                </div>
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">الدور</label>
+                    <select class="select-field" id="editAccountRole">
+                        <option value="admin">مدير النظام (Admin)</option>
+                        <option value="manager">مدير (Manager)</option>
+                        <option value="user">مستخدم (User)</option>
+                        <option value="viewer">مشاهد فقط (Viewer)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm text-[var(--color-muted)] block mb-1">الحالة</label>
+                    <div class="flex items-center gap-3 mt-2">
+                        <label class="toggle-switch"><input type="checkbox" id="editAccountStatus" checked><span class="toggle-slider"></span></label>
+                        <span class="text-sm font-medium" id="editAccountStatusLabel">نشط</span>
+                    </div>
+                </div>
+                <button class="btn-primary w-full justify-center mt-4" id="saveEditAccountBtn"><i class="las la-save"></i> حفظ التغييرات</button>
+            </div>
+        </div>
+    </div>
+<script>
+(function () {
+    var API_BASE = 'http://108.181.221.18:7049/api/admin';
+    var CREATE_URL = API_BASE + '/create/account';
+
+    var accFullName = document.getElementById('accFullName');
+    var accEmail = document.getElementById('accEmail');
+    var accPhone = document.getElementById('accPhone');
+    var accJobTitle = document.getElementById('accJobTitle');
+    var accPassword = document.getElementById('accPassword');
+    var accConfirmPass = document.getElementById('accConfirmPass');
+    var accRole = document.getElementById('accRole');
+    var accStatus = document.getElementById('accStatus');
+    var accStatusLbl = document.getElementById('accStatusLbl');
+    var saveAccBtn = document.getElementById('saveAccBtn');
+    var resetAccBtn = document.getElementById('resetAccBtn');
+    var togglePassBtn = document.getElementById('togglePassBtn');
+    var toggleConfPassBtn = document.getElementById('toggleConfPassBtn');
+    var emailMsg = document.getElementById('emailMsg');
+    var phoneMsg = document.getElementById('phoneMsg');
+    var passMsg = document.getElementById('passMsg');
+    var confPassMsg = document.getElementById('confPassMsg');
+    var roleMsg = document.getElementById('roleMsg');
+    var permCheckboxes = document.querySelectorAll('.perm-checkbox');
+
+    function clearValidationMsgs() {
+        emailMsg.textContent = '';
+        emailMsg.className = 'validation-msg';
+        phoneMsg.textContent = '';
+        phoneMsg.className = 'validation-msg';
+        passMsg.textContent = '';
+        passMsg.className = 'validation-msg';
+        confPassMsg.textContent = '';
+        confPassMsg.className = 'validation-msg';
+        roleMsg.textContent = '';
+        roleMsg.className = 'validation-msg';
+    }
+
+    function validateEmailOnly(email) {
+        if (!email) return false;
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateCreateForm() {
+        clearValidationMsgs();
+        var isValid = true;
+
+        if (!accFullName.value.trim()) {
+            isValid = false;
+            accFullName.style.borderColor = '#ef4444';
+            setTimeout(function () {
+                accFullName.style.borderColor = '';
+            }, 3000);
+        }
+
+        var emailVal = accEmail.value.trim();
+
+        if (!emailVal) {
+            isValid = false;
+            emailMsg.textContent = 'البريد الإلكتروني مطلوب';
+            emailMsg.className = 'validation-msg error';
+        } else if (!validateEmailOnly(emailVal)) {
+            isValid = false;
+            emailMsg.textContent = 'صيغة البريد الإلكتروني غير صالحة';
+            emailMsg.className = 'validation-msg error';
+        }
+
+        if (!accPhone.value.trim()) {
+            isValid = false;
+            phoneMsg.textContent = 'رقم الهاتف مطلوب';
+            phoneMsg.className = 'validation-msg error';
+        }
+
+        var passVal = accPassword.value;
+
+        if (!passVal) {
+            isValid = false;
+            passMsg.textContent = 'كلمة المرور مطلوبة';
+            passMsg.className = 'validation-msg error';
+        } else if (passVal.length < 6) {
+            isValid = false;
+            passMsg.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            passMsg.className = 'validation-msg error';
+        }
+
+        var confVal = accConfirmPass.value;
+
+        if (!confVal) {
+            isValid = false;
+            confPassMsg.textContent = 'تأكيد كلمة المرور مطلوب';
+            confPassMsg.className = 'validation-msg error';
+        } else if (passVal !== confVal) {
+            isValid = false;
+            confPassMsg.textContent = 'كلمتا المرور غير متطابقتين';
+            confPassMsg.className = 'validation-msg error';
+        }
+
+        if (!accRole.value) {
+            isValid = false;
+            roleMsg.textContent = 'الدور الأساسي مطلوب';
+            roleMsg.className = 'validation-msg error';
+        }
+
+        return isValid;
+    }
+
+    function collectPermissions() {
+        var permissions = {};
+
+        permCheckboxes.forEach(function (cb) {
+            permissions[cb.getAttribute('data-perm')] = cb.checked ? 1 : 0;
+        });
+
+        return permissions;
+    }
+
+    function buildCreatePayload() {
+        var permissions = collectPermissions();
+
+        return {
+            name: accFullName.value.trim(),
+            email: accEmail.value.trim().toLowerCase(),
+            phone_number: accPhone.value.trim(),
+            password: accPassword.value,
+            account_type: accRole.value,
+            job_title: accJobTitle.value.trim(),
+            account_status: accStatus.checked ? 'active' : 'inactive',
+            advances: [],
+            expenses: [],
+            transfers: [],
+            fees: [],
+            dashboard_view: permissions.dashboard_view,
+            outgoing_manage: permissions.outgoing_manage,
+            visa_manage: permissions.visa_manage,
+            transfers_manage: permissions.transfers_manage,
+            advances_manage: permissions.advances_manage,
+            payments_manage: permissions.payments_manage,
+            accounts_manage: permissions.accounts_manage,
+            logs_view: permissions.logs_view,
+            settings_manage: permissions.settings_manage,
+            print_reports: permissions.print_reports
+        };
+    }
+
+    function resetCreateForm() {
+        accFullName.value = '';
+        accEmail.value = '';
+        accPhone.value = '';
+        accJobTitle.value = '';
+        accPassword.value = '';
+        accConfirmPass.value = '';
+        accRole.value = '';
+        accStatus.checked = true;
+        accStatusLbl.textContent = 'نشط';
+
+        accPassword.setAttribute('type', 'password');
+        accConfirmPass.setAttribute('type', 'password');
+
+        togglePassBtn.querySelector('i').classList.remove('la-eye-slash');
+        togglePassBtn.querySelector('i').classList.add('la-eye');
+
+        toggleConfPassBtn.querySelector('i').classList.remove('la-eye-slash');
+        toggleConfPassBtn.querySelector('i').classList.add('la-eye');
+
+        permCheckboxes.forEach(function (cb) {
+            cb.checked = cb.getAttribute('data-perm') === 'dashboard_view';
+        });
+
+        clearValidationMsgs();
+        accFullName.style.borderColor = '';
+        accEmail.style.borderColor = '';
+    }
+
+    window.accountCreateFunctions = {
+        clearValidationMsgs: clearValidationMsgs,
+        validateEmailOnly: validateEmailOnly,
+        validateCreateForm: validateCreateForm,
+        collectPermissions: collectPermissions,
+        buildCreatePayload: buildCreatePayload,
+        resetCreateForm: resetCreateForm
+    };
+
+    togglePassBtn.addEventListener('click', function () {
+        var type = accPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+
+        accPassword.setAttribute('type', type);
+
+        var icon = togglePassBtn.querySelector('i');
+
+        icon.classList.toggle('la-eye', type === 'password');
+        icon.classList.toggle('la-eye-slash', type === 'text');
+    });
+
+    toggleConfPassBtn.addEventListener('click', function () {
+        var type = accConfirmPass.getAttribute('type') === 'password' ? 'text' : 'password';
+
+        accConfirmPass.setAttribute('type', type);
+
+        var icon = toggleConfPassBtn.querySelector('i');
+
+        icon.classList.toggle('la-eye', type === 'password');
+        icon.classList.toggle('la-eye-slash', type === 'text');
+    });
+
+    accStatus.addEventListener('change', function () {
+        accStatusLbl.textContent = accStatus.checked ? 'نشط' : 'غير نشط';
+    });
+
+    saveAccBtn.addEventListener('click', function () {
+        clearValidationMsgs();
+
+        if (!validateCreateForm()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ في النموذج',
+                text: 'يرجى تصحيح الأخطاء في النموذج',
+                confirmButtonText: 'حسناً'
+            });
+            return;
+        }
+
+        saveAccBtn.disabled = true;
+        saveAccBtn.innerHTML = '<i class="las la-spinner la-spin"></i> جاري الحفظ...';
+
+        fetch(CREATE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(buildCreatePayload())
+        })
+        .then(function (res) {
+            return res.json();
+        })
+        .then(function (data) {
+            saveAccBtn.disabled = false;
+            saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم بنجاح',
+                    text: 'تم إنشاء الحساب بنجاح',
+                    confirmButtonText: 'حسناً'
+                });
+
+                resetCreateForm();
+
+                if (window.accountListFunctions) {
+                    window.accountListFunctions.loadAccounts();
+                }
+            } else {
+                var message = data.message || '';
+
+                if (
+                    message.toLowerCase().indexOf('email') !== -1 &&
+                    message.toLowerCase().indexOf('exist') !== -1
+                ) {
+                    emailMsg.textContent = 'البريد الإلكتروني مستخدم بالفعل';
+                    emailMsg.className = 'validation-msg error';
+                }
+
+                if (
+                    message.toLowerCase().indexOf('phone') !== -1 &&
+                    message.toLowerCase().indexOf('exist') !== -1
+                ) {
+                    phoneMsg.textContent = 'رقم الهاتف مستخدم بالفعل';
+                    phoneMsg.className = 'validation-msg error';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: data.message || 'حدث خطأ أثناء إنشاء الحساب',
+                    confirmButtonText: 'حسناً'
+                });
+            }
+        })
+        .catch(function (err) {
+            saveAccBtn.disabled = false;
+            saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
+
+            Swal.fire({
+                icon: 'error',
+                title: 'فشل الاتصال',
+                text: 'فشل الاتصال بالخادم: ' + err.message,
+                confirmButtonText: 'حسناً'
+            });
+        });
+    });
+
+    resetAccBtn.addEventListener('click', function () {
+        resetCreateForm();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'تم',
+            text: 'تم إعادة تعيين النموذج',
+            confirmButtonText: 'حسناً',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    });
+})();
+</script>
+
+<script>
+(function () {
+    var API_BASE = 'http://108.181.221.18:7049/api/admin';
+    var LIST_URL = API_BASE + '/accounts';
+    var accountsTable = document.getElementById('accountsTable');
+    var accountsTableBody = document.getElementById('accountsTableBody');
+    var noAccountsMsg = document.getElementById('noAccountsMsg');
+    var accountsCountLabel = document.getElementById('accountsCountLabel');
+    var accountsLoadingMsg = document.getElementById('accountsLoadingMsg');
+    var accountsErrorMsg = document.getElementById('accountsErrorMsg');
+    var refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
+    var retryLoadAccountsBtn = document.getElementById('retryLoadAccountsBtn');
+    var cachedAccounts = [];
+
+    function formatDate(isoString) {
+        if (!isoString) return 'لم يسجل بعد';
+
+        try {
+            var d = new Date(isoString);
+
+            return d.toLocaleDateString('ar-EG', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }) + ' ' + d.toLocaleTimeString('ar-EG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return isoString;
+        }
+    }
+
+    function getRoleBadgeClass(role) {
+        var map = {
+            admin: 'admin',
+            manager: 'manager',
+            user: 'user',
+            viewer: 'viewer'
+        };
+
+        return map[role] || 'user';
+    }
+
+    function getRoleLabel(role) {
+        var map = {
+            admin: 'مدير النظام',
+            manager: 'مدير',
+            user: 'مستخدم',
+            viewer: 'مشاهد فقط'
+        };
+
+        return map[role] || 'مستخدم';
+    }
+
+    function getStatusBadge(status) {
+        var isActive = status === 'active' || status === true || status === 1;
+
+        if (isActive) {
+            return '<span class="badge-success"><i class="las la-check-circle"></i> نشط</span>';
+        }
+
+        return '<span class="badge-danger"><i class="las la-times-circle"></i> غير نشط</span>';
+    }
+
+    function renderAccountsTable(accounts) {
+        cachedAccounts = accounts || [];
+        accountsTableBody.innerHTML = '';
+
+        if (!cachedAccounts.length) {
+            noAccountsMsg.style.display = 'block';
+            accountsTable.style.display = 'none';
+            accountsCountLabel.textContent = '0 حساب';
+            accountsLoadingMsg.style.display = 'none';
+            accountsErrorMsg.style.display = 'none';
+            return;
+        }
+
+        noAccountsMsg.style.display = 'none';
+        accountsTable.style.display = 'table';
+        accountsLoadingMsg.style.display = 'none';
+        accountsErrorMsg.style.display = 'none';
+        accountsCountLabel.textContent = cachedAccounts.length + ' حساب';
+
+        cachedAccounts.forEach(function (acc) {
+            var tr = document.createElement('tr');
+
+            var accId = acc.id || acc._id || '';
+            var accName = acc.name || acc.fullName || acc.full_name || '-';
+            var accEmailVal = acc.email || '-';
+            var accRoleVal = acc.account_type || acc.role || acc.accountType || 'user';
+            var accStatusVal = acc.account_status || acc.status || acc.active;
+            var accLastLogin = acc.last_login || acc.lastLogin || null;
+            var accJobTitleVal = acc.job_title || acc.jobTitle || '';
+
+            tr.innerHTML =
+                '<td><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-[var(--darker-bg)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0"><i class="las la-user text-sm text-[var(--color-muted)]"></i></div><div><p class="font-medium text-[var(--color-white)] text-sm">' +
+                accName +
+                '</p>' +
+                (accJobTitleVal ? '<p class="text-xs text-[var(--color-muted)]">' + accJobTitleVal + '</p>' : '') +
+                '</div></div></td>' +
+                '<td class="text-sm text-[var(--color-muted)]" dir="ltr" style="text-align:right;">' +
+                accEmailVal +
+                '</td>' +
+                '<td><span class="role-badge ' +
+                getRoleBadgeClass(accRoleVal) +
+                '">' +
+                getRoleLabel(accRoleVal) +
+                '</span></td>' +
+                '<td>' +
+                getStatusBadge(accStatusVal) +
+                '</td>' +
+                '<td class="text-xs text-[var(--color-muted)]">' +
+                formatDate(accLastLogin) +
+                '</td>' +
+                '<td><div class="flex gap-1"><button class="btn-outline btn-xs edit-account-btn" data-id="' +
+                accId +
+                '" title="تعديل"><i class="las la-edit"></i></button><button class="btn-outline btn-xs delete-account-btn" data-id="' +
+                accId +
+                '" title="حذف" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i></button></div></td>';
+
+            accountsTableBody.appendChild(tr);
+        });
+
+        accountsTableBody.querySelectorAll('.edit-account-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (window.accountEditFunctions) {
+                    window.accountEditFunctions.openEditModal(this.getAttribute('data-id'));
+                }
+            });
+        });
+
+        accountsTableBody.querySelectorAll('.delete-account-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (window.accountDeleteFunctions) {
+                    window.accountDeleteFunctions.confirmDeleteAccount(this.getAttribute('data-id'));
+                }
+            });
+        });
+    }
+
+    function showLoadingState() {
+        accountsTable.style.display = 'none';
+        noAccountsMsg.style.display = 'none';
+        accountsErrorMsg.style.display = 'none';
+        accountsLoadingMsg.style.display = 'block';
+        accountsCountLabel.textContent = 'جاري التحميل...';
+    }
+
+    function showErrorState() {
+        accountsTable.style.display = 'none';
+        noAccountsMsg.style.display = 'none';
+        accountsLoadingMsg.style.display = 'none';
+        accountsErrorMsg.style.display = 'block';
+        accountsCountLabel.textContent = 'فشل التحميل';
+    }
+
+    function loadAccounts() {
+        showLoadingState();
+
+        fetch(LIST_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(function (res) {
+            if (!res.ok) {
+                throw new Error('HTTP ' + res.status);
+            }
+
+            return res.json();
+        })
+        .then(function (data) {
+            var accounts = [];
+
+            if (Array.isArray(data)) {
+                accounts = data;
+            } else if (data && data.success && Array.isArray(data.data)) {
+                accounts = data.data;
+            } else if (data && Array.isArray(data.accounts)) {
+                accounts = data.accounts;
+            } else if (data && Array.isArray(data.results)) {
+                accounts = data.results;
+            }
+
+            renderAccountsTable(accounts);
+        })
+        .catch(function () {
+            showErrorState();
+        });
+    }
+
+    window.accountListFunctions = {
+        loadAccounts: loadAccounts,
+        getCachedAccounts: function () {
+            return cachedAccounts;
+        }
+    };
+
+    refreshAccountsBtn.addEventListener('click', function () {
+        loadAccounts();
+    });
+
+    if (retryLoadAccountsBtn) {
+        retryLoadAccountsBtn.addEventListener('click', function () {
+            loadAccounts();
+        });
+    }
+})();
+</script>
+
+
+
+
+<script>
+(function () {
+    var bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    var navNotch = document.getElementById('navNotch');
+    var bottomMobileNav = document.getElementById('bottomMobileNav');
+
+    function moveNotch(activeItem) {
+        if (!navNotch || !activeItem || !bottomMobileNav) return;
+
+        var rect = activeItem.getBoundingClientRect();
+        var navRect = bottomMobileNav.getBoundingClientRect();
+
+        navNotch.style.left =
+            (rect.left + rect.width / 2 - navRect.left) + 'px';
+    }
+
+    function setBottomNavActive() {
+        var activeItem = null;
+
+        bottomNavItems.forEach(function (item) {
+            item.classList.remove('active');
+
+            if (item.getAttribute('data-tab') === 'accounts') {
+                item.classList.add('active');
+                activeItem = item;
+            }
+        });
+
+        if (activeItem) {
+            moveNotch(activeItem);
+        } else if (bottomNavItems.length > 0) {
+            bottomNavItems[0].classList.add('active');
+            moveNotch(bottomNavItems[0]);
+        }
+    }
+
+    setBottomNavActive();
+
+    window.addEventListener('resize', function () {
+        var activeItem = document.querySelector('.bottom-nav-item.active');
+
+        if (activeItem) {
+            moveNotch(activeItem);
+        }
+    });
+
+    bottomNavItems.forEach(function (item) {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            bottomNavItems.forEach(function (i) {
+                i.classList.remove('active');
+            });
+
+            this.classList.add('active');
+            moveNotch(this);
+        });
+    });
+})();
+</script>
+
+<script>
+(function () {
+    var themeToggles = document.querySelectorAll('.theme-toggle');
+    var body = document.body;
+    var savedTheme = localStorage.getItem('theme') || 'dark';
+
+    function applyTheme(theme) {
+        var isDark = theme === 'dark';
+
+        body.classList.toggle('light', !isDark);
+
+        themeToggles.forEach(function (toggle) {
+            toggle.classList.toggle('dark', isDark);
+        });
+
+        localStorage.setItem('theme', theme);
+    }
+
+    applyTheme(savedTheme);
+
+    themeToggles.forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+            var isDark = !body.classList.contains('light');
+
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+    });
+})();
+</script>
+
+<script>
+(function () {
+    var userFullNameEl = document.getElementById('userFullName');
+    var roleEl = document.getElementById('role');
+    var headerAvatarImg = document.getElementById('headerAvatar');
+    var userAvatarImg = document.getElementById('userAvatar');
+
+    try {
+        var stored = localStorage.getItem('userProfileData');
+
+        if (stored) {
+            var data = JSON.parse(stored);
+
+            if (data.fullName && userFullNameEl) {
+                userFullNameEl.textContent = data.fullName;
+            }
+
+            if (data.role && roleEl) {
+                roleEl.textContent = data.role;
+            }
+
+            if (data.avatar) {
+                if (headerAvatarImg) {
+                    headerAvatarImg.src = data.avatar;
+                }
+
+                if (userAvatarImg) {
+                    userAvatarImg.src = data.avatar;
+                }
+            }
+        }
+    } catch (e) {
+    }
+})();
+</script>
+
+<script>
+(function () {
+    if (window.accountListFunctions) {
+        window.accountListFunctions.loadAccounts();
+    }
+})();
+</script>
+
+</body>
+</html>
