@@ -519,11 +519,6 @@
             background: rgba(13, 153, 255, 0.1);
         }
 
-        .report-action-btn.delete-btn:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
-
         .report-action-btn.print-btn:hover {
             color: #f59e0b;
             background: rgba(245, 158, 11, 0.1);
@@ -1030,9 +1025,6 @@
                         <div class="flex items-center gap-2 flex-shrink-0">
                             <button class="btn-outline btn-xs" id="clearFiltersBtn"><i class="las la-times"></i> مسح
                                 الفلاتر</button>
-                            <button class="btn-outline btn-xs" id="clearAllReportsBtn"
-                                style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i
-                                    class="las la-trash-alt"></i> مسح الكل</button>
                         </div>
                     </div>
                 </div>
@@ -1060,11 +1052,19 @@
                     </div>
                 </div>
                 <div class="info-card mt-6" id="reportDetailCard" style="display:none;">
-                    <div class="text-center mb-4">
-                        <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
-                        <h3 class="text-xl font-bold text-[var(--color-white)]" id="detailReportTitle">تقرير</h3>
-                        <p class="text-sm text-[var(--color-muted)]" id="detailReportDate"></p>
-                        <span id="detailReportCategory" class="badge-primary mt-1"></span>
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
+                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="detailReportTitle">تقرير</h3>
+                            <p class="text-sm text-[var(--color-muted)]" id="detailReportDate"></p>
+                            <span id="detailReportCategory" class="badge-primary mt-1"></span>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة
+                                هذا التقرير</button>
+                            <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i>
+                                إغلاق</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="view-table" id="detailReportTable">
@@ -1082,12 +1082,6 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
-                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
-                        <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة
-                            هذا التقرير</button>
-                        <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i>
-                            إغلاق</button>
                     </div>
                 </div>
             </div>
@@ -1250,15 +1244,9 @@
                         printBtn.title = 'طباعة التقرير';
                         printBtn.innerHTML = '<i class="las la-print"></i>';
                         printBtn.addEventListener('click', function () { printReport(
-                        report); }); const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'report-action-btn delete-btn';
-                        deleteBtn.title = 'حذف التقرير';
-                        deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                        deleteBtn.addEventListener('click', function () { deleteReport(
-                            report); });
+                        report); });
                         tdActions.appendChild(viewBtn);
                         tdActions.appendChild(printBtn);
-                        tdActions.appendChild(deleteBtn);
                         tr.appendChild(tdDate);
                         tr.appendChild(tdCategory);
                         tr.appendChild(tdName);
@@ -1319,26 +1307,6 @@
             document.getElementById('printDetailReportBtn').addEventListener('click', function () { if (
                     currentDetailReport) { printReport(currentDetailReport); } });
 
-            function deleteReport(report) { if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return; let storageKey; if (
-                    report.category === 'خوارج') storageKey = STORAGE_KEY_OUTGOING; else if (report.category ===
-                    'فيز') storageKey = STORAGE_KEY_VISA; else if (report.category === 'تحويلات') storageKey =
-                    STORAGE_KEY_TRANSFERS; else storageKey = STORAGE_KEY_ADVANCES; try { const stored = localStorage
-                    .getItem(storageKey); if (!stored) return; let reports = JSON.parse(stored);
-                    reports = reports.filter(r => r.id !== report.id);
-                    localStorage.setItem(storageKey, JSON.stringify(reports)); if (currentDetailReport && currentDetailReport
-                        .id === report.id) { hideReportDetail(); }
-                    renderReportsTable();
-                    showSuccess('تم حذف التقرير بنجاح.'); } catch (e) { showSuccess('حدث خطأ أثناء الحذف.'); } }
-            document.getElementById('clearAllReportsBtn').addEventListener('click', function () { if (!confirm(
-                        'هل أنت متأكد من مسح جميع التقارير من جميع الأقسام؟ هذا الإجراء لا يمكن التراجع عنه.'))
-                    return;
-                localStorage.removeItem(STORAGE_KEY_OUTGOING);
-                localStorage.removeItem(STORAGE_KEY_VISA);
-                localStorage.removeItem(STORAGE_KEY_TRANSFERS);
-                localStorage.removeItem(STORAGE_KEY_ADVANCES);
-                hideReportDetail();
-                renderReportsTable();
-                showSuccess('تم مسح جميع التقارير بنجاح.'); });
             document.getElementById('filterDateFrom').addEventListener('change', renderReportsTable);
             document.getElementById('filterDateTo').addEventListener('change', renderReportsTable);
             document.getElementById('filterCategory').addEventListener('change', renderReportsTable);
