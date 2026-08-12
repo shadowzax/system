@@ -130,7 +130,16 @@ app.get("/admin/acount", (req, res) => {
         description: ""
     });
 });
+app.get("/me/reports", (req, res) => {
+    if (!req.isAuthenticated) {
+    return res.redirect("/login");
+     }
 
+    res.render("profile/myreports", {
+        title: "",
+        description: ""
+    });
+});
 /*-----------------------------------------*/
 app.get("/outgoing", (req, res) => {
     if (!req.isAuthenticated) {
