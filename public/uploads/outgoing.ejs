@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -12,8 +13,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -976,6 +979,7 @@
         }
 
         @media print {
+
             html,
             body {
                 width: 80.5mm;
@@ -1151,12 +1155,15 @@
         }
     </style>
 </head>
+
 <body>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="https://i.ibb.co/HRbkkLw/3177440-1.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <img id="userAvatar" src="https://i.ibb.co/HRbkkLw/3177440-1.jpg"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
                     <div>
                         <p class="font-bold text-[var(--color-white)]" id="userFullName">Mohamed Ibrahim</p>
                         <p class="text-xs text-[var(--color-muted)]" id="role">مدير الحسابات</p>
@@ -1165,18 +1172,26 @@
             </div>
             <nav class="flex-1">
                 <div class="sidebar-section-title">الكاش</div>
-                <a href="/outgoing" class="sidebar-item active" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
-                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
-                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
-                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <a href="/outgoing" class="sidebar-item active" data-page="outgoing-invoices"><i
+                        class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i
+                        class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i
+                        class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i
+                        class="las la-hand-holding-usd"></i><span>السلف</span></a>
                 <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i
+                            class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
-                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed
+                    by</span>
                 <div>
-                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer"
+                        class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman
+                        Mohamed</a>
                 </div>
                 <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
             </div>
@@ -1185,7 +1200,8 @@
             <header id="mainHeader">
                 <div class="flex items-center gap-6 mr-4">
                     <a class="flex w-fit select-none items-center" href="/">
-                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo"
+                            class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
                     </a>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -1195,7 +1211,8 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg" class="header-avatar" alt="avatar">
+                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg"
+                        class="header-avatar" alt="avatar">
                 </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -1208,13 +1225,16 @@
                     <div class="restaurant-header">
                         <i class="las la-utensils"></i>
                         <h3>الخوارج</h3>
-                        <input type="text" class="restaurant-name-input" id="restaurantNameInput" placeholder="ابن حميدو السلام">
+                        <input type="text" class="restaurant-name-input" id="restaurantNameInput"
+                            placeholder="ابن حميدو السلام">
                         <div class="mr-auto flex items-center gap-2">
-                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active" title="تبديل بين التاريخ التلقائي واليدوي">
+                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active"
+                                title="تبديل بين التاريخ التلقائي واليدوي">
                                 <i class="las la-calendar-check"></i>
                                 <span id="dateToggleText">تلقائي</span>
                             </button>
-                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2" style="width:140px;" disabled>
+                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2"
+                                style="width:140px;" disabled>
                         </div>
                     </div>
                     <div class="overflow-x-auto pr-6">
@@ -1238,18 +1258,23 @@
                     </div>
                     <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
                         <div class="flex flex-wrap gap-3 items-center">
-                            <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
+                            <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة
+                                صف</button>
                             <div class="add-rows-section">
                                 <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
                                 <input type="number" id="rowsCountInput" value="3" min="1" max="50">
-                                <button class="btn-outline btn-sm" id="addRowsBatchBtn"><i class="las la-plus-circle"></i> إضافة</button>
+                                <button class="btn-outline btn-sm" id="addRowsBatchBtn"><i
+                                        class="las la-plus-circle"></i> إضافة</button>
                             </div>
-                            <button class="btn-outline btn-sm" id="clearRowsBtn"><i class="las la-trash-alt"></i> مسح الكل</button>
+                            <button class="btn-outline btn-sm" id="clearRowsBtn"><i class="las la-trash-alt"></i> مسح
+                                الكل</button>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             <button class="btn-primary btn-sm" id="storeBtn"><i class="las la-save"></i> تخزين</button>
-                            <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة (82.5mm)</button>
-                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> CSV</button>
+                            <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة
+                                (82.5mm)</button>
+                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i
+                                    class="las la-file-excel"></i> CSV</button>
                         </div>
                     </div>
                 </div>
@@ -1279,14 +1304,17 @@
                         </table>
                     </div>
                     <div class="mt-6 flex justify-center gap-3 flex-wrap">
-                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة هذا التقرير</button>
-                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
+                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة
+                            هذا التقرير</button>
+                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i>
+                            إغلاق</button>
                     </div>
                 </div>
                 <div class="mt-6 info-card" id="recentReportsCard">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-history text-primary"></i> آخر التقارير المنشأة</h3>
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i
+                                    class="las la-history text-primary"></i> آخر التقارير المنشأة</h3>
                             <p class="text-sm text-[var(--color-muted)]">عرض آخر التقارير التي تم تخزينها</p>
                         </div>
                     </div>
@@ -1743,9 +1771,9 @@
                 total: total
             };
 
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MTcyNDQ4NzYiLCJpYXQiOjE3ODY0NDMyMzMsImV4cCI6MTc4NzA0ODAzM30.B4YsAEubEw5QB21Zamw8Odrh0b0x_a4rTm0-aDln7O0";
+            const token = "<%= token %>"; 
             try {
-                const response = await fetch('http://108.181.221.18:7049/api/expenses/store', {
+                const response = await fetch("<%= api %>" + '/api/expenses/store', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2133,4 +2161,5 @@
         });
     </script>
 </body>
+
 </html>
