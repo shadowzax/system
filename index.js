@@ -111,6 +111,20 @@ app.get("/", (req, res) => {
     });
 });
 */
+app.get("/1", (req, res) => {
+    res.render("../uploads/outgoing", {
+        title: "",
+        description: ""
+    });
+});
+
+app.get("/2", (req, res) => {
+    res.render("../uploads/test", {
+        title: "",
+        description: ""
+    });
+});
+
 app.get("/login", (req, res) => {
     if (req.isAuthenticated) {
         return res.redirect("/");
