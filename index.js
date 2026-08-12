@@ -125,22 +125,17 @@ app.get("/login", (req, res) => {
 app.get("/1", (req, res) => {
     // if (!req.isAuthenticated) {
     //     return res.redirect("/login");
-    // }
+    }
 
-    res.render("/public/uploads/outgoing", {
-        title: "",
-        description: ""
-    });
+    res.sendFile(path.join(__dirname, "public", "uploads", "outgoing.ejs"));
 });
+
 app.get("/2", (req, res) => {
     // if (!req.isAuthenticated) {
     //     return res.redirect("/login");
-    // }
+    }
 
-    res.render("/public/uploads/test", {
-        title: "",
-        description: ""
-    });
+    res.sendFile(path.join(__dirname, "public", "uploads", "test.ejs"));
 });
 
 app.get("/admin/acount", (req, res) => {
