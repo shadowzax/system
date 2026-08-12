@@ -219,7 +219,7 @@
         .badge-primary {
             background: rgba(13, 153, 255, 0.12);
             border: 1px solid rgba(13, 153, 255, 0.3);
-            padding: 8px 18px;
+            padding: 6px 16px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -227,13 +227,12 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
         }
 
         .badge-warning {
             background: rgba(245, 158, 11, 0.12);
             border: 1px solid rgba(245, 158, 11, 0.3);
-            padding: 8px 18px;
+            padding: 6px 16px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -241,13 +240,12 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
         }
 
         .badge-secondary {
             background: rgba(124, 58, 237, 0.12);
             border: 1px solid rgba(124, 58, 237, 0.3);
-            padding: 8px 18px;
+            padding: 6px 16px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -255,13 +253,12 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
         }
 
         .badge-accent {
             background: rgba(6, 182, 212, 0.12);
             border: 1px solid rgba(6, 182, 212, 0.3);
-            padding: 8px 18px;
+            padding: 6px 16px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -269,7 +266,6 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
         }
 
         #mainHeader {
@@ -634,214 +630,36 @@
             margin-top: 4px;
         }
 
-        .detail-header-card {
-            background: linear-gradient(135deg, rgba(13, 153, 255, 0.06) 0%, rgba(124, 58, 237, 0.03) 50%, rgba(6, 182, 212, 0.04) 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 28px 24px 22px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .detail-header-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(13, 153, 255, 0.07) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .detail-header-card::after {
-            content: '';
-            position: absolute;
-            bottom: -40%;
-            left: -20%;
-            width: 160px;
-            height: 160px;
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .detail-header-card .detail-icon-circle {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: rgba(13, 153, 255, 0.1);
-            border: 2px solid rgba(13, 153, 255, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .detail-header-card .detail-icon-circle i {
-            font-size: 2rem;
-            color: var(--color-primary);
-        }
-
-        .detail-header-card h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--color-white);
-            position: relative;
-            z-index: 1;
-            margin-bottom: 4px;
-        }
-
-        .detail-header-card .detail-date-text {
-            font-size: 0.85rem;
-            color: var(--color-muted);
-            position: relative;
-            z-index: 1;
-            margin-bottom: 10px;
-        }
-
-        .detail-header-card .detail-badge-wrapper {
-            position: relative;
-            z-index: 1;
-        }
-
-        .view-table-wrapper {
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-
         .view-table {
             width: 100%;
             border-collapse: collapse;
             font-family: 'Alexandria', sans-serif;
+            margin-top: 16px;
         }
 
         .view-table th,
         .view-table td {
-            padding: 13px 16px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
             text-align: right;
             color: var(--color-white);
-            border-bottom: 1px solid rgba(186, 186, 186, 0.08);
         }
 
         .view-table th {
             background: var(--darker-bg);
             color: var(--color-muted);
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .view-table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .view-table tbody tr:hover {
-            background: rgba(13, 153, 255, 0.03);
-        }
-
-        .view-table tbody tr:last-child td {
-            border-bottom: none;
+            letter-spacing: 0.5px;
         }
 
         .view-table .total-row td {
             border-top: 2px solid var(--color-primary);
-            border-bottom: none;
             font-weight: 700;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             color: var(--color-primary);
-            background: rgba(13, 153, 255, 0.04);
-            padding: 16px;
-            letter-spacing: 0.3px;
-        }
-
-        .view-table .total-row td:first-child {
-            font-weight: 700;
-            color: var(--color-white);
-        }
-
-        .detail-actions-bar {
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-        }
-
-        .detail-actions-bar .btn-outline {
-            padding: 10px 22px;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 0.82rem;
-        }
-
-        .detail-actions-bar .btn-outline.print-action {
-            border-color: rgba(245, 158, 11, 0.4);
-            color: #f59e0b;
-        }
-
-        .detail-actions-bar .btn-outline.print-action:hover {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: #f59e0b;
-            color: #f59e0b;
-        }
-
-        .detail-actions-bar .btn-outline.close-action {
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-
-        .detail-actions-bar .btn-outline.close-action:hover {
-            background: rgba(239, 68, 68, 0.08);
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-
-        @media (max-width: 640px) {
-            .detail-header-card {
-                padding: 22px 16px 18px;
-            }
-
-            .detail-header-card .detail-icon-circle {
-                width: 58px;
-                height: 58px;
-            }
-
-            .detail-header-card .detail-icon-circle i {
-                font-size: 1.5rem;
-            }
-
-            .detail-header-card h3 {
-                font-size: 1.2rem;
-            }
-
-            .view-table th,
-            .view-table td {
-                padding: 10px 12px;
-                font-size: 0.85rem;
-            }
-
-            .view-table .total-row td {
-                font-size: 1rem;
-                padding: 12px;
-            }
-
-            .detail-actions-bar {
-                gap: 10px;
-            }
-
-            .detail-actions-bar .btn-outline {
-                padding: 8px 16px;
-                font-size: 0.75rem;
-            }
+            background: var(--darker-bg);
         }
 
         .modal-overlay {
@@ -1223,11 +1041,11 @@
                         <table class="reports-table" id="reportsTable">
                             <thead>
                                 <tr>
-                                    <th style="width:18%;">التاريخ</th>
+                                    <th style="width:16%;">التاريخ</th>
                                     <th style="width:12%;">النوع</th>
-                                    <th style="width:26%;">الاسم</th>
-                                    <th style="width:20%;">الإجمالي (ج.م)</th>
-                                    <th style="width:24%;">الإجراءات</th>
+                                    <th style="width:28%;">الاسم</th>
+                                    <th style="width:18%;">الإجمالي (ج.م)</th>
+                                    <th style="width:26%;">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="reportsTbody">
@@ -1242,17 +1060,13 @@
                     </div>
                 </div>
                 <div class="info-card mt-6" id="reportDetailCard" style="display:none;">
-                    <div class="detail-header-card">
-                        <div class="detail-icon-circle">
-                            <i class="las la-file-alt"></i>
-                        </div>
-                        <h3 id="detailReportTitle">تقرير</h3>
-                        <p class="detail-date-text" id="detailReportDate"></p>
-                        <div class="detail-badge-wrapper">
-                            <span id="detailReportCategory" class="badge-primary"></span>
-                        </div>
+                    <div class="text-center mb-4">
+                        <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
+                        <h3 class="text-xl font-bold text-[var(--color-white)]" id="detailReportTitle">تقرير</h3>
+                        <p class="text-sm text-[var(--color-muted)]" id="detailReportDate"></p>
+                        <span id="detailReportCategory" class="badge-primary mt-1"></span>
                     </div>
-                    <div class="view-table-wrapper">
+                    <div class="overflow-x-auto">
                         <table class="view-table" id="detailReportTable">
                             <thead>
                                 <tr>
@@ -1269,11 +1083,11 @@
                             </tfoot>
                         </table>
                     </div>
-                    <div class="detail-actions-bar">
-                        <button class="btn-outline print-action" id="printDetailReportBtn"><i
-                                class="las la-print"></i> طباعة هذا التقرير</button>
-                        <button class="btn-outline close-action" id="closeDetailReportBtn"><i
-                                class="las la-times"></i> إغلاق</button>
+                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
+                        <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة
+                            هذا التقرير</button>
+                        <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i>
+                            إغلاق</button>
                     </div>
                 </div>
             </div>
@@ -1457,7 +1271,7 @@
                 detailReportTitle.textContent = report.name || 'تقرير';
                 detailReportDate.textContent = report.date || '';
                 detailReportCategory.textContent = report.category || '';
-                detailReportCategory.className = getCategoryBadgeClass(report.category);
+                detailReportCategory.className = getCategoryBadgeClass(report.category) + ' mt-1';
                 detailReportTbody.innerHTML = ''; if (report.rows && report.rows.length) { report.rows.forEach(row => { const
                         tr = document.createElement('tr'); const tdDesc = document.createElement('td');
                         tdDesc.textContent = row.desc || ''; const tdAmount = document.createElement('td');
