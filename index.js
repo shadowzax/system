@@ -94,11 +94,12 @@ app.use(async (req, res, next) => {
 });
 
 app.use((req, res, next) => {
+    res.locals.token = req.cookies?.token || "";
     res.locals.title = "My App";
     res.locals.api = API_BASE_URL;
     res.locals.description = "";
-    res.locals.isAuthenticated = req.isAuthenticated;
-    res.locals.user = req.user;
+    res.locals.isAuthenticated = req.isAuthenticated || false;
+    res.locals.user = req.user || null;
 
     next();
 });
@@ -120,6 +121,28 @@ app.get("/login", (req, res) => {
         description: "قم بتسجيل الدخول إلى حسابك"
     });
 });
+
+app.get("/1", (req, res) => {
+    // if (!req.isAuthenticated) {
+    //     return res.redirect("/login");
+    // }
+
+    res.render("uploads/outgoing", {
+        title: "",
+        description: ""
+    });
+});
+app.get("/2", (req, res) => {
+    // if (!req.isAuthenticated) {
+    //     return res.redirect("/login");
+    // }
+
+    res.render("uploads/test", {
+        title: "",
+        description: ""
+    });
+});
+
 app.get("/admin/acount", (req, res) => {
     // if (!req.isAuthenticated) {
     //     return res.redirect("/login");
