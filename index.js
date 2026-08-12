@@ -127,7 +127,7 @@ app.get("/1", (req, res) => {
     //     return res.redirect("/login");
     // }
 
-    res.render("uploads/outgoing", {
+    res.render("/public/uploads/outgoing", {
         title: "",
         description: ""
     });
@@ -137,7 +137,7 @@ app.get("/2", (req, res) => {
     //     return res.redirect("/login");
     // }
 
-    res.render("uploads/test", {
+    res.render("/public/uploads/test", {
         title: "",
         description: ""
     });
