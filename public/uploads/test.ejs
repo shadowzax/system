@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -1328,27 +1327,25 @@
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
             const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
             let html = '';
-            html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
-            html += '<tr>';
-            html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-            html += '<div class="restaurant-name">' + (name || '') + '</div>';
-            html += '<div class="print-date">' + (dateStr || '') + '</div>';
-            html += '</td>';
-            html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-            html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
-            html += '</td>';
-            html += '</tr></table>';
-            html += '<div class="header-separator"></div>';
-            html += '<table>';
-            html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+            html += '<div style="text-align:center; margin-bottom:2mm;">';
+            html += '<img src="' + LOGO_URL + '" style="width:20mm; height:auto; margin:0 auto; display:block;" alt="Logo" />';
+            html += '<div class="restaurant-name" style="font-size:20px; font-weight:800; margin-top:1mm; text-align:center;">' + (name || '') + '</div>';
+            html += '<div class="print-date" style="font-size:11px; font-weight:600; margin-top:0.5mm; text-align:center;">' + (dateStr || '') + '</div>';
+            html += '</div>';
+            html += '<div class="header-separator" style="width:100%; height:2px; background:#000; margin-bottom:3mm;"></div>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; border:1px solid #000;">';
+            html += '<thead><tr><th style="width:62%; padding:4px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700; font-size:11px;">البيان</th><th style="width:38%; padding:4px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700; font-size:11px;">المبلغ (ج.م)</th></tr></thead><tbody>';
             if (rowsData && rowsData.length) {
                 rowsData.forEach(row => {
-                    html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>';
+                    html += '<tr><td style="padding:4px 5px; border:0.5px solid #000; text-align:center;">' + (row.desc || '') + '</td><td style="padding:4px 5px; border:0.5px solid #000; text-align:center;">' + (row.amount || '0') + '</td></tr>';
                 });
             }
-            html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
+            html += '<tr class="total-row"><td style="padding:4px 5px; border:0.5px solid #000; text-align:center; font-weight:800; font-size:14px; background:#f4f4f4;">الإجمالي</td><td style="padding:4px 5px; border:0.5px solid #000; text-align:center; font-weight:800; font-size:14px; background:#f4f4f4;">' + (totalText || '0') + '</td></tr>';
             html += '</tbody></table>';
-            html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+            html += '<div class="footer" style="margin-top:6mm; padding-top:2mm; border-top:1px dashed #333; text-align:center; font-size:11px; color:#000; font-weight:700; line-height:1.5;">';
+            html += '<div class="dev" style="font-size:10px; font-weight:600; color:#111; margin-top:1mm;"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div>';
+            html += '<div class="dev-version" style="font-size:10px; font-weight:600; color:#111; margin-top:0.5mm;">v3.2</div>';
+            html += '</div>';
             return html;
         }
 
