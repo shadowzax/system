@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -587,10 +586,10 @@
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <img id="userAvatar" src="<%- user && user.profile_picture ? user.profile_picture : 'https://i.ibb.co/HRbkkLw/3177440-1.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user && user.fullName ? user.fullName : 'عبدالرحمن محمد' %></p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user && user.role ? user.role : 'Administrator' %></p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user && user.name ? user.name : '' %></p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user && user.job_title ? user.job_title : (user && user.account_type === 'admin' ? 'Administrator' : '') %></p>
                     </div>
                 </div>
             </div>
@@ -633,7 +632,7 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
+                    <img id="headerAvatar" src="<%- user && user.profile_picture ? user.profile_picture : 'https://i.ibb.co/HRbkkLw/3177440-1.jpg' %>" class="header-avatar" alt="avatar">
                 </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -656,13 +655,13 @@
                         <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-user text-primary"></i> الملف الشخصي</h3>
                         <div class="flex flex-col sm:flex-row items-start gap-6 mb-6">
                             <div class="flex flex-col items-center gap-3">
-                                <img id="profileAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="avatar-upload" alt="صورة الملف">
+                                <img id="profileAvatar" src="<%- user && user.profile_picture ? user.profile_picture : 'https://i.ibb.co/HRbkkLw/3177440-1.jpg' %>" class="avatar-upload" alt="صورة الملف">
                                 <button class="btn-outline btn-sm" id="changeAvatarBtn"><i class="las la-camera"></i> تغيير الصورة</button>
                             </div>
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">الاسم الكامل</label>
-                                    <input type="text" class="input-field" id="fullNameInput" value="<%= user && user.fullName ? user.fullName : '' %>" placeholder="الاسم الكامل">
+                                    <input type="text" class="input-field" id="fullNameInput" value="<%= user && user.name ? user.name : '' %>" placeholder="الاسم الكامل">
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
@@ -670,15 +669,15 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
-                                    <input type="tel" class="input-field" id="phoneInput" value="<%= user && user.phone ? user.phone : '' %>" placeholder="رقم الهاتف">
+                                    <input type="tel" class="input-field" id="phoneInput" value="<%= user && user.phone_number ? user.phone_number : '' %>" placeholder="رقم الهاتف">
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">الدور الوظيفي</label>
                                     <select class="input-field" id="roleSelect">
-                                        <option value="admin" <%= user && user.role === 'admin' ? 'selected' : '' %>>مدير النظام</option>
-                                        <option value="manager" <%= user && user.role === 'manager' ? 'selected' : '' %>>مدير مطعم</option>
-                                        <option value="cashier" <%= user && user.role === 'cashier' ? 'selected' : '' %>>كاشير</option>
-                                        <option value="viewer" <%= user && user.role === 'viewer' ? 'selected' : '' %>>مشاهد فقط</option>
+                                        <option value="admin" <%= user && user.account_type === 'admin' ? 'selected' : '' %>>مدير النظام</option>
+                                        <option value="manager" <%= user && user.account_type === 'manager' ? 'selected' : '' %>>مدير مطعم</option>
+                                        <option value="cashier" <%= user && user.account_type === 'cashier' ? 'selected' : '' %>>كاشير</option>
+                                        <option value="viewer" <%= user && user.account_type === 'viewer' ? 'selected' : '' %>>مشاهد فقط</option>
                                     </select>
                                 </div>
                             </div>
@@ -690,35 +689,35 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">اسم المطعم</label>
-                                <input type="text" class="input-field" id="restaurantName" value="<%= user && user.restaurant && user.restaurant.name ? user.restaurant.name : '' %>" placeholder="اسم المطعم">
+                                <input type="text" class="input-field" id="restaurantName" placeholder="اسم المطعم">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">رقم السجل التجاري</label>
-                                <input type="text" class="input-field" id="commercialReg" value="<%= user && user.restaurant && user.restaurant.commercialReg ? user.restaurant.commercialReg : '' %>" placeholder="رقم السجل التجاري">
+                                <input type="text" class="input-field" id="commercialReg" placeholder="رقم السجل التجاري">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
-                                <input type="tel" class="input-field" id="restaurantPhone" value="<%= user && user.restaurant && user.restaurant.phone ? user.restaurant.phone : '' %>" placeholder="رقم هاتف المطعم">
+                                <input type="tel" class="input-field" id="restaurantPhone" placeholder="رقم هاتف المطعم">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
-                                <input type="email" class="input-field" id="restaurantEmail" value="<%= user && user.restaurant && user.restaurant.email ? user.restaurant.email : '' %>" placeholder="البريد الإلكتروني">
+                                <input type="email" class="input-field" id="restaurantEmail" placeholder="البريد الإلكتروني">
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">العنوان</label>
-                                <textarea class="input-field" id="restaurantAddress" placeholder="العنوان الكامل"><%= user && user.restaurant && user.restaurant.address ? user.restaurant.address : '' %></textarea>
+                                <textarea class="input-field" id="restaurantAddress" placeholder="العنوان الكامل"></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">ساعات العمل</label>
-                                <input type="text" class="input-field" id="workingHours" value="<%= user && user.restaurant && user.restaurant.workingHours ? user.restaurant.workingHours : '' %>" placeholder="ساعات العمل">
+                                <input type="text" class="input-field" id="workingHours" placeholder="ساعات العمل">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">العملة الافتراضية</label>
                                 <select class="input-field" id="currencySelect">
-                                    <option value="EGP" <%= user && user.restaurant && user.restaurant.currency === 'EGP' ? 'selected' : '' %>>ج.م - جنيه مصري</option>
-                                    <option value="SAR" <%= user && user.restaurant && user.restaurant.currency === 'SAR' ? 'selected' : '' %>>ر.س - ريال سعودي</option>
-                                    <option value="USD" <%= user && user.restaurant && user.restaurant.currency === 'USD' ? 'selected' : '' %>>$ - دولار أمريكي</option>
-                                    <option value="EUR" <%= user && user.restaurant && user.restaurant.currency === 'EUR' ? 'selected' : '' %>>€ - يورو</option>
+                                    <option value="EGP">ج.م - جنيه مصري</option>
+                                    <option value="SAR">ر.س - ريال سعودي</option>
+                                    <option value="USD">$ - دولار أمريكي</option>
+                                    <option value="EUR">€ - يورو</option>
                                 </select>
                             </div>
                         </div>
@@ -1047,29 +1046,21 @@
 
             function populateFromUser() {
                 const userData = currentUser;
-                if (userData.fullName) {
-                    document.getElementById('fullNameInput').value = userData.fullName;
-                    document.getElementById('userFullName').textContent = userData.fullName;
+                if (userData.name) {
+                    document.getElementById('fullNameInput').value = userData.name;
+                    document.getElementById('userFullName').textContent = userData.name;
                 }
                 if (userData.email) document.getElementById('emailInput').value = userData.email;
-                if (userData.phone) document.getElementById('phoneInput').value = userData.phone;
-                if (userData.role) {
-                    document.getElementById('roleSelect').value = userData.role;
-                    document.getElementById('role').textContent = userData.role === 'admin' ? 'Administrator' : userData.role;
+                if (userData.phone_number) document.getElementById('phoneInput').value = userData.phone_number;
+                if (userData.account_type) {
+                    document.getElementById('roleSelect').value = userData.account_type;
+                    document.getElementById('role').textContent = userData.job_title || (userData.account_type === 'admin' ? 'Administrator' : userData.account_type);
                 }
-                if (userData.avatar) {
-                    userAvatar.src = userData.avatar;
-                    headerAvatar.src = userData.avatar;
-                    profileAvatar.src = userData.avatar;
+                if (userData.profile_picture) {
+                    userAvatar.src = userData.profile_picture;
+                    headerAvatar.src = userData.profile_picture;
+                    profileAvatar.src = userData.profile_picture;
                 }
-                const restaurant = userData.restaurant || {};
-                if (restaurant.name) document.getElementById('restaurantName').value = restaurant.name;
-                if (restaurant.commercialReg) document.getElementById('commercialReg').value = restaurant.commercialReg;
-                if (restaurant.phone) document.getElementById('restaurantPhone').value = restaurant.phone;
-                if (restaurant.email) document.getElementById('restaurantEmail').value = restaurant.email;
-                if (restaurant.address) document.getElementById('restaurantAddress').value = restaurant.address;
-                if (restaurant.workingHours) document.getElementById('workingHours').value = restaurant.workingHours;
-                if (restaurant.currency) document.getElementById('currencySelect').value = restaurant.currency;
             }
 
             function loadLocalStorage() {
@@ -1087,17 +1078,6 @@
                             document.getElementById('roleSelect').value = p.role;
                             document.getElementById('role').textContent = p.role === 'admin' ? 'Administrator' : p.role;
                         }
-                    }
-                    const restaurantData = localStorage.getItem('restaurantSettings');
-                    if (restaurantData) {
-                        const r = JSON.parse(restaurantData);
-                        if (r.name) document.getElementById('restaurantName').value = r.name;
-                        if (r.commercialReg) document.getElementById('commercialReg').value = r.commercialReg;
-                        if (r.phone) document.getElementById('restaurantPhone').value = r.phone;
-                        if (r.email) document.getElementById('restaurantEmail').value = r.email;
-                        if (r.address) document.getElementById('restaurantAddress').value = r.address;
-                        if (r.workingHours) document.getElementById('workingHours').value = r.workingHours;
-                        if (r.currency) document.getElementById('currencySelect').value = r.currency;
                     }
                     const notifData = localStorage.getItem('notificationSettings');
                     if (notifData) {
