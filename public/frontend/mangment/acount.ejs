@@ -1834,7 +1834,7 @@ loadAccountsWithData();
     </div>
 <script>
 (function () {
-    var API_BASE = 'http://108.181.221.18:7049/api/admin';
+    var API_BASE =  "<%= api %>" + '/api/admin';
     var CREATE_URL = API_BASE + '/create/account';
 
     var accFullName = document.getElementById('accFullName');
