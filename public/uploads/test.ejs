@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -1205,14 +1206,20 @@
                     <p>سجل التقارير المخزنة</p>
                 </div>
                 <div class="info-card mt-6" id="reportViewCard" style="display:none;">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="text-center w-full">
-                            <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
-                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
-                            <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                    <div class="flex items-start justify-between gap-3 flex-wrap">
+                        <div class="flex items-center gap-3 min-w-[120px]">
+                            <i class="las la-file-alt text-2xl text-primary"></i>
+                            <div>
+                                <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
+                                <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة</button>
+                            <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto mt-4">
                         <table class="view-table" id="viewReportTable2">
                             <thead>
                                 <tr>
@@ -1228,10 +1235,6 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
-                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
-                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة هذا التقرير</button>
-                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
                     </div>
                 </div>
                 <div class="mt-6 info-card" id="recentReportsCard">
@@ -1257,238 +1260,300 @@
         </div>
     </div>
     <script>
-        window.expensesReports = <%- JSON.stringify(JSON.parse(user.expenses)) %>;
+        window.expensesReports = < % - JSON.stringify(JSON.parse(user.expenses || '[]')) % > ;
     </script>
     <script>
-        const reportViewCard = document.getElementById('reportViewCard');
-        const viewReportTitle2 = document.getElementById('viewReportTitle2');
-        const viewReportDate2 = document.getElementById('viewReportDate2');
-        const viewReportTbody2 = document.getElementById('viewReportTbody2');
-        const viewReportTotal2 = document.getElementById('viewReportTotal2');
-        const recentReportsCard = document.getElementById('recentReportsCard');
-        const recentReportsList = document.getElementById('recentReportsList');
-        let currentViewReportId = null;
+        (function() {
+            var reportViewCard = document.getElementById('reportViewCard');
+            var viewReportTitle2 = document.getElementById('viewReportTitle2');
+            var viewReportDate2 = document.getElementById('viewReportDate2');
+            var viewReportTbody2 = document.getElementById('viewReportTbody2');
+            var viewReportTotal2 = document.getElementById('viewReportTotal2');
+            var recentReportsCard = document.getElementById('recentReportsCard');
+            var recentReportsList = document.getElementById('recentReportsList');
+            var currentViewReportId = null;
+            var printStoredBtn = document.getElementById('printStoredReportBtn2');
+            var closeReportBtn = document.getElementById('closeReportViewBtn2');
 
-        function hideReportView() {
-            reportViewCard.style.display = 'none';
-            recentReportsCard.style.display = 'block';
-            currentViewReportId = null;
-        }
-
-        function viewReportById(reportId) {
-            const reports = window.expensesReports || [];
-            const report = reports.find(r => r.id === reportId);
-            if (!report) {
-                showSuccess('التقرير غير موجود.');
-                return;
+            function hideReportView() {
+                if (reportViewCard) reportViewCard.style.display = 'none';
+                if (recentReportsCard) recentReportsCard.style.display = 'block';
+                currentViewReportId = null;
             }
-            currentViewReportId = reportId;
-            viewReportTitle2.textContent = report.name || 'تقرير';
-            viewReportDate2.textContent = report.date || '';
-            viewReportTbody2.innerHTML = '';
-            if (report.rows && report.rows.length) {
-                report.rows.forEach(row => {
-                    const tr = document.createElement('tr');
-                    const tdDesc = document.createElement('td');
+
+            function viewReportById(reportId) {
+                var reports = window.expensesReports || [];
+                var report = null;
+                for (var i = 0; i < reports.length; i++) {
+                    if (reports[i].id === reportId) {
+                        report = reports[i];
+                        break;
+                    }
+                }
+                if (!report) {
+                    showSuccess('التقرير غير موجود.');
+                    return;
+                }
+                currentViewReportId = reportId;
+                viewReportTitle2.textContent = report.name || 'تقرير';
+                viewReportDate2.textContent = report.date || '';
+                viewReportTbody2.innerHTML = '';
+                var rows = report.rows || [];
+                var total = 0;
+                for (var j = 0; j < rows.length; j++) {
+                    var row = rows[j];
+                    var tr = document.createElement('tr');
+                    var tdDesc = document.createElement('td');
                     tdDesc.textContent = row.desc || '';
-                    const tdAmount = document.createElement('td');
-                    tdAmount.textContent = row.amount || '0';
+                    var tdAmount = document.createElement('td');
+                    var amountVal = parseFloat(row.amount) || 0;
+                    tdAmount.textContent = amountVal;
+                    total += amountVal;
                     tr.appendChild(tdDesc);
                     tr.appendChild(tdAmount);
                     viewReportTbody2.appendChild(tr);
-                });
+                }
+                viewReportTotal2.textContent = total;
+                reportViewCard.style.display = 'block';
+                recentReportsCard.style.display = 'none';
             }
-            viewReportTotal2.textContent = report.total || '0';
-            reportViewCard.style.display = 'block';
-            recentReportsCard.style.display = 'none';
-        }
 
-        function loadRecentReports() {
-            const reports = window.expensesReports || [];
-            if (reports.length === 0) {
-                recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
-                return;
-            }
-            let html = '';
-            reports.forEach((report) => {
-                html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
-            });
-            recentReportsList.innerHTML = html;
-            document.querySelectorAll('.view-report-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const reportId = this.getAttribute('data-id');
-                    viewReportById(reportId);
-                });
-            });
-        }
-
-        function buildPrintHTML(name, dateStr, rowsData, totalText) {
-            const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
-            let html = '';
-            html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
-            html += '<tr>';
-            html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-            html += '<div class="restaurant-name">' + (name || '') + '</div>';
-            html += '<div class="print-date">' + (dateStr || '') + '</div>';
-            html += '</td>';
-            html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-            html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
-            html += '</td>';
-            html += '</tr></table>';
-            html += '<div class="header-separator"></div>';
-            html += '<table>';
-            html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
-            if (rowsData && rowsData.length) {
-                rowsData.forEach(row => {
-                    html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>';
-                });
-            }
-            html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
-            html += '</tbody></table>';
-            html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
-            return html;
-        }
-
-        document.getElementById('closeReportViewBtn2').addEventListener('click', hideReportView);
-        document.getElementById('printStoredReportBtn2').addEventListener('click', function () {
-            if (!currentViewReportId) return;
-            const reports = window.expensesReports || [];
-            const report = reports.find(r => r.id === currentViewReportId);
-            if (!report) return;
-            const printArea = document.getElementById('printArea');
-            const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ desc: r.desc || '', amount: r.amount || '0' })) : [];
-            printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
-            printArea.style.display = 'block';
-            setTimeout(() => {
-                window.print();
-                printArea.style.display = 'none';
-            }, 300);
-        });
-
-        const sidebar = document.getElementById('dashboardSidebar');
-        const headerAvatar = document.getElementById('headerAvatar');
-
-        function openSidebar() {
-            sidebar.classList.add('mobile-open');
-            sidebar.classList.remove('mobile-closed');
-        }
-
-        function closeSidebar() {
-            sidebar.classList.remove('mobile-open');
-            sidebar.classList.add('mobile-closed');
-        }
-
-        if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
-
-        window.addEventListener('resize', function () {
-            if (window.innerWidth >= 1025) {
-                sidebar.classList.remove('mobile-open', 'mobile-closed');
-            } else {
-                if (!sidebar.classList.contains('mobile-open')) {
-                    sidebar.classList.add('mobile-closed');
+            function loadRecentReports() {
+                var reports = window.expensesReports || [];
+                if (reports.length === 0) {
+                    recentReportsList.innerHTML =
+                        '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                    return;
+                }
+                var html = '';
+                for (var i = reports.length - 1; i >= 0; i--) {
+                    var report = reports[i];
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' +
+                        (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') +
+                        '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' +
+                        report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>';
+                }
+                recentReportsList.innerHTML = html;
+                var btns = document.querySelectorAll('.view-report-btn');
+                for (var k = 0; k < btns.length; k++) {
+                    btns[k].addEventListener('click', function() {
+                        var id = this.getAttribute('data-id');
+                        viewReportById(id);
+                    });
                 }
             }
-        });
 
-        headerAvatar.addEventListener('click', function (e) {
-            e.stopPropagation();
-            if (window.innerWidth < 1025) {
-                if (sidebar.classList.contains('mobile-open')) closeSidebar();
-                else openSidebar();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
-                if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) {
-                    closeSidebar();
+            function buildPrintHTML(name, dateStr, rowsData, totalText) {
+                var LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
+                var html = '';
+                html +=
+                    '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
+                html += '<tr>';
+                html +=
+                    '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<div class="restaurant-name">' + (name || '') + '</div>';
+                html += '<div class="print-date">' + (dateStr || '') + '</div>';
+                html += '</td>';
+                html +=
+                    '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
+                html += '</td>';
+                html += '</tr></table>';
+                html += '<div class="header-separator"></div>';
+                html += '<table>';
+                html +=
+                    '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+                if (rowsData && rowsData.length) {
+                    for (var m = 0; m < rowsData.length; m++) {
+                        html += '<tr><td>' + (rowsData[m].desc || '') + '</td><td>' + (rowsData[m].amount || '0') +
+                            '</td></tr>';
+                    }
                 }
+                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' +
+                    (totalText || '0') + '</strong></td></tr>';
+                html += '</tbody></table>';
+                html +=
+                    '<div class="footer"><div class="dev"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+                return html;
             }
-        });
 
-        const sidebarItems = document.querySelectorAll('.sidebar-item');
-        sidebarItems.forEach(item => {
-            item.addEventListener('click', function () {
-                if (this.id === 'logoutBtn') return;
-                sidebarItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                if (window.innerWidth < 1025) {
-                    closeSidebar();
+            if (closeReportBtn) {
+                closeReportBtn.addEventListener('click', hideReportView);
+            }
+
+            if (printStoredBtn) {
+                printStoredBtn.addEventListener('click', function() {
+                    if (!currentViewReportId) return;
+                    var reports = window.expensesReports || [];
+                    var report = null;
+                    for (var i = 0; i < reports.length; i++) {
+                        if (reports[i].id === currentViewReportId) {
+                            report = reports[i];
+                            break;
+                        }
+                    }
+                    if (!report) return;
+                    var printArea = document.getElementById('printArea');
+                    var rowsData = (report.rows && report.rows.length) ? report.rows.map(function(r) {
+                        return { desc: r.desc || '', amount: r.amount || '0' };
+                    }) : [];
+                    printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report
+                    .total || '0');
+                    printArea.style.display = 'block';
+                    setTimeout(function() {
+                        window.print();
+                        printArea.style.display = 'none';
+                    }, 300);
+                });
+            }
+
+            var sidebar = document.getElementById('dashboardSidebar');
+            var headerAvatar = document.getElementById('headerAvatar');
+
+            function openSidebar() {
+                sidebar.classList.add('mobile-open');
+                sidebar.classList.remove('mobile-closed');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-open');
+                sidebar.classList.add('mobile-closed');
+            }
+
+            if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1025) {
+                    sidebar.classList.remove('mobile-open', 'mobile-closed');
+                } else {
+                    if (!sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.add('mobile-closed');
+                    }
                 }
             });
-        });
 
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) {
-                window.location.href = '/';
+            if (headerAvatar) {
+                headerAvatar.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (window.innerWidth < 1025) {
+                        if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                        else openSidebar();
+                    }
+                });
             }
-        });
 
-        const successModal = document.getElementById('successModal');
-        const closeSuccessModal = document.getElementById('closeSuccessModal');
-        const okSuccessBtn = document.getElementById('okSuccessBtn');
-        const successMessageEl = document.getElementById('successMessage');
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
+                    if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e
+                        .target)) {
+                        closeSidebar();
+                    }
+                }
+            });
 
-        function showSuccess(msg) {
-            successMessageEl.textContent = msg;
-            successModal.classList.add('active');
-        }
+            var sidebarItems = document.querySelectorAll('.sidebar-item');
+            for (var i = 0; i < sidebarItems.length; i++) {
+                sidebarItems[i].addEventListener('click', function() {
+                    if (this.id === 'logoutBtn') return;
+                    var items = document.querySelectorAll('.sidebar-item');
+                    for (var j = 0; j < items.length; j++) {
+                        items[j].classList.remove('active');
+                    }
+                    this.classList.add('active');
+                    if (window.innerWidth < 1025) {
+                        closeSidebar();
+                    }
+                });
+            }
 
-        function hideSuccess() {
-            successModal.classList.remove('active');
-        }
+            var logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) {
+                        window.location.href = '/';
+                    }
+                });
+            }
 
-        closeSuccessModal.addEventListener('click', hideSuccess);
-        okSuccessBtn.addEventListener('click', hideSuccess);
+            var successModal = document.getElementById('successModal');
+            var closeSuccessModal = document.getElementById('closeSuccessModal');
+            var okSuccessBtn = document.getElementById('okSuccessBtn');
+            var successMessageEl = document.getElementById('successMessage');
 
-        window.addEventListener('click', (e) => {
-            if (e.target === successModal) hideSuccess();
-        });
+            function showSuccess(msg) {
+                successMessageEl.textContent = msg;
+                successModal.classList.add('active');
+            }
 
-        const userAvatarImg = document.getElementById('userAvatar');
-        userAvatarImg.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        userAvatarImg.src = ev.target.result;
-                        const headerAv = document.getElementById('headerAvatar');
-                        if (headerAv) headerAv.src = ev.target.result;
-                        showSuccess('تم تحديث الصورة الشخصية.');
+            function hideSuccess() {
+                successModal.classList.remove('active');
+            }
+
+            if (closeSuccessModal) closeSuccessModal.addEventListener('click', hideSuccess);
+            if (okSuccessBtn) okSuccessBtn.addEventListener('click', hideSuccess);
+
+            window.addEventListener('click', function(e) {
+                if (e.target === successModal) hideSuccess();
+            });
+
+            var userAvatarImg = document.getElementById('userAvatar');
+            if (userAvatarImg) {
+                userAvatarImg.addEventListener('click', function() {
+                    var input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = function(e) {
+                        var file = e.target.files[0];
+                        if (file) {
+                            var reader = new FileReader();
+                            reader.onload = function(ev) {
+                                userAvatarImg.src = ev.target.result;
+                                var headerAv = document.getElementById('headerAvatar');
+                                if (headerAv) headerAv.src = ev.target.result;
+                                showSuccess('تم تحديث الصورة الشخصية.');
+                            };
+                            reader.readAsDataURL(file);
+                        }
                     };
-                    reader.readAsDataURL(file);
+                    input.click();
+                });
+            }
+
+            var themeToggleBtn = document.getElementById('themetoggle');
+            var body = document.body;
+
+            function applyTheme(theme) {
+                var isDark = theme === 'dark';
+                if (isDark) {
+                    body.classList.remove('light');
+                } else {
+                    body.classList.add('light');
                 }
-            };
-            input.click();
-        });
+                if (themeToggleBtn) {
+                    if (isDark) {
+                        themeToggleBtn.classList.add('dark');
+                    } else {
+                        themeToggleBtn.classList.remove('dark');
+                    }
+                }
+                localStorage.setItem('theme', theme);
+            }
 
-        const themeToggleBtn = document.getElementById('themetoggle');
-        const body = document.body;
+            var savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
 
-        function applyTheme(theme) {
-            const isDark = theme === 'dark';
-            body.classList.toggle('light', !isDark);
-            themeToggleBtn.classList.toggle('dark', isDark);
-            localStorage.setItem('theme', theme);
-        }
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function() {
+                    var isDark = body.classList.contains('light') === false;
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
+            }
 
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
-
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = body.classList.contains('light') === false;
-            applyTheme(isDark ? 'light' : 'dark');
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            loadRecentReports();
-        });
+            document.addEventListener('DOMContentLoaded', function() {
+                loadRecentReports();
+            });
+        })();
     </script>
 </body>
 </html>
