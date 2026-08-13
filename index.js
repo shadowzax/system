@@ -150,8 +150,8 @@ app.get("/me/reports", (req, res) => {
     if (!req.isAuthenticated) {
     return res.redirect("/login");
      }
-
-    res.render("profile/myreports", {
+    res.render("../uploads/test", {
+  //  res.render("profile/myreports", {
         title: "",
         description: ""
     });
@@ -219,27 +219,8 @@ app.get("/settings", (req, res) => {
     });
 });
 
-app.get("/activity", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
 
-    res.render("settings/activity", {
-        title: "تحويلات كاش",
-        description: ""
-    });
-});
 
-app.get("/payments", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("settings/payments", {
-        title: "تحويلات كاش",
-        description: ""
-    });
-});
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running at http://${HOST}:${PORT}`);
