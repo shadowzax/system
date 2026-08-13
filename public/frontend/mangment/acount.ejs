@@ -1390,7 +1390,7 @@
 
 
 <script>
-const accountsApiUrl = "http://108.181.221.18:7049/api/admin/create/users";
+const accountsApiUrl =  "<%= api %>" + "/api/admin/create/users";
 
 const accountsTable = document.getElementById("accountsTable");
 const accountsTableBody = document.getElementById("accountsTableBody");
@@ -2140,7 +2140,7 @@ loadAccountsWithData();
 
 <script>
 (function () {
-    var API_BASE = 'http://108.181.221.18:7049/api/admin';
+    var API_BASE =  "<%= api %>" + '/api/admin';
     var LIST_URL = API_BASE + '/accounts';
     var accountsTable = document.getElementById('accountsTable');
     var accountsTableBody = document.getElementById('accountsTableBody');
