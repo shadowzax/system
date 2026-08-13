@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -10,8 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -271,109 +271,6 @@
         }
         main {
             padding-top: var(--header-height);
-        }
-        .bottom-mobile-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--bottom-nav-height);
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color);
-            z-index: 100;
-            padding: 6px 8px;
-            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        @media (max-width: 1024px) {
-            .bottom-mobile-nav {
-                display: flex;
-                align-items: center;
-                justify-content: space-around;
-                gap: 4px;
-            }
-        }
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            flex: 1;
-            padding: 6px 4px;
-            border-radius: 14px;
-            cursor: pointer;
-            text-decoration: none;
-            color: var(--color-muted);
-            font-size: 0.7rem;
-            font-weight: 500;
-            transition: all 0.25s ease;
-            position: relative;
-            min-width: 0;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .bottom-nav-item i {
-            font-size: 1.25rem;
-            transition: all 0.25s ease;
-            flex-shrink: 0;
-        }
-        .bottom-nav-item span {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-width: 100%;
-            font-size: 0.68rem;
-        }
-        .bottom-nav-item:hover {
-            color: var(--color-primary);
-            background: rgba(13, 153, 255, 0.06);
-        }
-        .bottom-nav-item:active {
-            transform: scale(0.94);
-            background: rgba(13, 153, 255, 0.12);
-        }
-        .bottom-nav-item.active {
-            color: var(--color-primary);
-            font-weight: 700;
-        }
-        .bottom-nav-item.active i {
-            position: absolute;
-            top: -34px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 44px;
-            height: 44px;
-            background: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-            z-index: 102;
-            font-size: 1.4rem;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            color: var(--color-primary);
-        }
-        .bottom-nav-item.active span {
-            margin-top: 18px;
-        }
-        .nav-notch {
-            position: absolute;
-            top: 0;
-            width: 48px;
-            height: 48px;
-            background: var(--color-background);
-            border-radius: 50%;
-            z-index: 101;
-            transform: translate(-50%, -50%);
-            transition: left 0.3s ease;
-            pointer-events: none;
         }
         .btn-primary {
             background: var(--color-primary);
@@ -678,50 +575,40 @@
     </style>
 </head>
 <body>
+    <script>
+        window.__APP_DATA__ = {
+            token: "<%- token %>",
+            api: "<%- api %>",
+            isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
+            user: <%- JSON.stringify(user || null) %>
+        };
+    </script>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <img id="userAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user && user.fullName ? user.fullName : 'عبدالرحمن محمد' %></p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user && user.role ? user.role : 'Administrator' %></p>
                     </div>
                 </div>
             </div>
             <nav class="flex-1">
                 <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item " data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
                 <div class="sidebar-section-title">الكاش</div>
-            
-                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices">
-                    <i class="las la-file-invoice-dollar"></i>
-                    <span>خوارج</span>
-                </a>
-            
-                <a href="/visa" class="sidebar-item" data-page="visa">
-                    <i class="las la-credit-card"></i>
-                    <span>فيز</span>
-                </a>
-            
-                <a href="/cash" class="sidebar-item" data-page="transfers">
-                    <i class="las la-exchange-alt"></i>
-                    <span>تحويلات</span>
-                </a>
-<a href="/advances" class="sidebar-item" data-page="advances">
-    <i class="las la-hand-holding-usd"></i>
-    <span>السلف</span>
-</a>
+                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
                 <div class="sidebar-section-title">الإدارة</div>
-                <a href="/payments" class="sidebar-item " data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
+                <a href="/payments" class="sidebar-item" data-page="payments"><i class="las la-credit-card"></i><span>المدفوعات</span></a>
                 <div class="sidebar-section-title">النظام</div>
                 <a href="/settings" class="sidebar-item active" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل
-                        النشاط</span></a>
+                <a href="/activity" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
                 <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i
-                            class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
@@ -746,7 +633,7 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                    <img id="headerAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
                 </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -766,34 +653,32 @@
                 </div>
                 <div id="settingsContent">
                     <div class="info-card" id="tab-profile">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-user text-primary"></i> الملف الشخصي
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-user text-primary"></i> الملف الشخصي</h3>
                         <div class="flex flex-col sm:flex-row items-start gap-6 mb-6">
                             <div class="flex flex-col items-center gap-3">
-                                <img id="profileAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="avatar-upload" alt="صورة الملف">
+                                <img id="profileAvatar" src="<%- user && user.avatar ? user.avatar : 'https://files.catbox.moe/4lsmka.jpg' %>" class="avatar-upload" alt="صورة الملف">
                                 <button class="btn-outline btn-sm" id="changeAvatarBtn"><i class="las la-camera"></i> تغيير الصورة</button>
                             </div>
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">الاسم الكامل</label>
-                                    <input type="text" class="input-field" id="fullNameInput" value="عبدالرحمن محمد" placeholder="الاسم الكامل">
+                                    <input type="text" class="input-field" id="fullNameInput" value="<%= user && user.fullName ? user.fullName : '' %>" placeholder="الاسم الكامل">
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
-                                    <input type="email" class="input-field" id="emailInput" value="gamesy500@gmail.com" placeholder="البريد الإلكتروني">
+                                    <input type="email" class="input-field" id="emailInput" value="<%= user && user.email ? user.email : '' %>" placeholder="البريد الإلكتروني">
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
-                                    <input type="tel" class="input-field" id="phoneInput" value="01063720595" placeholder="رقم الهاتف">
+                                    <input type="tel" class="input-field" id="phoneInput" value="<%= user && user.phone ? user.phone : '' %>" placeholder="رقم الهاتف">
                                 </div>
                                 <div>
                                     <label class="block text-sm text-[var(--color-muted)] mb-1">الدور الوظيفي</label>
                                     <select class="input-field" id="roleSelect">
-                                        <option value="admin" selected>مدير النظام</option>
-                                        <option value="manager">مدير مطعم</option>
-                                        <option value="cashier">كاشير</option>
-                                        <option value="viewer">مشاهد فقط</option>
+                                        <option value="admin" <%= user && user.role === 'admin' ? 'selected' : '' %>>مدير النظام</option>
+                                        <option value="manager" <%= user && user.role === 'manager' ? 'selected' : '' %>>مدير مطعم</option>
+                                        <option value="cashier" <%= user && user.role === 'cashier' ? 'selected' : '' %>>كاشير</option>
+                                        <option value="viewer" <%= user && user.role === 'viewer' ? 'selected' : '' %>>مشاهد فقط</option>
                                     </select>
                                 </div>
                             </div>
@@ -801,50 +686,46 @@
                         <button class="btn-primary" id="saveProfileBtn"><i class="las la-save"></i> حفظ التغييرات</button>
                     </div>
                     <div class="info-card hidden" id="tab-restaurant">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-store-alt text-primary"></i> معلومات المطعم
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-store-alt text-primary"></i> معلومات المطعم</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">اسم المطعم</label>
-                                <input type="text" class="input-field" id="restaurantName" value="ابن حميدو السلام" placeholder="اسم المطعم">
+                                <input type="text" class="input-field" id="restaurantName" value="<%= user && user.restaurant && user.restaurant.name ? user.restaurant.name : '' %>" placeholder="اسم المطعم">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">رقم السجل التجاري</label>
-                                <input type="text" class="input-field" id="commercialReg" value="----" placeholder="رقم السجل التجاري">
+                                <input type="text" class="input-field" id="commercialReg" value="<%= user && user.restaurant && user.restaurant.commercialReg ? user.restaurant.commercialReg : '' %>" placeholder="رقم السجل التجاري">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">رقم الهاتف</label>
-                                <input type="tel" class="input-field" id="restaurantPhone" value="01063720595" placeholder="رقم هاتف المطعم">
+                                <input type="tel" class="input-field" id="restaurantPhone" value="<%= user && user.restaurant && user.restaurant.phone ? user.restaurant.phone : '' %>" placeholder="رقم هاتف المطعم">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">البريد الإلكتروني</label>
-                                <input type="email" class="input-field" id="restaurantEmail" value="info@shadowza.sapce" placeholder="البريد الإلكتروني">
+                                <input type="email" class="input-field" id="restaurantEmail" value="<%= user && user.restaurant && user.restaurant.email ? user.restaurant.email : '' %>" placeholder="البريد الإلكتروني">
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">العنوان</label>
-                                <textarea class="input-field" id="restaurantAddress" placeholder="العنوان الكامل">شارع السلام , خليج نعمه , امام مدخل البولينج , شرم الشيخ</textarea>
+                                <textarea class="input-field" id="restaurantAddress" placeholder="العنوان الكامل"><%= user && user.restaurant && user.restaurant.address ? user.restaurant.address : '' %></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">ساعات العمل</label>
-                                <input type="text" class="input-field" id="workingHours" value="10:00 ص - 12:00 ص" placeholder="ساعات العمل">
+                                <input type="text" class="input-field" id="workingHours" value="<%= user && user.restaurant && user.restaurant.workingHours ? user.restaurant.workingHours : '' %>" placeholder="ساعات العمل">
                             </div>
                             <div>
                                 <label class="block text-sm text-[var(--color-muted)] mb-1">العملة الافتراضية</label>
                                 <select class="input-field" id="currencySelect">
-                                    <option value="EGP" selected>ج.م - جنيه مصري</option>
-                                    <option value="SAR">ر.س - ريال سعودي</option>
-                                    <option value="USD">$ - دولار أمريكي</option>
-                                    <option value="EUR">€ - يورو</option>
+                                    <option value="EGP" <%= user && user.restaurant && user.restaurant.currency === 'EGP' ? 'selected' : '' %>>ج.م - جنيه مصري</option>
+                                    <option value="SAR" <%= user && user.restaurant && user.restaurant.currency === 'SAR' ? 'selected' : '' %>>ر.س - ريال سعودي</option>
+                                    <option value="USD" <%= user && user.restaurant && user.restaurant.currency === 'USD' ? 'selected' : '' %>>$ - دولار أمريكي</option>
+                                    <option value="EUR" <%= user && user.restaurant && user.restaurant.currency === 'EUR' ? 'selected' : '' %>>€ - يورو</option>
                                 </select>
                             </div>
                         </div>
                         <button class="btn-primary" id="saveRestaurantBtn"><i class="las la-save"></i> حفظ معلومات المطعم</button>
                     </div>
                     <div class="info-card hidden" id="tab-notifications">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-bell text-primary"></i> إعدادات الإشعارات
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-bell text-primary"></i> إعدادات الإشعارات</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
                                 <div>
@@ -900,9 +781,7 @@
                         <button class="btn-primary mt-6" id="saveNotificationsBtn"><i class="las la-save"></i> حفظ إعدادات الإشعارات</button>
                     </div>
                     <div class="info-card hidden" id="tab-security">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-shield-alt text-primary"></i> إعدادات الأمان
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-shield-alt text-primary"></i> إعدادات الأمان</h3>
                         <div class="space-y-4 mb-6">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -939,9 +818,7 @@
                         </div>
                     </div>
                     <div class="info-card hidden" id="tab-appearance">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-palette text-primary"></i> إعدادات المظهر
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-palette text-primary"></i> إعدادات المظهر</h3>
                         <div class="space-y-4 mb-6">
                             <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)]">
                                 <div>
@@ -991,9 +868,7 @@
                         <button class="btn-primary" id="saveAppearanceBtn"><i class="las la-save"></i> حفظ إعدادات المظهر</button>
                     </div>
                     <div class="info-card hidden" id="tab-backup">
-                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2">
-                            <i class="las la-cloud-upload-alt text-primary"></i> النسخ الاحتياطي والاستعادة
-                        </h3>
+                        <h3 class="text-lg font-bold text-[var(--color-white)] mb-6 flex items-center gap-2"><i class="las la-cloud-upload-alt text-primary"></i> النسخ الاحتياطي والاستعادة</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             <div class="p-5 rounded-xl bg-[var(--darker-bg)] border border-[var(--border-color)] text-center">
                                 <i class="las la-download text-4xl text-primary mb-3"></i>
@@ -1006,6 +881,7 @@
                                 <p class="font-medium text-[var(--color-white)] mb-2">استعادة نسخة احتياطية</p>
                                 <p class="text-xs text-[var(--color-muted)] mb-4">رفع ملف نسخة احتياطية لاستعادة البيانات</p>
                                 <button class="btn-outline btn-sm w-full justify-center" id="restoreBackupBtn"><i class="las la-upload"></i> رفع ملف</button>
+                                <input type="file" id="restoreFileInput" accept=".json" class="hidden">
                             </div>
                         </div>
                         <div class="mt-4">
@@ -1038,14 +914,6 @@
             </div>
         </main>
     </div>
-    <!-- <div class="bottom-mobile-nav" id="bottomMobileNav">
-        <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item" data-tab="dashboard"><i class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="tickets"><i class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
-        <a href="#" class="bottom-nav-item active" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-    </div> -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
             <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
@@ -1069,15 +937,25 @@
     </div>
     <script>
         (function() {
+            const appData = window.__APP_DATA__ || {};
+            const currentUser = appData.user || {};
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
+            const userAvatar = document.getElementById('userAvatar');
+            const profileAvatar = document.getElementById('profileAvatar');
 
-            function openSidebar() { sidebar.classList.add('mobile-open');
-                sidebar.classList.remove('mobile-closed'); }
+            function openSidebar() {
+                sidebar.classList.add('mobile-open');
+                sidebar.classList.remove('mobile-closed');
+            }
 
-            function closeSidebar() { sidebar.classList.remove('mobile-open');
-                sidebar.classList.add('mobile-closed'); }
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-open');
+                sidebar.classList.add('mobile-closed');
+            }
+
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 1025) {
                     sidebar.classList.remove('mobile-open', 'mobile-closed');
@@ -1085,93 +963,58 @@
                     if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
                 }
             });
-            if (headerAvatar) {
-                headerAvatar.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    if (window.innerWidth < 1025) {
-                        if (sidebar.classList.contains('mobile-open')) closeSidebar();
-                        else openSidebar();
-                    }
-                });
-            }
+
+            headerAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (window.innerWidth < 1025) {
+                    if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                    else openSidebar();
+                }
+            });
+
             document.addEventListener('click', function(e) {
                 if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
-                    if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e
-                            .target)) {
+                    if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) {
                         closeSidebar();
                     }
                 }
             });
-const sidebarItems = document.querySelectorAll('.sidebar-item');
 
-sidebarItems.forEach(item => {
-    item.addEventListener('click', function () {
-        if (this.id === 'logoutBtn') return;
-
-        sidebarItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-
-        if (window.innerWidth < 1025) {
-            closeSidebar();
-        }
-    });
-});
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/';
-                });
-            }
-            const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-            const navNotch = document.getElementById('navNotch');
-
-            function moveNotch(activeItem) {
-                if (!navNotch || !activeItem) return;
-                const rect = activeItem.getBoundingClientRect();
-                const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2 - navRect.left;
-                navNotch.style.left = centerX + 'px';
-            }
-
-            function setBottomNavActive() {
-                let activeItem = null;
-                bottomNavItems.forEach(item => {
-                    item.classList.remove('active');
-                    const tab = item.getAttribute('data-tab');
-                    if (tab === 'settings') { item.classList.add('active');
-                        activeItem = item; }
-                });
-                if (activeItem) moveNotch(activeItem);
-            }
-            setBottomNavActive();
-            window.addEventListener('resize', () => {
-                const activeItem = document.querySelector('.bottom-nav-item.active');
-                if (activeItem) moveNotch(activeItem);
-            });
-            bottomNavItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    bottomNavItems.forEach(i => i.classList.remove('active'));
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.id === 'logoutBtn') return;
+                    sidebarItems.forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
-                    moveNotch(this);
-                    const tab = this.getAttribute('data-tab');
-                    if (tab === 'dashboard') window.location.href = '?page=dashboard';
-                    if (tab === 'reports') window.location.href = '?page=reports';
+                    if (window.innerWidth < 1025) closeSidebar();
                 });
             });
+
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) window.location.href = '/';
+            });
+
             const successModal = document.getElementById('successModal');
             const closeSuccessModal = document.getElementById('closeSuccessModal');
             const okSuccessBtn = document.getElementById('okSuccessBtn');
             const successMessageEl = document.getElementById('successMessage');
 
-            function showSuccess(msg) { successMessageEl.textContent = msg;
-                successModal.classList.add('active'); }
+            function showSuccess(msg) {
+                successMessageEl.textContent = msg;
+                successModal.classList.add('active');
+            }
 
-            function hideSuccess() { successModal.classList.remove('active'); }
+            function hideSuccess() {
+                successModal.classList.remove('active');
+            }
+
             closeSuccessModal.addEventListener('click', hideSuccess);
             okSuccessBtn.addEventListener('click', hideSuccess);
-            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+            window.addEventListener('click', (e) => {
+                if (e.target === successModal) hideSuccess();
+            });
+
             const confirmModal = document.getElementById('confirmModal');
             const closeConfirmModal = document.getElementById('closeConfirmModal');
             const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
@@ -1187,97 +1030,63 @@ sidebarItems.forEach(item => {
                 confirmModal.classList.add('active');
             }
 
-            function hideConfirm() { confirmModal.classList.remove('active');
-                confirmCallback = null; }
+            function hideConfirm() {
+                confirmModal.classList.remove('active');
+                confirmCallback = null;
+            }
+
             closeConfirmModal.addEventListener('click', hideConfirm);
             cancelConfirmBtn.addEventListener('click', hideConfirm);
-            proceedConfirmBtn.addEventListener('click', function() { if (confirmCallback) confirmCallback();
-                hideConfirm(); });
-            window.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirm(); });
+            proceedConfirmBtn.addEventListener('click', function() {
+                if (confirmCallback) confirmCallback();
+                hideConfirm();
+            });
+            window.addEventListener('click', (e) => {
+                if (e.target === confirmModal) hideConfirm();
+            });
 
-            function showNotEditable() {
-                showSuccess("النظام غير قابل للتعديل حاليا");
+            function populateFromUser() {
+                const userData = currentUser;
+                if (userData.fullName) {
+                    document.getElementById('fullNameInput').value = userData.fullName;
+                    document.getElementById('userFullName').textContent = userData.fullName;
+                }
+                if (userData.email) document.getElementById('emailInput').value = userData.email;
+                if (userData.phone) document.getElementById('phoneInput').value = userData.phone;
+                if (userData.role) {
+                    document.getElementById('roleSelect').value = userData.role;
+                    document.getElementById('role').textContent = userData.role === 'admin' ? 'Administrator' : userData.role;
+                }
+                if (userData.avatar) {
+                    userAvatar.src = userData.avatar;
+                    headerAvatar.src = userData.avatar;
+                    profileAvatar.src = userData.avatar;
+                }
+                const restaurant = userData.restaurant || {};
+                if (restaurant.name) document.getElementById('restaurantName').value = restaurant.name;
+                if (restaurant.commercialReg) document.getElementById('commercialReg').value = restaurant.commercialReg;
+                if (restaurant.phone) document.getElementById('restaurantPhone').value = restaurant.phone;
+                if (restaurant.email) document.getElementById('restaurantEmail').value = restaurant.email;
+                if (restaurant.address) document.getElementById('restaurantAddress').value = restaurant.address;
+                if (restaurant.workingHours) document.getElementById('workingHours').value = restaurant.workingHours;
+                if (restaurant.currency) document.getElementById('currencySelect').value = restaurant.currency;
             }
 
-            const userAvatarImg = document.getElementById('userAvatar');
-            const profileAvatar = document.getElementById('profileAvatar');
-            const changeAvatarBtn = document.getElementById('changeAvatarBtn');
-
-            function triggerAvatarUpload() {
-                showNotEditable();
-            }
-            if (userAvatarImg) userAvatarImg.addEventListener('click', triggerAvatarUpload);
-            if (changeAvatarBtn) changeAvatarBtn.addEventListener('click', triggerAvatarUpload);
-            const settingsTabs = document.querySelectorAll('.settings-tab');
-            const tabContents = {
-                'profile': document.getElementById('tab-profile'),
-                'restaurant': document.getElementById('tab-restaurant'),
-                'notifications': document.getElementById('tab-notifications'),
-                'security': document.getElementById('tab-security'),
-                'appearance': document.getElementById('tab-appearance'),
-                'backup': document.getElementById('tab-backup')
-            };
-            settingsTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    settingsTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    const tabName = this.getAttribute('data-tab');
-                    Object.keys(tabContents).forEach(key => {
-                        if (tabContents[key]) tabContents[key].classList.add('hidden');
-                    });
-                    if (tabContents[tabName]) tabContents[tabName].classList.remove('hidden');
-                });
-            });
-            document.getElementById('saveProfileBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('saveRestaurantBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('saveNotificationsBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('changePasswordBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('deleteAccountBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('saveAppearanceBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('createBackupBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.getElementById('restoreBackupBtn').onclick = function(e) { e.preventDefault();
-                showNotEditable(); };
-            const colorOptions = document.querySelectorAll('.color-option');
-            colorOptions.forEach(btn => {
-                btn.onclick = function(e) { e.preventDefault();
-                    showNotEditable(); };
-            });
-            document.getElementById('darkModeToggle').onchange = function(e) { e.preventDefault();
-                showNotEditable(); };
-            document.addEventListener('DOMContentLoaded', function() {
-                const themeToggles = document.querySelectorAll('.theme-toggle');
-                const body = document.body;
-                const darkModeToggle = document.getElementById('darkModeToggle');
-                const applyTheme = (theme) => {
-                    const isDark = theme === 'dark';
-                    body.classList.toggle('light', !isDark);
-                    themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
-                    if (darkModeToggle) darkModeToggle.checked = isDark;
-                    localStorage.setItem('theme', theme);
-                };
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                applyTheme(savedTheme);
-                themeToggles.forEach(toggle => {
-                    toggle.addEventListener('click', () => {
-                        const isDark = body.classList.contains('light') === false;
-                        applyTheme(isDark ? 'light' : 'dark');
-                    });
-                });
+            function loadLocalStorage() {
                 try {
                     const profileData = localStorage.getItem('userProfileSettings');
                     if (profileData) {
                         const p = JSON.parse(profileData);
-                        if (p.fullName) document.getElementById('fullNameInput').value = p.fullName;
+                        if (p.fullName) {
+                            document.getElementById('fullNameInput').value = p.fullName;
+                            document.getElementById('userFullName').textContent = p.fullName;
+                        }
                         if (p.email) document.getElementById('emailInput').value = p.email;
                         if (p.phone) document.getElementById('phoneInput').value = p.phone;
-                        if (p.role) document.getElementById('roleSelect').value = p.role;
+                        if (p.role) {
+                            document.getElementById('roleSelect').value = p.role;
+                            document.getElementById('role').textContent = p.role === 'admin' ? 'Administrator' : p.role;
+                        }
                     }
                     const restaurantData = localStorage.getItem('restaurantSettings');
                     if (restaurantData) {
@@ -1294,8 +1103,7 @@ sidebarItems.forEach(item => {
                     if (notifData) {
                         const n = JSON.parse(notifData);
                         if (n.orders !== undefined) document.getElementById('notifyOrders').checked = n.orders;
-                        if (n.inventory !== undefined) document.getElementById('notifyInventory').checked = n
-                            .inventory;
+                        if (n.inventory !== undefined) document.getElementById('notifyInventory').checked = n.inventory;
                         if (n.reviews !== undefined) document.getElementById('notifyReviews').checked = n.reviews;
                         if (n.weekly !== undefined) document.getElementById('notifyWeekly').checked = n.weekly;
                         if (n.email !== undefined) document.getElementById('notifyEmail').checked = n.email;
@@ -1304,13 +1112,12 @@ sidebarItems.forEach(item => {
                     if (appearanceData) {
                         const a = JSON.parse(appearanceData);
                         if (a.fontSize) document.getElementById('fontSizeSelect').value = a.fontSize;
-                        if (a.animations !== undefined) document.getElementById('animationsToggle').checked = a
-                            .animations;
+                        if (a.animations !== undefined) document.getElementById('animationsToggle').checked = a.animations;
                     }
                     const savedColor = localStorage.getItem('primaryColor');
                     if (savedColor) {
                         document.documentElement.style.setProperty('--color-primary', savedColor);
-                        colorOptions.forEach(b => {
+                        document.querySelectorAll('.color-option').forEach(b => {
                             b.classList.remove('border-white');
                             b.classList.add('border-transparent');
                             if (b.getAttribute('data-color') === savedColor) {
@@ -1319,8 +1126,242 @@ sidebarItems.forEach(item => {
                             }
                         });
                     }
+                    const twoFactor = localStorage.getItem('twoFactorAuth');
+                    if (twoFactor !== null) document.getElementById('twoFactorAuth').checked = twoFactor === 'true';
                 } catch (e) {}
+            }
+
+            populateFromUser();
+            loadLocalStorage();
+
+            function saveProfile() {
+                const data = {
+                    fullName: document.getElementById('fullNameInput').value,
+                    email: document.getElementById('emailInput').value,
+                    phone: document.getElementById('phoneInput').value,
+                    role: document.getElementById('roleSelect').value
+                };
+                localStorage.setItem('userProfileSettings', JSON.stringify(data));
+                document.getElementById('userFullName').textContent = data.fullName;
+                document.getElementById('role').textContent = data.role === 'admin' ? 'Administrator' : data.role;
+                showSuccess('تم حفظ الملف الشخصي بنجاح');
+            }
+
+            function saveRestaurant() {
+                const data = {
+                    name: document.getElementById('restaurantName').value,
+                    commercialReg: document.getElementById('commercialReg').value,
+                    phone: document.getElementById('restaurantPhone').value,
+                    email: document.getElementById('restaurantEmail').value,
+                    address: document.getElementById('restaurantAddress').value,
+                    workingHours: document.getElementById('workingHours').value,
+                    currency: document.getElementById('currencySelect').value
+                };
+                localStorage.setItem('restaurantSettings', JSON.stringify(data));
+                showSuccess('تم حفظ معلومات المطعم بنجاح');
+            }
+
+            function saveNotifications() {
+                const data = {
+                    orders: document.getElementById('notifyOrders').checked,
+                    inventory: document.getElementById('notifyInventory').checked,
+                    reviews: document.getElementById('notifyReviews').checked,
+                    weekly: document.getElementById('notifyWeekly').checked,
+                    email: document.getElementById('notifyEmail').checked
+                };
+                localStorage.setItem('notificationSettings', JSON.stringify(data));
+                showSuccess('تم حفظ إعدادات الإشعارات بنجاح');
+            }
+
+            function changePassword() {
+                const current = document.getElementById('currentPassword').value;
+                const newPass = document.getElementById('newPassword').value;
+                const confirmPass = document.getElementById('confirmPassword').value;
+                if (!current || !newPass || !confirmPass) {
+                    showSuccess('يرجى ملء جميع الحقول');
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    showSuccess('كلمتا المرور غير متطابقتين');
+                    return;
+                }
+                localStorage.setItem('userPassword', newPass);
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                showSuccess('تم تغيير كلمة المرور بنجاح');
+            }
+
+            function deleteAccount() {
+                localStorage.clear();
+                showSuccess('تم حذف الحساب');
+                setTimeout(() => window.location.href = '/', 1500);
+            }
+
+            function saveAppearance() {
+                const data = {
+                    fontSize: document.getElementById('fontSizeSelect').value,
+                    animations: document.getElementById('animationsToggle').checked
+                };
+                localStorage.setItem('appearanceSettings', JSON.stringify(data));
+                showSuccess('تم حفظ إعدادات المظهر بنجاح');
+            }
+
+            function createBackup() {
+                const backup = {
+                    profile: localStorage.getItem('userProfileSettings'),
+                    restaurant: localStorage.getItem('restaurantSettings'),
+                    notifications: localStorage.getItem('notificationSettings'),
+                    appearance: localStorage.getItem('appearanceSettings'),
+                    primaryColor: localStorage.getItem('primaryColor'),
+                    twoFactorAuth: localStorage.getItem('twoFactorAuth'),
+                    theme: localStorage.getItem('theme')
+                };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showSuccess('تم إنشاء النسخة الاحتياطية');
+            }
+
+            function restoreBackup(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.profile) localStorage.setItem('userProfileSettings', data.profile);
+                        if (data.restaurant) localStorage.setItem('restaurantSettings', data.restaurant);
+                        if (data.notifications) localStorage.setItem('notificationSettings', data.notifications);
+                        if (data.appearance) localStorage.setItem('appearanceSettings', data.appearance);
+                        if (data.primaryColor) localStorage.setItem('primaryColor', data.primaryColor);
+                        if (data.twoFactorAuth) localStorage.setItem('twoFactorAuth', data.twoFactorAuth);
+                        if (data.theme) localStorage.setItem('theme', data.theme);
+                        loadLocalStorage();
+                        showSuccess('تم استعادة النسخة الاحتياطية بنجاح');
+                    } catch (err) {
+                        showSuccess('ملف النسخة الاحتياطية غير صالح');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            document.getElementById('saveRestaurantBtn').addEventListener('click', saveRestaurant);
+            document.getElementById('saveNotificationsBtn').addEventListener('click', saveNotifications);
+            document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+            document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+                showConfirm('تأكيد الحذف', 'هل أنت متأكد من رغبتك في حذف الحساب؟ لا يمكن التراجع عن هذا الإجراء.', deleteAccount);
             });
+            document.getElementById('saveAppearanceBtn').addEventListener('click', saveAppearance);
+            document.getElementById('createBackupBtn').addEventListener('click', createBackup);
+            document.getElementById('restoreBackupBtn').addEventListener('click', function() {
+                document.getElementById('restoreFileInput').click();
+            });
+            document.getElementById('restoreFileInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    restoreBackup(e.target.files[0]);
+                    e.target.value = '';
+                }
+            });
+
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.documentElement.style.setProperty('--color-primary', color);
+                    localStorage.setItem('primaryColor', color);
+                    colorOptions.forEach(b => {
+                        b.classList.remove('border-white');
+                        b.classList.add('border-transparent');
+                    });
+                    this.classList.remove('border-transparent');
+                    this.classList.add('border-white');
+                    showSuccess('تم تغيير اللون الأساسي');
+                });
+            });
+
+            document.getElementById('darkModeToggle').addEventListener('change', function(e) {
+                const isDark = e.target.checked;
+                document.body.classList.toggle('light', !isDark);
+                document.querySelectorAll('.theme-toggle').forEach(t => t.classList.toggle('dark', isDark));
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                showSuccess('تم تغيير الوضع');
+            });
+
+            document.getElementById('twoFactorAuth').addEventListener('change', function(e) {
+                localStorage.setItem('twoFactorAuth', e.target.checked ? 'true' : 'false');
+            });
+
+            const settingsTabs = document.querySelectorAll('.settings-tab');
+            const tabContents = {
+                'profile': document.getElementById('tab-profile'),
+                'restaurant': document.getElementById('tab-restaurant'),
+                'notifications': document.getElementById('tab-notifications'),
+                'security': document.getElementById('tab-security'),
+                'appearance': document.getElementById('tab-appearance'),
+                'backup': document.getElementById('tab-backup')
+            };
+
+            settingsTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    settingsTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    Object.keys(tabContents).forEach(key => {
+                        if (tabContents[key]) tabContents[key].classList.add('hidden');
+                    });
+                    if (tabContents[tabName]) tabContents[tabName].classList.remove('hidden');
+                });
+            });
+
+            const themeToggles = document.querySelectorAll('.theme-toggle');
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                document.body.classList.toggle('light', !isDark);
+                themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
+                document.getElementById('darkModeToggle').checked = isDark;
+                localStorage.setItem('theme', theme);
+            }
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
+            themeToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const isDark = document.body.classList.contains('light') === false;
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
+            });
+
+            document.getElementById('changeAvatarBtn').addEventListener('click', function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = function(e) {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            const imgUrl = ev.target.result;
+                            userAvatar.src = imgUrl;
+                            headerAvatar.src = imgUrl;
+                            profileAvatar.src = imgUrl;
+                            localStorage.setItem('userAvatar', imgUrl);
+                            showSuccess('تم تغيير الصورة بنجاح');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            });
+
+            const savedAvatar = localStorage.getItem('userAvatar');
+            if (savedAvatar) {
+                userAvatar.src = savedAvatar;
+                headerAvatar.src = savedAvatar;
+                profileAvatar.src = savedAvatar;
+            }
         })();
     </script>
 </body>
