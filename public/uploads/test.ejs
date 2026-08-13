@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -1206,10 +1207,16 @@
                 </div>
                 <div class="info-card mt-6" id="reportViewCard" style="display:none;">
                     <div class="flex items-center justify-between mb-4">
-                        <div class="text-center w-full">
+                        <div class="flex gap-2">
+                            <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
+                        </div>
+                        <div class="text-center flex-1">
                             <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
                             <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
                             <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة هذا التقرير</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -1228,10 +1235,6 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
-                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
-                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة هذا التقرير</button>
-                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
                     </div>
                 </div>
                 <div class="mt-6 info-card" id="recentReportsCard">
