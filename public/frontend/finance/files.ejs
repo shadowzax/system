@@ -875,7 +875,7 @@
     </script>
     <script>
         (function() {
-            var API_BASE = 'http://108.181.221.18:7049/api/admin/files';
+            var API_BASE = "<%= api %>" + '/api/admin/files';
             var appData = { files: [] };
             var currentFileId = null;
             var confirmCallback = null;
