@@ -134,6 +134,14 @@ app.get("/", (req, res) => {
     });
 });
 */
+app.get("/100", (req, res) => {
+    res.render("finance/files", {
+        title: "",
+        description: ""
+    });
+});
+
+
 app.get("/1", (req, res) => {
     res.render("../uploads/outgoing", {
         title: "",
