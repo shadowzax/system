@@ -1145,31 +1145,33 @@
 
             function convertLegacySalaryEmployee(employee, fileCreatedAt) {
                 if (!employee) return;
-                if (employee.monthlyData && Object.keys(employee.monthlyData).length > 0) return;
-                if (Array.isArray(employee.salaryRecords) && employee.salaryRecords.length > 0) {
-                    let monthKey = getCurrentMonthKey();
-                    if (fileCreatedAt) {
-                        const d = new Date(fileCreatedAt);
-                        if (!isNaN(d.getTime())) {
-                            monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                if (!Array.isArray(employee.salaryRecords) || employee.salaryRecords.length === 0) return;
+                if (!employee.monthlyData) employee.monthlyData = {};
+                employee.salaryRecords.forEach(rec => {
+                    if (rec.days && typeof rec.days === 'object') {
+                        let monthKey;
+                        if (rec.month) {
+                            monthKey = rec.month;
+                        } else if (fileCreatedAt) {
+                            const d = new Date(fileCreatedAt);
+                            if (!isNaN(d.getTime())) {
+                                monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                            }
+                        } else {
+                            monthKey = getCurrentMonthKey();
                         }
-                    }
-                    const mergedDays = {};
-                    employee.salaryRecords.forEach(rec => {
-                        if (rec.days && typeof rec.days === 'object') {
-                            for (const day in rec.days) {
-                                const val = rec.days[day];
-                                if (val !== undefined && val !== null && val !== '') {
-                                    mergedDays[day] = String(val);
-                                }
+                        if (!employee.monthlyData[monthKey]) {
+                            employee.monthlyData[monthKey] = { days: {} };
+                        }
+                        for (const day in rec.days) {
+                            const val = rec.days[day];
+                            if (val !== undefined && val !== null && val !== '') {
+                                employee.monthlyData[monthKey].days[day] = String(val);
                             }
                         }
-                    });
-                    if (Object.keys(mergedDays).length > 0) {
-                        if (!employee.monthlyData) employee.monthlyData = {};
-                        employee.monthlyData[monthKey] = { days: mergedDays };
                     }
-                }
+                });
+                delete employee.salaryRecords;
             }
 
             async function sendSalaryToServer(fileId, employeeId, day, amount) {
@@ -1624,15 +1626,18 @@
                 const serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.files && Array.isArray(serverData.files)) {
                     appData.files = serverData.files;
-                    saveAppData(appData);
-                    renderFilesList();
                 } else if (serverData && Array.isArray(serverData)) {
                     appData.files = serverData;
-                    saveAppData(appData);
-                    renderFilesList();
-                } else {
-                    renderFilesList();
                 }
+                appData.files.forEach(file => {
+                    if (file.employees && Array.isArray(file.employees)) {
+                        file.employees.forEach(emp => {
+                            convertLegacySalaryEmployee(emp, file.createdAt);
+                        });
+                    }
+                });
+                saveAppData(appData);
+                renderFilesList();
             }
 
             document.addEventListener('DOMContentLoaded', function() {
