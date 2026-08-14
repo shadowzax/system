@@ -696,16 +696,27 @@
                 </div>
             </div>
             <nav class="flex-1">
-                <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
+                <!-- <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
+                        التحكم</span></a> -->
+
+                <div class="sidebar-section-title">الكاش</div>
+                <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item " data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <div class="sidebar-section-title">الملف الشخصي</div>
+                <a href="/settings" class="sidebar-item " data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/me/reports" class="sidebar-item" data-page="reports"><i class="las la-chart-bar"></i><span>آخر التقارير</span></a>
+
                 <div class="sidebar-section-title">المالية</div>
-                <a href="#" class="sidebar-item active" data-page="files"><i class="las la-folder"></i><span>الملفات والموظفين</span></a>
-                <a href="#" class="sidebar-item" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
-                <div class="sidebar-section-title">النظام</div>
-                <a href="#" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-                <a href="#" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
-                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                <a href="/employee-files" class="sidebar-item active" data-page="files"><i class="las la-folder"></i><span>الملفات والموظفين</span></a>
+                <a href="/employee-advance" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <a href="/employee-salary" class="sidebar-item" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
+
+
+                  <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
@@ -793,14 +804,7 @@
             </div>
         </main>
     </div>
-    <div class="bottom-mobile-nav" id="bottomMobileNav">
-        <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item" data-tab="home"><i class="las la-home"></i><span>الرئيسية</span></a>
-        <a href="#" class="bottom-nav-item active" data-tab="files"><i class="las la-folder"></i><span>الملفات</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="loans"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-    </div>
+
     <div class="modal-overlay" id="employeeFormModal">
         <div class="modal-content">
             <button class="modal-close" id="closeEmployeeFormModal"><i class="las la-times"></i></button>
