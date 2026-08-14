@@ -989,8 +989,7 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
-                </div>
+                    <img id="headerAvatar" src="<%- user && user.profile_picture ? user.profile_picture : 'https://i.ibb.co/HRbkkLw/3177440-1.jpg' %>" class="header-avatar" alt="avatar">                </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
@@ -1047,14 +1046,7 @@
         </main>
     </div>
     <div id="printArea" style="display:none;"></div>
-    <div class="bottom-mobile-nav" id="bottomMobileNav">
-        <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item" data-tab="home"><i class="las la-home"></i><span>الرئيسية</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="files"><i class="las la-folder"></i><span>الملفات</span></a>
-        <a href="#" class="bottom-nav-item active" data-tab="loans"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-    </div>
+
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
             <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
