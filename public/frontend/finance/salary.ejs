@@ -1,1 +1,1651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>الرواتب اليومية</title>
+    <meta name="description" content="نظام إدارة الرواتب باليومية">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 68px;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
+        }
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Alexandria', system-ui, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 0;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-background);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0563a7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d99ff;
+        }
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border-color);
+            position: fixed;
+            right: 0;
+            top: var(--header-height);
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease, z-index 0.3s;
+            z-index: 30;
+            padding: 24px 16px;
+            transform: translateX(0);
+        }
+        .dashboard-sidebar.mobile-closed {
+            transform: translateX(100%);
+        }
+        @media (max-width: 1024px) {
+            .dashboard-sidebar.mobile-open {
+                z-index: 105;
+            }
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--color-muted);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        .sidebar-item i {
+            font-size: 22px;
+            width: 28px;
+            flex-shrink: 0;
+        }
+        .sidebar-item:hover {
+            background: rgba(13, 153, 255, 0.08);
+            color: var(--color-primary);
+        }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(13, 153, 255, 0.15), rgba(124, 58, 237, 0.1));
+            color: var(--color-primary);
+            border-right: 3px solid var(--color-primary);
+            font-weight: 600;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-muted);
+            padding: 16px 16px 8px;
+            font-weight: 600;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-sidebar {
+                transform: translateX(100%);
+                width: 260px;
+                z-index: 45;
+            }
+            .dashboard-sidebar.mobile-open {
+                transform: translateX(0);
+                z-index: 105;
+            }
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(100%);
+                z-index: 45;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+        @media (min-width: 1025px) {
+            .dashboard-sidebar {
+                transform: translateX(0) !important;
+                z-index: 30;
+            }
+            .dashboard-sidebar.mobile-open,
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(0) !important;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: var(--shadow-glow);
+        }
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--color-background);
+            z-index: 110;
+            transition: background-color 0.3s;
+        }
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .header-avatar:hover {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+        main {
+            padding-top: var(--header-height);
+        }
+        .bottom-mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        @media (max-width: 1024px) {
+            .bottom-mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            padding: 6px 4px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .bottom-nav-item span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            font-size: 0.68rem;
+        }
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+        }
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+            background: rgba(13, 153, 255, 0.12);
+        }
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        .bottom-nav-item.active i {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 102;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            color: var(--color-primary);
+        }
+        .bottom-nav-item.active span {
+            margin-top: 18px;
+        }
+        .nav-notch {
+            position: absolute;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--color-background);
+            border-radius: 50%;
+            z-index: 101;
+            transform: translate(-50%, -50%);
+            transition: left 0.3s ease;
+            pointer-events: none;
+        }
+        .input-field {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--color-white);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+        select.input-field {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 36px;
+            cursor: pointer;
+        }
+        @media (max-width: 640px) {
+            .input-field {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+            .info-card {
+                padding: 18px;
+            }
+            .btn-sm {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+        }
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover {
+            background: #0b85e0;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.25);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--color-white);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .btn-outline:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.05);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+        }
+        .btn-xs {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+        .modal-content.wide {
+            max-width: 950px;
+        }
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 24px 20px;
+                border-radius: 18px;
+                max-width: 95vw;
+            }
+            .modal-content.wide {
+                max-width: 95vw;
+            }
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: var(--color-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            z-index: 5;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        .title-cell {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 32px;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 28px;
+        }
+        .title-cell h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+        .title-cell p {
+            color: var(--color-muted);
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+        .title-cell .title-icon {
+            font-size: 2.4rem;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+        @media (max-width: 640px) {
+            .title-cell {
+                padding: 20px 16px;
+            }
+            .title-cell h1 {
+                font-size: 1.5rem;
+            }
+            .title-cell p {
+                font-size: 0.85rem;
+            }
+        }
+        .theme-toggle {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all .4s ease;
+        }
+        .theme-toggle .toggle-circle {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
+            transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
+        }
+        .theme-toggle .icon {
+            position: absolute;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .4s ease;
+        }
+        .theme-toggle .sun-icon {
+            color: #ff6b35;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .theme-toggle .moon-icon {
+            color: #a78bfa;
+            opacity: 0;
+            transform: rotate(180deg) scale(.5);
+        }
+        .theme-toggle.dark {
+            background: linear-gradient(45deg, #475569, #1e293b);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .toggle-circle {
+            right: calc(100% - 31px);
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+        .theme-toggle.dark .sun-icon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(.5);
+        }
+        .theme-toggle.dark .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .file-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+        }
+        .file-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.12);
+            transform: translateY(-2px);
+        }
+        .file-card .file-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(13, 153, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+        .shared-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-top: 16px;
+            max-height: 60vh;
+            overflow-y: auto;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+        .shared-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 900px;
+            table-layout: auto;
+        }
+        .shared-table th,
+        .shared-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .shared-table thead th {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .shared-table thead th.emp-header {
+            position: sticky;
+            right: 0;
+            z-index: 6;
+            background: var(--darker-bg);
+            min-width: 140px;
+            text-align: right;
+            padding-right: 12px;
+        }
+        .shared-table thead th.day-num-header {
+            min-width: 44px;
+            width: 44px;
+        }
+        .shared-table tbody td.emp-cell {
+            position: sticky;
+            right: 0;
+            background: var(--card-bg);
+            z-index: 3;
+            font-weight: 600;
+            text-align: right;
+            padding-right: 12px;
+            min-width: 140px;
+            border-left: 2px solid var(--border-color);
+        }
+        .shared-table tbody td.emp-cell .emp-name-display {
+            font-weight: 700;
+            color: var(--color-white);
+            font-size: 0.85rem;
+        }
+        .shared-table tbody td.emp-cell .emp-code-display {
+            font-size: 0.65rem;
+            color: var(--color-muted);
+        }
+        .shared-table tbody tr:hover td {
+            background: rgba(13, 153, 255, 0.04);
+        }
+        .shared-table tbody tr:hover td.emp-cell {
+            background: rgba(13, 153, 255, 0.06);
+        }
+        .shared-table tbody td .day-input {
+            width: 44px;
+            max-width: 44px;
+            padding: 5px 2px;
+            text-align: center;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 0.78rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .shared-table tbody td .day-input:focus {
+            border-color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+            box-shadow: 0 0 0 2px rgba(13, 153, 255, 0.08);
+            z-index: 2;
+            position: relative;
+        }
+        .shared-table tbody td .day-input.has-value {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.35);
+            color: #10b981;
+            font-weight: 700;
+        }
+        .shared-table tbody td .day-input.has-value-zero {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.35);
+            color: #ef4444;
+            font-weight: 700;
+        }
+        .shared-table tfoot td {
+            background: var(--darker-bg);
+            font-weight: 700;
+            font-size: 0.78rem;
+            border-top: 2px solid var(--border-color);
+        }
+        .shared-table tfoot td.summary-label-cell {
+            text-align: right;
+            padding-right: 12px;
+            color: var(--color-muted);
+            position: sticky;
+            right: 0;
+            background: var(--darker-bg);
+            z-index: 4;
+            border-left: 2px solid var(--border-color);
+        }
+        .shared-table tfoot td.summary-value-cell {
+            color: #10b981;
+            font-size: 0.8rem;
+        }
+        .shared-table tfoot td.summary-days-cell {
+            color: var(--color-primary);
+        }
+        @media (max-width: 640px) {
+            .shared-table {
+                font-size: 0.7rem;
+                min-width: 750px;
+            }
+            .shared-table thead th.day-num-header {
+                min-width: 34px;
+                width: 34px;
+                font-size: 0.6rem;
+            }
+            .shared-table tbody td .day-input {
+                width: 34px;
+                max-width: 34px;
+                font-size: 0.68rem;
+                padding: 4px 1px;
+            }
+            .shared-table thead th.emp-header,
+            .shared-table tbody td.emp-cell {
+                min-width: 110px;
+            }
+        }
+        @media print {
+            html,
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background: #ffffff;
+                font-family: 'Alexandria', sans-serif;
+                direction: rtl;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            body>:not(#printArea) {
+                display: none !important;
+            }
+            #printArea {
+                display: block !important;
+                position: static;
+                width: 100%;
+                max-width: 100%;
+                min-height: auto;
+                padding: 8mm 10mm;
+                margin: 0 auto;
+                background: #ffffff;
+                color: #000000;
+                direction: rtl;
+                overflow: visible;
+                box-sizing: border-box;
+                font-family: 'Alexandria', sans-serif;
+                visibility: visible !important;
+                line-height: 1.4;
+            }
+            #printArea * {
+                visibility: visible !important;
+                box-sizing: border-box;
+            }
+            #printArea .print-header {
+                text-align: center;
+                margin-bottom: 5mm;
+                border-bottom: 2px solid #000;
+                padding-bottom: 2mm;
+            }
+            #printArea .print-header h2 {
+                font-size: 20px;
+                font-weight: 800;
+                margin: 0;
+            }
+            #printArea .print-header .sub {
+                font-size: 12px;
+                font-weight: 600;
+                color: #333;
+                margin-top: 2px;
+            }
+            #printArea table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 10px;
+                border: 1px solid #000;
+            }
+            #printArea table th {
+                background: #e8e8e8;
+                font-weight: 700;
+                font-size: 10px;
+                border: 1px solid #000;
+                padding: 4px 5px;
+                text-align: center;
+                color: #000;
+            }
+            #printArea table td {
+                border: 1px solid #000;
+                padding: 3px 5px;
+                text-align: center;
+                font-size: 10px;
+                color: #000;
+                background: #fff;
+            }
+            #printArea table .total-row td {
+                font-weight: 800;
+                background: #f4f4f4;
+            }
+            #printArea .footer {
+                margin-top: 5mm;
+                padding-top: 2mm;
+                border-top: 1px dashed #333;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+                color: #000;
+            }
+            #printArea .footer .dev {
+                font-size: 10px;
+                font-weight: 600;
+                color: #111;
+            }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 300;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            color: var(--color-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateX(-50%) translateY(20px);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            border-color: var(--color-success);
+            color: var(--color-success);
+        }
+        .toast.error {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+    </style>
+</head>
+<body>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1">
+                <div class="sidebar-section-title">الرئيسية</div>
+                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة التحكم</span></a>
+                <div class="sidebar-section-title">المالية</div>
+                <a href="#" class="sidebar-item" data-page="loans"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <a href="#" class="sidebar-item active" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
+                <div class="sidebar-section-title">النظام</div>
+                <a href="#" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="#" class="sidebar-item" data-page="logs"><i class="las la-history"></i><span>سجل النشاط</span></a>
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="#" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                </div>
+            </nav>
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                </div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v5.2</div>
+            </div>
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="header-avatar" alt="avatar">
+                </div>
+            </header>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="title-cell">
+                    <div class="title-icon"><i class="las la-money-bill-wave"></i></div>
+                    <h1>الرواتب اليومية</h1>
+                    <p>حساب الرواتب على أساس المضاعف اليومي - جدول مشترك</p>
+                </div>
+                <div id="filesView">
+                    <div class="info-card">
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-folder-open text-primary"></i> الملفات</h3>
+                        </div>
+                        <div class="mb-4">
+                            <div class="relative">
+                                <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
+                                <input type="text" id="fileSearchInput" class="input-field pr-10" placeholder="ابحث عن ملف...">
+                            </div>
+                        </div>
+                        <div class="space-y-3" id="filesList"></div>
+                    </div>
+                </div>
+                <div id="employeesView" style="display:none;">
+                    <div class="info-card">
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <button class="btn-outline btn-sm" id="backToFilesBtn"><i class="las la-arrow-right"></i> رجوع</button>
+                                <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2" id="currentFileName"></h3>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="btn-outline btn-sm" id="printFileBtn"><i class="las la-print"></i> طباعة الملف</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 mb-4 p-3 bg-[var(--darker-bg)] rounded-xl">
+                            <span class="text-sm text-[var(--color-muted)]">الشهر:</span>
+                            <input type="month" id="employeeMonthFilter" class="input-field text-sm py-2 px-3" style="width:auto;min-width:160px;">
+                        </div>
+                        <div class="mb-4">
+                            <div class="relative">
+                                <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
+                                <input type="text" id="employeeSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف...">
+                            </div>
+                        </div>
+                        <div class="shared-table-wrapper" id="sharedTableWrapper">
+                            <table class="shared-table" id="sharedTable">
+                                <thead id="sharedTableHead"></thead>
+                                <tbody id="sharedTableBody"></tbody>
+                                <tfoot id="sharedTableFoot"></tfoot>
+                            </table>
+                        </div>
+                        <div class="text-center text-xs text-[var(--color-muted)] mt-3" id="tableHint">يمكنك تعديل المضاعفات مباشرة في الجدول أعلاه، وسيتم الحفظ تلقائياً عند الانتقال من الخلية أو بالضغط على Enter.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="printArea" style="display:none;"></div>
+    <div class="bottom-mobile-nav" id="bottomMobileNav">
+        <div class="nav-notch" id="navNotch"></div>
+        <a href="#" class="bottom-nav-item" data-tab="home"><i class="las la-home"></i><span>الرئيسية</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="files"><i class="las la-folder"></i><span>الملفات</span></a>
+        <a href="#" class="bottom-nav-item active" data-tab="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+    </div>
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
+            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
+            <p id="successMessage" class="text-[var(--color-muted)]"></p>
+            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeConfirmModal"><i class="las la-times"></i></button>
+            <i class="las la-question-circle text-5xl text-warning mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تأكيد</h3>
+            <p id="confirmMessage" class="text-[var(--color-muted)]"></p>
+            <div class="flex gap-3 mt-5 justify-center">
+                <button class="btn-primary btn-sm" id="confirmYesBtn" style="background:#ef4444;">نعم</button>
+                <button class="btn-outline btn-sm" id="confirmNoBtn">لا</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
 
+    <script>
+        (function() {
+            const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
+
+            function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, m => arabicToEnglishMap[m] || m); }
+
+            function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
+
+            function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
+
+            function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8); }
+
+            function getCurrentMonthKey() { const now = new Date(); return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'); }
+
+            function getDaysInMonth(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); return new Date(year, month, 0).getDate(); }
+
+            function formatMonthDisplay(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']; return monthNames[month - 1] + ' ' + year; }
+
+            function monthKeyToInput(monthKey) { return monthKey; }
+
+            function inputToMonthKey(inputVal) { return inputVal; }
+
+            const STORAGE_KEY = 'dailySalaryAppData_v3';
+            const API_BASE = 'http://108.181.221.18:7049/api/admin';
+
+            function getToken() {
+                return localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+            }
+
+            function loadAppData() { try { const stored = localStorage.getItem(STORAGE_KEY); if (stored) return JSON.parse(stored); } catch (e) {} return { files: [] }; }
+
+            function saveAppData(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }
+
+            let appData = loadAppData();
+            let currentFileId = null;
+            let confirmCallback = null;
+
+            const sidebar = document.getElementById('dashboardSidebar');
+            const headerAvatar = document.getElementById('headerAvatar');
+
+            function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
+
+            function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
+            if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+            window.addEventListener('resize', function() { if (window.innerWidth >= 1025) { sidebar.classList.remove('mobile-open', 'mobile-closed'); } else { if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed'); } });
+            if (headerAvatar) { headerAvatar.addEventListener('click', function(e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
+            document.addEventListener('click', function(e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => { item.addEventListener('click', function() { if (this.id === 'logoutBtn') return; sidebarItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); if (window.innerWidth < 1025) closeSidebar(); }); });
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); if (confirm('هل أنت متأكد من تسجيل الخروج؟')) window.location.href = '/'; }); }
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+            const navNotch = document.getElementById('navNotch');
+
+            function moveNotch(activeItem) { if (!navNotch || !activeItem) return; const rect = activeItem.getBoundingClientRect(); const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect(); const centerX = rect.left + rect.width / 2 - navRect.left; navNotch.style.left = centerX + 'px'; }
+            bottomNavItems.forEach(item => { item.addEventListener('click', function(e) { e.preventDefault(); bottomNavItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); moveNotch(this); }); });
+            const initialActive = document.querySelector('.bottom-nav-item.active');
+            if (initialActive) moveNotch(initialActive);
+            window.addEventListener('resize', () => { const activeItem = document.querySelector('.bottom-nav-item.active'); if (activeItem) moveNotch(activeItem); });
+
+            const successModal = document.getElementById('successModal');
+            const successMessageEl = document.getElementById('successMessage');
+
+            function showSuccess(msg) { successMessageEl.textContent = msg; successModal.classList.add('active'); }
+
+            function hideSuccess() { successModal.classList.remove('active'); }
+            document.getElementById('closeSuccessModal').addEventListener('click', hideSuccess);
+            document.getElementById('okSuccessBtn').addEventListener('click', hideSuccess);
+            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+
+            const confirmModal = document.getElementById('confirmModal');
+            const confirmMessageEl = document.getElementById('confirmMessage');
+
+            function showConfirm(msg, callback) { confirmMessageEl.textContent = msg; confirmCallback = callback; confirmModal.classList.add('active'); }
+
+            function hideConfirm() { confirmModal.classList.remove('active'); confirmCallback = null; }
+            document.getElementById('closeConfirmModal').addEventListener('click', hideConfirm);
+            document.getElementById('confirmNoBtn').addEventListener('click', hideConfirm);
+            document.getElementById('confirmYesBtn').addEventListener('click', function() { if (confirmCallback) { confirmCallback(); confirmCallback = null; } hideConfirm(); });
+            window.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirm(); });
+
+            const toastEl = document.getElementById('toast');
+            let toastTimeout;
+
+            function showToast(message, type = 'success') {
+                if (!toastEl) return;
+                toastEl.textContent = message;
+                toastEl.className = 'toast ' + type + ' show';
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 2000);
+            }
+
+            function convertLegacySalaryEmployee(employee, fileCreatedAt) {
+                if (!employee) return;
+                if (employee.monthlyData && Object.keys(employee.monthlyData).length > 0) return;
+                if (Array.isArray(employee.salaryRecords) && employee.salaryRecords.length > 0) {
+                    let monthKey = getCurrentMonthKey();
+                    if (fileCreatedAt) {
+                        const d = new Date(fileCreatedAt);
+                        if (!isNaN(d.getTime())) {
+                            monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                        }
+                    }
+                    const mergedDays = {};
+                    employee.salaryRecords.forEach(rec => {
+                        if (rec.days && typeof rec.days === 'object') {
+                            for (const day in rec.days) {
+                                const val = rec.days[day];
+                                if (val !== undefined && val !== null && val !== '') {
+                                    mergedDays[day] = String(val);
+                                }
+                            }
+                        }
+                    });
+                    if (Object.keys(mergedDays).length > 0) {
+                        if (!employee.monthlyData) employee.monthlyData = {};
+                        employee.monthlyData[monthKey] = { days: mergedDays };
+                    }
+                }
+            }
+
+            async function fetchAdminFiles() {
+                try {
+                    const token = getToken();
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const response = await fetch(`${API_BASE}/files`, { headers });
+                    const data = await response.json();
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'فشل تحميل الملفات');
+                    }
+                    const files = Array.isArray(data.files) ? data.files : [];
+                    files.forEach(file => {
+                        if (file.employees && Array.isArray(file.employees)) {
+                            file.employees.forEach(emp => convertLegacySalaryEmployee(emp, file.createdAt));
+                        }
+                    });
+                    appData.files = files;
+                    saveAppData(appData);
+                    renderFilesList();
+                } catch (error) {
+                    console.error('Error fetching files:', error);
+                    showToast('تعذر تحميل الملفات من الخادم، يتم استخدام البيانات المخزنة محلياً', 'error');
+                }
+            }
+
+            async function sendSalaryToServer(fileId, employeeId, day, amount) {
+                try {
+                    const token = getToken();
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const response = await fetch(`${API_BASE}/files/salary`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            fileId: fileId,
+                            employeeId: employeeId,
+                            day: day,
+                            amount: amount
+                        })
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'فشل الحفظ');
+                    }
+                    return data;
+                } catch (error) {
+                    throw error;
+                }
+            }
+
+            function getEmployeeDayData(fileId, employeeId, monthKey) { const file = appData.files.find(f => f.id === fileId); if (!file) return {}; const emp = file.employees.find(e => e.id === employeeId); if (!emp) return {}; if (!emp.monthlyData) emp.monthlyData = {}; if (!emp.monthlyData[monthKey]) emp.monthlyData[monthKey] = { days: {} }; return emp.monthlyData[monthKey]; }
+
+            function getEmployeeTotalDays(fileId, employeeId, monthKey) { const dayData = getEmployeeDayData(fileId, employeeId, monthKey); let totalDays = 0; if (dayData.days) { for (const day in dayData.days) { totalDays += parseNumber(dayData.days[day] || 0); } } return totalDays; }
+
+            function getEmployeeAttendanceDays(fileId, employeeId, monthKey) { const dayData = getEmployeeDayData(fileId, employeeId, monthKey); let count = 0; if (dayData.days) { for (const day in dayData.days) { if (parseNumber(dayData.days[day] || 0) !== 0) count++; } } return count; }
+
+            function getEmployeeAbsenceDays(fileId, employeeId, monthKey) { const daysInMonth = getDaysInMonth(monthKey); const attendance = getEmployeeAttendanceDays(fileId, employeeId, monthKey); return daysInMonth - attendance; }
+
+            function getEmployeeTotalLoans(employee) {
+                let total = 0;
+                if (employee.advances && Array.isArray(employee.advances)) {
+                    employee.advances.forEach(adv => {
+                        if (adv.days && typeof adv.days === 'object') {
+                            for (const day in adv.days) {
+                                total += parseNumber(adv.days[day] || 0);
+                            }
+                        }
+                    });
+                }
+                return total;
+            }
+
+            const filesView = document.getElementById('filesView');
+            const employeesView = document.getElementById('employeesView');
+            const filesList = document.getElementById('filesList');
+            const currentFileName = document.getElementById('currentFileName');
+            const employeeMonthFilter = document.getElementById('employeeMonthFilter');
+            const sharedTableHead = document.getElementById('sharedTableHead');
+            const sharedTableBody = document.getElementById('sharedTableBody');
+            const sharedTableFoot = document.getElementById('sharedTableFoot');
+            const fileSearchInput = document.getElementById('fileSearchInput');
+            const employeeSearchInput = document.getElementById('employeeSearchInput');
+
+            function renderFilesList() {
+                const query = fileSearchInput ? fileSearchInput.value.toLowerCase().trim() : '';
+                filesList.innerHTML = '';
+                const filteredFiles = appData.files.filter(file => file.name && file.name.toLowerCase().includes(query));
+                if (filteredFiles.length === 0) {
+                    filesList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]"><i class="las la-folder-open text-5xl block mb-3 opacity-30"></i><p>لا توجد ملفات</p><p class="text-xs mt-1">لا يمكن إنشاء ملفات جديدة</p></div>';
+                    return;
+                }
+                filteredFiles.forEach(file => {
+                    const employeeCount = file.employees ? file.employees.length : 0;
+                    const div = document.createElement('div');
+                    div.className = 'file-card';
+                    div.innerHTML =
+                        `<div class="file-icon"><i class="las la-folder"></i></div><div class="flex-1 min-w-0"><p class="font-bold text-[var(--color-white)] text-base">${file.name || 'ملف بدون اسم'}</p><p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · أنشئ ${new Date(file.createdAt).toLocaleDateString('ar-EG')}</p></div><div class="flex gap-2 flex-shrink-0"><button class="btn-outline btn-xs open-file-btn" data-id="${file.id}" title="فتح الملف"><i class="las la-folder-open"></i> فتح</button></div>`;
+                    filesList.appendChild(div);
+                });
+                document.querySelectorAll('.open-file-btn').forEach(btn => { btn.addEventListener('click', function() { openFile(this.getAttribute('data-id')); }); });
+            }
+            if (fileSearchInput) {
+                fileSearchInput.addEventListener('input', renderFilesList);
+            }
+
+            function openFile(fileId) {
+                currentFileId = fileId;
+                const file = appData.files.find(f => f.id === fileId);
+                if (!file) return;
+                if (!file.employees) file.employees = [];
+                currentFileName.textContent = '📁 ' + (file.name || 'ملف');
+                filesView.style.display = 'none';
+                employeesView.style.display = 'block';
+                employeeMonthFilter.value = monthKeyToInput(getCurrentMonthKey());
+                if (employeeSearchInput) employeeSearchInput.value = '';
+                renderSharedTable();
+            }
+
+            function closeFile() {
+                currentFileId = null;
+                filesView.style.display = 'block';
+                employeesView.style.display = 'none';
+                renderFilesList();
+            }
+
+            function collectAllDaysFromTable() {
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const file = appData.files.find(f => f.id === currentFileId);
+                if (!file || !file.employees) return;
+                const daysInMonth = getDaysInMonth(monthKey);
+                file.employees.forEach(emp => {
+                    if (!emp.monthlyData) emp.monthlyData = {};
+                    if (!emp.monthlyData[monthKey]) emp.monthlyData[monthKey] = { days: {} };
+                    emp.monthlyData[monthKey].days = {};
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const input = document.getElementById('day-input-' + emp.id + '-' + d);
+                        if (input) {
+                            const val = convertArabicNumerals(input.value).replace(/,/g, '').trim();
+                            if (val !== '' && !isNaN(parseFloat(val)) && parseFloat(val) !== 0) {
+                                emp.monthlyData[monthKey].days[d] = val;
+                            }
+                        }
+                    }
+                });
+            }
+
+            async function saveSalaryForInput(input) {
+                const fileId = currentFileId;
+                const employeeId = input.getAttribute('data-eid');
+                const day = parseInt(input.getAttribute('data-day'));
+                const rawVal = convertArabicNumerals(input.value).replace(/,/g, '').trim();
+                const amount = rawVal === '' ? 0 : parseFloat(rawVal);
+                if (isNaN(amount)) {
+                    showToast('قيمة غير صحيحة', 'error');
+                    return;
+                }
+
+                try {
+                    await sendSalaryToServer(fileId, employeeId, day, amount);
+
+                    const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                    const file = appData.files.find(f => f.id === fileId);
+                    const emp = file.employees.find(e => e.id === employeeId);
+                    if (emp) {
+                        if (!emp.monthlyData) emp.monthlyData = {};
+                        if (!emp.monthlyData[monthKey]) emp.monthlyData[monthKey] = { days: {} };
+                        if (amount === 0) {
+                            delete emp.monthlyData[monthKey].days[day];
+                        } else {
+                            emp.monthlyData[monthKey].days[day] = String(amount);
+                        }
+                    }
+                    saveAppData(appData);
+                    updateRowSummary(employeeId);
+                    updateTableFootSummary();
+                    showToast(amount === 0 ? 'تم حذف القيمة' : 'تم حفظ القيمة');
+                } catch (error) {
+                    showToast('خطأ: ' + error.message, 'error');
+                    input.value = input.defaultValue || '';
+                }
+            }
+
+            function renderSharedTable() {
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const file = appData.files.find(f => f.id === currentFileId);
+                const daysInMonth = getDaysInMonth(monthKey);
+                sharedTableHead.innerHTML = '';
+                sharedTableBody.innerHTML = '';
+                sharedTableFoot.innerHTML = '';
+                if (!file || !file.employees || file.employees.length === 0) {
+                    sharedTableBody.innerHTML = '<tr><td colspan="' + (daysInMonth + 6) +
+                        '" class="text-center py-8 text-[var(--color-muted)]"><i class="las la-users text-4xl block mb-2 opacity-30"></i>لا يوجد موظفين في هذا الملف</td></tr>';
+                    return;
+                }
+                let headRow = '<tr><th class="emp-header">الموظف</th>';
+                for (let d = 1; d <= daysInMonth; d++) {
+                    headRow += '<th class="day-num-header">' + d + '</th>';
+                }
+                headRow += '<th class="emp-header">إجمالي الأيام</th><th class="emp-header">صافي الراتب</th><th class="emp-header">إجمالي السلف</th><th class="emp-header">الأيام المخصومة</th><th class="emp-header">إجمالي الخصومات</th><th class="emp-header">اليومية</th></tr>';
+                sharedTableHead.innerHTML = headRow;
+                file.employees.forEach(emp => {
+                    const monthlySalary = parseNumber(emp.monthlySalary || 0);
+                    const dayRate = monthlySalary / 30;
+                    const dayData = getEmployeeDayData(currentFileId, emp.id, monthKey);
+                    if (!dayData.days) dayData.days = {};
+                    let totalDays = 0;
+                    let row = '<tr>';
+                    row += '<td class="emp-cell"><div class="emp-name-display">' + (emp.name || 'بدون اسم') +
+                        '</div><div class="emp-code-display">كود: ' + (emp.code || '---') + ' · ' + (emp.profession || '---') + '</div></td>';
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const multiplierVal = dayData.days[d] !== undefined ? dayData.days[d] : '';
+                        const numVal = parseNumber(multiplierVal);
+                        const hasVal = multiplierVal !== '' && !isNaN(numVal);
+                        const isZero = hasVal && numVal === 0;
+                        let cls = '';
+                        if (isZero) cls = ' has-value-zero';
+                        else if (hasVal && numVal !== 0) cls = ' has-value';
+                        if (hasVal && numVal !== 0) totalDays += numVal;
+                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d +
+                            '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal +
+                            '" inputmode="decimal" placeholder="0"></td>';
+                    }
+                    const totalSalary = dayRate * totalDays;
+                    const totalLoans = getEmployeeTotalLoans(emp);
+                    const deductedDays = daysInMonth - totalDays;
+                    const totalDeductions = deductedDays * dayRate;
+                    row += '<td class="emp-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(totalDays) + '</td>';
+                    row += '<td class="emp-cell" style="color:#10b981;font-weight:700;">' + formatNumber(totalSalary) + '</td>';
+                    row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
+                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(deductedDays) + '</td>';
+                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
+                    row += '<td class="emp-cell" style="color:var(--color-muted);font-weight:600;">' + formatNumber(dayRate) + '</td>';
+                    row += '</tr>';
+                    sharedTableBody.innerHTML += row;
+                });
+                let footRow = '<tr><td class="summary-label-cell" style="font-weight:700;">إجمالي اليومي</td>';
+                for (let d = 1; d <= daysInMonth; d++) {
+                    footRow += '<td class="summary-value-cell">-</td>';
+                }
+                footRow += '<td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td></tr>';
+                sharedTableFoot.innerHTML = footRow;
+                bindTableInputEvents();
+                updateTableFootSummary();
+                applyEmployeeFilter();
+            }
+
+            function applyEmployeeFilter() {
+                const query = employeeSearchInput ? employeeSearchInput.value.toLowerCase().trim() : '';
+                const rows = sharedTableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const empName = row.querySelector('.emp-name-display')?.textContent || '';
+                    const empCode = row.querySelector('.emp-code-display')?.textContent || '';
+                    const searchText = (empName + ' ' + empCode).toLowerCase();
+                    if (searchText.includes(query)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            if (employeeSearchInput) {
+                employeeSearchInput.addEventListener('input', applyEmployeeFilter);
+            }
+
+            function updateTableFootSummary() {
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const file = appData.files.find(f => f.id === currentFileId);
+                if (!file || !file.employees) return;
+                const daysInMonth = getDaysInMonth(monthKey);
+                const footCells = sharedTableFoot.querySelectorAll('td');
+                if (footCells.length < daysInMonth + 6) return;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    let dayTotal = 0;
+                    file.employees.forEach(emp => {
+                        const input = document.getElementById('day-input-' + emp.id + '-' + d);
+                        if (input) {
+                            const val = parseNumber(input.value);
+                            if (!isNaN(val)) dayTotal += val;
+                        }
+                    });
+                    footCells[d].textContent = dayTotal > 0 ? formatNumber(dayTotal) : '-';
+                    footCells[d].style.color = dayTotal > 0 ? 'var(--color-primary)' : 'var(--color-muted)';
+                }
+                const summaryLabelCell = footCells[0];
+                if (summaryLabelCell) summaryLabelCell.textContent = 'إجمالي الأيام لكل يوم';
+            }
+
+            function updateRowSummary(empId) {
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const file = appData.files.find(f => f.id === currentFileId);
+                if (!file) return;
+                const emp = file.employees.find(e => e.id === empId);
+                if (!emp) return;
+                const daysInMonth = getDaysInMonth(monthKey);
+                const monthlySalary = parseNumber(emp.monthlySalary || 0);
+                const dayRate = monthlySalary / 30;
+                let totalDays = 0;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const input = document.getElementById('day-input-' + empId + '-' + d);
+                    if (input) {
+                        const val = parseNumber(input.value);
+                        if (!isNaN(val) && val !== 0) totalDays += val;
+                    }
+                }
+                const totalSalary = dayRate * totalDays;
+                const totalLoans = getEmployeeTotalLoans(emp);
+                const deductedDays = daysInMonth - totalDays;
+                const totalDeductions = deductedDays * dayRate;
+                const rows = sharedTableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const firstCell = row.querySelector('td.emp-cell');
+                    if (firstCell) {
+                        const rowEmpId = row.querySelector('.day-input')?.getAttribute('data-eid');
+                        if (rowEmpId === empId) {
+                            const cells = row.querySelectorAll('td.emp-cell');
+                            if (cells.length >= 6) {
+                                cells[1].textContent = formatNumber(totalDays);
+                                cells[1].style.color = 'var(--color-primary)';
+                                cells[2].textContent = formatNumber(totalSalary);
+                                cells[2].style.color = '#10b981';
+                                cells[3].textContent = formatNumber(totalLoans);
+                                cells[3].style.color = '#ef4444';
+                                cells[4].textContent = formatNumber(deductedDays);
+                                cells[4].style.color = '#f59e0b';
+                                cells[5].textContent = formatNumber(totalDeductions);
+                                cells[5].style.color = '#f59e0b';
+                                cells[6].textContent = formatNumber(dayRate);
+                                cells[6].style.color = 'var(--color-muted)';
+                            }
+                        }
+                    }
+                });
+            }
+
+            function bindTableInputEvents() {
+                sharedTableBody.querySelectorAll('.day-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const val = convertArabicNumerals(this.value).replace(/,/g, '');
+                        const num = parseFloat(val);
+                        this.classList.remove('has-value', 'has-value-zero');
+                        if (val !== '' && !isNaN(num)) {
+                            if (num === 0) {
+                                this.classList.add('has-value-zero');
+                            } else {
+                                this.classList.add('has-value');
+                            }
+                        }
+                        const empId = this.getAttribute('data-eid');
+                        if (empId) updateRowSummary(empId);
+                        updateTableFootSummary();
+                    });
+                    input.addEventListener('blur', function() {
+                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
+                        const num = parseFloat(val);
+                        if (!isNaN(num) && val !== '') {
+                            this.value = formatNumber(num);
+                            if (num === 0) {
+                                this.classList.add('has-value-zero');
+                                this.classList.remove('has-value');
+                            } else {
+                                this.classList.add('has-value');
+                                this.classList.remove('has-value-zero');
+                            }
+                        } else {
+                            this.value = '';
+                            this.classList.remove('has-value', 'has-value-zero');
+                        }
+                        const empId = this.getAttribute('data-eid');
+                        if (empId) updateRowSummary(empId);
+                        updateTableFootSummary();
+                        saveSalaryForInput(this);
+                    });
+                    input.addEventListener('keydown', function(e) {
+                        const key = e.key;
+                        if (key === 'Enter') {
+                            e.preventDefault();
+                            this.blur();
+                            return;
+                        }
+                        const directionMap = {
+                            'ArrowUp': 'up',
+                            'ArrowDown': 'down',
+                            'ArrowLeft': 'left',
+                            'ArrowRight': 'right'
+                        };
+                        if (directionMap[key]) {
+                            e.preventDefault();
+                            const direction = directionMap[key];
+                            const target = getAdjacentInput(this, direction);
+                            if (target) {
+                                target.focus();
+                            } else {
+                                this.blur();
+                            }
+                        }
+                    });
+                });
+            }
+
+            function getAdjacentInput(currentInput, direction) {
+                const employeeId = currentInput.getAttribute('data-eid');
+                const day = parseInt(currentInput.getAttribute('data-day'));
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const daysInMonth = getDaysInMonth(monthKey);
+                if (direction === 'left') {
+                    if (day < daysInMonth) return document.getElementById('day-input-' + employeeId + '-' + (day + 1));
+                } else if (direction === 'right') {
+                    if (day > 1) return document.getElementById('day-input-' + employeeId + '-' + (day - 1));
+                } else if (direction === 'up' || direction === 'down') {
+                    const file = appData.files.find(f => f.id === currentFileId);
+                    if (!file || !file.employees) return null;
+                    const employees = file.employees;
+                    const currentEmpIndex = employees.findIndex(e => e.id === employeeId);
+                    let targetEmpIndex = direction === 'up' ? currentEmpIndex - 1 : currentEmpIndex + 1;
+                    if (targetEmpIndex >= 0 && targetEmpIndex < employees.length) {
+                        return document.getElementById('day-input-' + employees[targetEmpIndex].id + '-' + day);
+                    }
+                }
+                return null;
+            }
+
+            function printAllFileEmployees() {
+                collectAllDaysFromTable();
+                saveAppData(appData);
+                const file = appData.files.find(f => f.id === currentFileId);
+                if (!file || !file.employees || file.employees.length === 0) {
+                    showSuccess('لا يوجد موظفين في هذا الملف للطباعة.');
+                    return;
+                }
+                const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
+                const daysInMonth = getDaysInMonth(monthKey);
+                let html = '<div class="print-header"><h2>' + (file.name || 'كشف رواتب يومية') + '</h2><div class="sub">' +
+                    formatMonthDisplay(monthKey) + '</div></div>';
+                html += '<table><thead><tr><th>الموظف</th><th>الراتب الشهري</th><th>اليومية</th><th>إجمالي الأيام</th><th>إجمالي السلف</th><th>الأيام المخصومة</th><th>إجمالي الخصومات</th><th>صافي الراتب</th></tr></thead><tbody>';
+                let counter = 1;
+                file.employees.forEach(emp => {
+                    const monthlySalary = parseNumber(emp.monthlySalary || 0);
+                    const dayRate = monthlySalary / 30;
+                    const totalDays = getEmployeeTotalDays(currentFileId, emp.id, monthKey);
+                    const totalLoans = getEmployeeTotalLoans(emp);
+                    const deductedDays = daysInMonth - totalDays;
+                    const totalDeductions = deductedDays * dayRate;
+                    const totalSalary = dayRate * totalDays;
+                    html += '<tr><td>' + counter++ + ' - ' + (emp.name || '---') + ' (كود: ' + (emp.code || '---') +
+                        ')</td><td>' + formatNumber(monthlySalary) + '</td><td>' + formatNumber(dayRate) +
+                        '</td><td>' + formatNumber(totalDays) + '</td><td>' + formatNumber(totalLoans) +
+                        '</td><td>' + formatNumber(deductedDays) + '</td><td>' + formatNumber(totalDeductions) +
+                        '</td><td style="font-weight:bold;color:#059669;">' + formatNumber(totalSalary) + '</td></tr>';
+                });
+                html += '</tbody></table>';
+                html +=
+                    '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v5.2</div></div>';
+                const printArea = document.getElementById('printArea');
+                printArea.innerHTML = html;
+                printArea.style.display = 'block';
+                setTimeout(() => {
+                    window.print();
+                    printArea.style.display = 'none';
+                }, 300);
+            }
+
+            document.getElementById('backToFilesBtn').addEventListener('click', () => {
+                collectAllDaysFromTable();
+                saveAppData(appData);
+                closeFile();
+            });
+            document.getElementById('employeeMonthFilter').addEventListener('change', function() {
+                collectAllDaysFromTable();
+                saveAppData(appData);
+                renderSharedTable();
+            });
+            document.getElementById('printFileBtn').addEventListener('click', printAllFileEmployees);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const themeToggles = document.querySelectorAll('.theme-toggle');
+                const body = document.body;
+                const applyTheme = (theme) => {
+                    const isDark = theme === 'dark';
+                    body.classList.toggle('light', !isDark);
+                    themeToggles.forEach(toggle => toggle.classList.toggle('dark', isDark));
+                    localStorage.setItem('theme', theme);
+                };
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                applyTheme(savedTheme);
+                themeToggles.forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const isDark = body.classList.contains('light') === false;
+                        applyTheme(isDark ? 'light' : 'dark');
+                    });
+                });
+                employeeMonthFilter.value = monthKeyToInput(getCurrentMonthKey());
+                fetchAdminFiles();
+                renderFilesList();
+            });
+        })();
+    </script>
+</body>
+</html>
