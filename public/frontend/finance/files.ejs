@@ -684,14 +684,22 @@
     </style>
 </head>
 <body>
+    <script>
+        window.__APP_DATA__ = {
+            token: "<%- token %>",
+            api: "<%- api %>",
+            isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
+            user: <%- JSON.stringify(user || null) %>
+        };
+    </script>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="https://files.catbox.moe/4lsmka.jpg" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <img id="userAvatar" src="<%- user && user.profile_picture ? user.profile_picture : 'https://i.ibb.co/HRbkkLw/3177440-1.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName">عبدالرحمن محمد</p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role">Administrator</p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user && user.name ? user.name : '' %></p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user && user.job_title ? user.job_title : (user && user.account_type === 'admin' ? 'Administrator' : '') %></p>
                     </div>
                 </div>
             </div>
