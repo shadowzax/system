@@ -140,6 +140,18 @@ app.get("/100", (req, res) => {
         description: ""
     });
 });
+app.get("/101", (req, res) => {
+    res.render("finance/advance", {
+        title: "",
+        description: ""
+    });
+});
+app.get("/102", (req, res) => {
+    res.render("finance/salary", {
+        title: "",
+        description: ""
+    });
+});
 
 
 app.get("/1", (req, res) => {
