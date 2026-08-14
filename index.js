@@ -134,19 +134,19 @@ app.get("/", (req, res) => {
     });
 });
 */
-app.get("/100", (req, res) => {
+app.get("/employee-files", (req, res) => {
     res.render("finance/files", {
         title: "",
         description: ""
     });
 });
-app.get("/101", (req, res) => {
+app.get("/employee-advance", (req, res) => {
     res.render("finance/advance", {
         title: "",
         description: ""
     });
 });
-app.get("/102", (req, res) => {
+app.get("/employee-salary", (req, res) => {
     res.render("finance/salary", {
         title: "",
         description: ""
