@@ -1130,7 +1130,7 @@
             }
 
             const STORAGE_KEY = 'loansAppData_v4';
-            const API_BASE = 'http://108.181.221.18:7049/api/admin';
+            const API_BASE =  "<%= api %>" + '/api/admin';
 
             function getToken() {
                 return localStorage.getItem('token') || localStorage.getItem('authToken') || '';
