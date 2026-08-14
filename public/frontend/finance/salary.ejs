@@ -1029,6 +1029,9 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
+    </script>
+    <script>
         (function() {
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
 
@@ -1051,7 +1054,7 @@
             function inputToMonthKey(inputVal) { return inputVal; }
 
             const STORAGE_KEY = 'dailySalaryAppData_v3';
-            const API_BASE = "<%= api %>" + '/api/admin';
+            const API_BASE = '<%= api %>' + '/api/admin';
 
             function getToken() {
                 return localStorage.getItem('token') || localStorage.getItem('authToken') || '';
@@ -1148,31 +1151,6 @@
                         if (!employee.monthlyData) employee.monthlyData = {};
                         employee.monthlyData[monthKey] = { days: mergedDays };
                     }
-                }
-            }
-
-            async function fetchAdminFiles() {
-                try {
-                    const token = getToken();
-                    const headers = { 'Content-Type': 'application/json' };
-                    if (token) headers['Authorization'] = 'Bearer ' + token;
-                    const response = await fetch(`${API_BASE}/files`, { headers });
-                    const data = await response.json();
-                    if (!response.ok || !data.success) {
-                        throw new Error(data.message || 'فشل تحميل الملفات');
-                    }
-                    const files = Array.isArray(data.files) ? data.files : [];
-                    files.forEach(file => {
-                        if (file.employees && Array.isArray(file.employees)) {
-                            file.employees.forEach(emp => convertLegacySalaryEmployee(emp, file.createdAt));
-                        }
-                    });
-                    appData.files = files;
-                    saveAppData(appData);
-                    renderFilesList();
-                } catch (error) {
-                    console.error('Error fetching files:', error);
-                    showToast('تعذر تحميل الملفات من الخادم، يتم استخدام البيانات المخزنة محلياً', 'error');
                 }
             }
 
@@ -1624,6 +1602,21 @@
             });
             document.getElementById('printFileBtn').addEventListener('click', printAllFileEmployees);
 
+            function loadInitialData() {
+                const serverData = window.__SERVER_DATA__;
+                if (serverData && serverData.files && Array.isArray(serverData.files)) {
+                    appData.files = serverData.files;
+                    saveAppData(appData);
+                    renderFilesList();
+                } else if (serverData && Array.isArray(serverData)) {
+                    appData.files = serverData;
+                    saveAppData(appData);
+                    renderFilesList();
+                } else {
+                    renderFilesList();
+                }
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
                 const themeToggles = document.querySelectorAll('.theme-toggle');
                 const body = document.body;
@@ -1642,8 +1635,7 @@
                     });
                 });
                 employeeMonthFilter.value = monthKeyToInput(getCurrentMonthKey());
-                fetchAdminFiles();
-                renderFilesList();
+                loadInitialData();
             });
         })();
     </script>
