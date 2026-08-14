@@ -93,6 +93,28 @@ app.use(async (req, res, next) => {
     next();
 });
 
+app.use(async (req, res, next) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/files`);
+
+        let adminFiles = null;
+
+        try {
+            adminFiles = await response.json();
+        } catch {}
+
+        res.locals.adminFiles = adminFiles;
+
+        console.log("Admin Files:", adminFiles);
+    } catch (err) {
+        res.locals.adminFiles = null;
+
+        console.error("Admin Files Error:", err.message);
+    }
+
+    next();
+});
+
 app.use((req, res, next) => {
     res.locals.token = req.cookies?.token || "";
     res.locals.title = "My App";
@@ -100,6 +122,7 @@ app.use((req, res, next) => {
     res.locals.description = "";
     res.locals.isAuthenticated = req.isAuthenticated || false;
     res.locals.user = req.user || null;
+    res.locals.adminFiles = res.locals.adminFiles || null;
 
     next();
 });
