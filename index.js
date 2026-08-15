@@ -199,6 +199,17 @@ app.get("/me/reports", (req, res) => {
         description: ""
     });
 });
+/*------------------------------------------*/
+app.get("/admin/resturant/1", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("admin/1-ebnhamido", {
+        title: "ابن حميدو السلام",
+        description: ""
+    });
+});
 /*-----------------------------------------*/
 app.get("/outgoing", (req, res) => {
     if (!req.isAuthenticated) {
