@@ -13,6 +13,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* إضافات لطي الشريط الجانبي على سطح المكتب */
+        body.sidebar-collapsed .dashboard-sidebar {
+            display: none;
+        }
+        body.sidebar-collapsed main {
+            margin-right: 0 !important;
+        }
+        .sidebar-collapse-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-muted);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+        .sidebar-collapse-btn:hover {
+            color: var(--color-white);
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -72,6 +93,10 @@
                     <a class="flex w-fit select-none items-center" href="/">
                         <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
                     </a>
+                    <!-- زر طي / فتح الشريط الجانبي -->
+                    <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="طي / فتح القائمة">
+                        <i class="las la-bars"></i>
+                    </button>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <button class="theme-toggle" id="themetoggle">
@@ -80,7 +105,8 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg" class="header-avatar" alt="avatar">                </div>
+                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg" class="header-avatar" alt="avatar">
+                </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
@@ -502,6 +528,24 @@
                     if (window.innerWidth < 1025) closeSidebar();
                 });
             });
+
+            // إضافة منطق زر طي الشريط الجانبي
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            if (sidebarCollapseBtn) {
+                sidebarCollapseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (window.innerWidth >= 1025) { // فقط على الشاشات الكبيرة
+                        document.body.classList.toggle('sidebar-collapsed');
+                    } else {
+                        // على الجوال، نستخدم سلوك الدرج الحالي
+                        if (sidebar.classList.contains('mobile-open')) {
+                            closeSidebar();
+                        } else {
+                            openSidebar();
+                        }
+                    }
+                });
+            }
 
             const filesViewBtn = document.getElementById('filesViewBtn');
             const advancesViewBtn = document.getElementById('advancesViewBtn');
