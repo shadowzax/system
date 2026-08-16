@@ -14,24 +14,47 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        /* إضافات لطي الشريط الجانبي على سطح المكتب */
-        body.sidebar-collapsed .dashboard-sidebar {
-            display: none;
-        }
-        body.sidebar-collapsed main {
-            margin-right: 0 !important;
-        }
+        /* أنماط زر الطي داخل الشريط الجانبي */
         .sidebar-collapse-btn {
             background: transparent;
             border: none;
             color: var(--color-muted);
             cursor: pointer;
-            font-size: 1.5rem;
-            padding: 0.5rem;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
             transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .sidebar-collapse-btn:hover {
             color: var(--color-white);
+        }
+        /* زر التوسيع العائم عندما يكون الشريط مطويًا */
+        .sidebar-expand-fab {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: var(--bg-secondary, #1e293b);
+            color: var(--color-white);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem 0.5rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background 0.2s;
+        }
+        .sidebar-expand-fab:hover {
+            background: var(--bg-hover, #334155);
+        }
+        body.sidebar-collapsed .sidebar-expand-fab {
+            display: flex;
         }
     </style>
     <script>
@@ -93,10 +116,6 @@
                     <a class="flex w-fit select-none items-center" href="/">
                         <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
                     </a>
-                    <!-- زر طي / فتح الشريط الجانبي -->
-                    <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="طي / فتح القائمة">
-                        <i class="las la-bars"></i>
-                    </button>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <button class="theme-toggle" id="themetoggle">
@@ -241,6 +260,10 @@
             </div>
         </main>
     </div>
+    <!-- زر التوسيع العائم -->
+    <button class="sidebar-expand-fab" id="sidebarExpandFab" title="فتح القائمة">
+        <i class="las la-arrow-right"></i>
+    </button>
     <div id="printArea" style="display:none;"></div>
     <div class="bottom-mobile-nav" id="bottomMobileNav">
         <div class="nav-notch" id="navNotch"></div>
@@ -502,6 +525,7 @@
 
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
+            const sidebarExpandFab = document.getElementById('sidebarExpandFab');
             function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
             function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
@@ -529,23 +553,31 @@
                 });
             });
 
-            // إضافة منطق زر طي الشريط الجانبي
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
-            if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    if (window.innerWidth >= 1025) { // فقط على الشاشات الكبيرة
-                        document.body.classList.toggle('sidebar-collapsed');
-                    } else {
-                        // على الجوال، نستخدم سلوك الدرج الحالي
-                        if (sidebar.classList.contains('mobile-open')) {
-                            closeSidebar();
-                        } else {
-                            openSidebar();
-                        }
-                    }
-                });
-            }
+            // زر الطي داخل الشريط الجانبي
+            const sidebarCollapseBtn = document.createElement('button');
+            sidebarCollapseBtn.className = 'sidebar-collapse-btn';
+            sidebarCollapseBtn.id = 'sidebarCollapseBtn';
+            sidebarCollapseBtn.title = 'طي القائمة';
+            sidebarCollapseBtn.innerHTML = '<i class="las la-arrow-left"></i>';
+            sidebarCollapseBtn.style.position = 'absolute';
+            sidebarCollapseBtn.style.top = '10px';
+            sidebarCollapseBtn.style.left = '10px';
+            sidebarCollapseBtn.style.zIndex = '100';
+            sidebar.appendChild(sidebarCollapseBtn);
+
+            sidebarCollapseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (window.innerWidth >= 1025) {
+                    document.body.classList.toggle('sidebar-collapsed');
+                } else {
+                    closeSidebar();
+                }
+            });
+
+            // زر التوسيع العائم
+            sidebarExpandFab.addEventListener('click', function() {
+                document.body.classList.remove('sidebar-collapsed');
+            });
 
             const filesViewBtn = document.getElementById('filesViewBtn');
             const advancesViewBtn = document.getElementById('advancesViewBtn');
