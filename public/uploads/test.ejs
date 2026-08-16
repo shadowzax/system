@@ -32,8 +32,6 @@
             }
         }
     </script>
-
-
 </head>
 <body>
     <div class="relative min-h-screen">
@@ -201,7 +199,19 @@
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
-        let expandedFolders = {};
+        let expandedMonthFolders = {};
+        let expandedDayFolders = {};
+
+        // Arabic month names
+        const arabicMonths = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+
+        function getArabicMonthName(monthNumber) {
+            const index = parseInt(monthNumber, 10) - 1;
+            return arabicMonths[index] || monthNumber;
+        }
 
         function getReportDateKey(report) {
             if (report.timestamp) {
@@ -283,62 +293,99 @@
                 return;
             }
 
-            const grouped = {};
+            // Group by month then by day
+            const groupedByMonth = {};
             filteredReports.forEach(report => {
-                const dateKey = report.date || 'غير مؤرخ';
-                if (!grouped[dateKey]) {
-                    grouped[dateKey] = [];
+                const dateStr = report.date || '';
+                const parts = dateStr.split('-');
+                if (parts.length >= 3) {
+                    const year = parts[0];
+                    const month = parts[1];
+                    const day = parts[2];
+                    const monthKey = `${year}-${month}`;
+                    const dayKey = day;
+                    if (!groupedByMonth[monthKey]) {
+                        groupedByMonth[monthKey] = {
+                            monthName: getArabicMonthName(month) + ' ' + year,
+                            days: {}
+                        };
+                    }
+                    if (!groupedByMonth[monthKey].days[dayKey]) {
+                        groupedByMonth[monthKey].days[dayKey] = [];
+                    }
+                    groupedByMonth[monthKey].days[dayKey].push(report);
+                } else {
+                    // Fallback for unknown date
+                    const monthKey = 'unknown';
+                    if (!groupedByMonth[monthKey]) {
+                        groupedByMonth[monthKey] = { monthName: 'غير مؤرخ', days: {} };
+                    }
+                    const dayKey = 'unknown';
+                    if (!groupedByMonth[monthKey].days[dayKey]) {
+                        groupedByMonth[monthKey].days[dayKey] = [];
+                    }
+                    groupedByMonth[monthKey].days[dayKey].push(report);
                 }
-                grouped[dateKey].push(report);
             });
 
             let html = '';
-            Object.keys(grouped).forEach(dateKey => {
-                const isExpanded = expandedFolders[dateKey] || false;
-                html += `<div class="folder-item" data-folder="${dateKey}">`;
-                html += `<div class="folder-header" data-toggle="folder" data-date="${dateKey}">`;
-                html += `<div class="folder-title">`;
-                html += `<i class="las la-folder"></i>`;
-                html += `<span>${dateKey}</span>`;
+            Object.keys(groupedByMonth).forEach(monthKey => {
+                const monthData = groupedByMonth[monthKey];
+                const monthExpanded = expandedMonthFolders[monthKey] || false;
+                html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
+                html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
+                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthData.monthName}</span></div>`;
+                html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
                 html += `</div>`;
-                html += `<button class="btn-outline btn-xs folder-toggle-btn" data-action="toggle" data-date="${dateKey}">${isExpanded ? 'إغلاق' : 'فتح'}</button>`;
-                html += `</div>`;
-                html += `<div class="folder-content${isExpanded ? '' : ' hidden'}" data-content="${dateKey}">`;
-                grouped[dateKey].forEach(report => {
-                    html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
+                Object.keys(monthData.days).forEach(dayKey => {
+                    const dayStateKey = monthKey + '_' + dayKey;
+                    const dayExpanded = expandedDayFolders[dayStateKey] || false;
+                    html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
+                    html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
+                    html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayKey}</span></div>`;
+                    html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                    html += `</div>`;
+                    html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
+                    monthData.days[dayKey].forEach(report => {
+                        html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                    });
+                    html += `</div></div>`;
                 });
-                html += `</div>`;
-                html += `</div>`;
+                html += `</div></div>`;
             });
             recentReportsList.innerHTML = html;
 
-            document.querySelectorAll('.folder-header[data-toggle="folder"]').forEach(header => {
+            // Attach event listeners for month and day folder toggling
+            document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
                 header.addEventListener('click', function(e) {
                     if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
-                    const dateKey = this.getAttribute('data-date');
-                    const content = this.closest('.folder-item').querySelector('.folder-content');
-                    const button = this.querySelector('.folder-toggle-btn');
-                    if (content) {
-                        const isHidden = content.classList.toggle('hidden');
-                        expandedFolders[dateKey] = !isHidden;
-                        if (button) {
-                            button.textContent = isHidden ? 'فتح' : 'إغلاق';
-                        }
-                    }
+                    const monthKey = this.getAttribute('data-key');
+                    toggleMonthFolder(monthKey);
                 });
             });
 
-            document.querySelectorAll('.folder-toggle-btn').forEach(btn => {
+            document.querySelectorAll('.folder-header[data-toggle="day"]').forEach(header => {
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
+                    const dayStateKey = this.getAttribute('data-key');
+                    toggleDayFolder(dayStateKey);
+                });
+            });
+
+            document.querySelectorAll('.month-toggle-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    const dateKey = this.getAttribute('data-date');
-                    const folderItem = this.closest('.folder-item');
-                    const content = folderItem.querySelector('.folder-content');
-                    if (content) {
-                        const isHidden = content.classList.toggle('hidden');
-                        expandedFolders[dateKey] = !isHidden;
-                        this.textContent = isHidden ? 'فتح' : 'إغلاق';
-                    }
+                    const monthKey = this.getAttribute('data-key');
+                    toggleMonthFolder(monthKey);
+                });
+            });
+
+            document.querySelectorAll('.day-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dayStateKey = this.getAttribute('data-key');
+                    toggleDayFolder(dayStateKey);
                 });
             });
 
@@ -348,6 +395,29 @@
                     viewReportById(reportId);
                 });
             });
+        }
+
+        function toggleMonthFolder(monthKey) {
+            const content = document.querySelector(`[data-month-content="${monthKey}"]`);
+            if (!content) return;
+            const isHidden = content.classList.toggle('hidden');
+            expandedMonthFolders[monthKey] = !isHidden;
+            // Update button text
+            const btn = document.querySelector(`.month-toggle-btn[data-key="${monthKey}"]`);
+            if (btn) {
+                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
+            }
+        }
+
+        function toggleDayFolder(dayStateKey) {
+            const content = document.querySelector(`[data-day-content="${dayStateKey}"]`);
+            if (!content) return;
+            const isHidden = content.classList.toggle('hidden');
+            expandedDayFolders[dayStateKey] = !isHidden;
+            const btn = document.querySelector(`.day-toggle-btn[data-key="${dayStateKey}"]`);
+            if (btn) {
+                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
+            }
         }
 
         function renderDateResultsTable(reports) {
