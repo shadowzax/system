@@ -704,10 +704,6 @@
                 </div>
             </div>
             <nav class="flex-1">
-                <!-- <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a> -->
-
                 <div class="sidebar-section-title">الكاش</div>
                 <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
@@ -822,7 +818,7 @@
                         <label class="text-sm text-[var(--color-muted)] block mb-1">كود الموظف</label>
                         <div class="readonly-label" id="empCodeDisplay">---</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="empNameReadonlyDiv">
                         <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم</label>
                         <div class="readonly-label" id="empNameDisplay">---</div>
                     </div>
@@ -1219,6 +1215,7 @@
                 var editableWrap = document.getElementById('empEditableFields');
                 var nameInputWrap = document.getElementById('empNameInputWrap');
                 var nameInput = document.getElementById('empNameInput');
+                var nameReadonlyDiv = document.getElementById('empNameReadonlyDiv');
                 var codeDisplay = document.getElementById('empCodeDisplay');
                 var nameDisplay = document.getElementById('empNameDisplay');
                 var professionInput = document.getElementById('empProfessionInput');
@@ -1227,13 +1224,14 @@
                 if (editId) {
                     title.textContent = 'تعديل بيانات الموظف';
                     readonlyWrap.style.display = 'block';
-                    nameInputWrap.style.display = 'none';
+                    nameReadonlyDiv.style.display = 'none';
+                    nameInputWrap.style.display = 'block';
                     var file = appData.files.find(function(f) { return f.id === currentFileId; });
                     if (file) {
                         var emp = file.employees.find(function(e) { return e.id === editId; });
                         if (emp) {
                             codeDisplay.textContent = emp.code || '---';
-                            nameDisplay.textContent = emp.name || '---';
+                            nameInput.value = emp.name || '';
                             professionInput.value = emp.profession || '';
                             salaryInput.value = emp.monthlySalary || '';
                         }
@@ -1258,8 +1256,11 @@
                 if (!fileId) return;
 
                 if (editId) {
-                    var nameDisplay = document.getElementById('empNameDisplay');
-                    var employeeName = nameDisplay.textContent.trim();
+                    var employeeName = nameInput.value.trim();
+                    if (!employeeName) {
+                        showSuccess('يرجى إدخال اسم الموظف.');
+                        return;
+                    }
                     var payload = {
                         fileId: fileId,
                         employeeId: editId,
