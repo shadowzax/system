@@ -352,55 +352,45 @@
 
             function convertLegacySalaryEmployee(employee, fileCreatedAt) {
                 if (!employee) return;
-                if (!Array.isArray(employee.salaryRecords) || employee.salaryRecords.length === 0) return;
                 if (!employee.monthlyData) employee.monthlyData = {};
-                employee.salaryRecords.forEach(rec => {
-                    if (rec.days && typeof rec.days === 'object') {
-                        let monthKey;
-                        if (rec.month) {
-                            monthKey = rec.month;
-                        } else if (fileCreatedAt) {
-                            const d = new Date(fileCreatedAt);
-                            if (!isNaN(d.getTime())) {
-                                monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                            }
-                        } else {
-                            monthKey = getCurrentMonthKey();
-                        }
-                        if (!employee.monthlyData[monthKey]) {
-                            employee.monthlyData[monthKey] = { days: {} };
-                        }
-                        for (const day in rec.days) {
-                            const val = rec.days[day];
-                            if (val !== undefined && val !== null && val !== '') {
-                                employee.monthlyData[monthKey].days[day] = String(val);
-                            }
-                        }
-                    }
-                });
-                delete employee.salaryRecords;
                 if (!employee.monthlyAdvances) employee.monthlyAdvances = {};
-                if (Array.isArray(employee.advances)) {
+
+                let monthKey;
+                if (fileCreatedAt) {
+                    const d = new Date(fileCreatedAt);
+                    if (!isNaN(d.getTime())) {
+                        monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    }
+                }
+                if (!monthKey) monthKey = getCurrentMonthKey();
+
+                if (Array.isArray(employee.salaryRecords) && employee.salaryRecords.length > 0) {
+                    employee.salaryRecords.forEach(rec => {
+                        if (rec.days && typeof rec.days === 'object') {
+                            let mk = monthKey;
+                            if (rec.month) mk = rec.month;
+                            if (!employee.monthlyData[mk]) employee.monthlyData[mk] = { days: {} };
+                            for (const day in rec.days) {
+                                const val = rec.days[day];
+                                if (val !== undefined && val !== null && val !== '') {
+                                    employee.monthlyData[mk].days[day] = String(val);
+                                }
+                            }
+                        }
+                    });
+                    delete employee.salaryRecords;
+                }
+
+                if (Array.isArray(employee.advances) && employee.advances.length > 0) {
                     employee.advances.forEach(adv => {
                         if (adv.days && typeof adv.days === 'object') {
-                            let monthKey;
-                            if (adv.month) {
-                                monthKey = adv.month;
-                            } else if (fileCreatedAt) {
-                                const d = new Date(fileCreatedAt);
-                                if (!isNaN(d.getTime())) {
-                                    monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                                }
-                            } else {
-                                monthKey = getCurrentMonthKey();
-                            }
-                            if (!employee.monthlyAdvances[monthKey]) {
-                                employee.monthlyAdvances[monthKey] = { days: {} };
-                            }
+                            let mk = monthKey;
+                            if (adv.month) mk = adv.month;
+                            if (!employee.monthlyAdvances[mk]) employee.monthlyAdvances[mk] = { days: {} };
                             for (const day in adv.days) {
                                 const val = adv.days[day];
                                 if (val !== undefined && val !== null && val !== '') {
-                                    employee.monthlyAdvances[monthKey].days[day] = String(val);
+                                    employee.monthlyAdvances[mk].days[day] = String(val);
                                 }
                             }
                         }
@@ -418,11 +408,11 @@
             }
 
             async function updateEmployeeOnServer(fileId, employee) {
-                return await apiRequest('/files/employee', 'POST', { fileId, employeeId: employee.id, name: employee.name, profession: employee.profession, monthlySalary: employee.monthlySalary, code: employee.code });
+                return await apiRequest('/files/update-employee', 'PUT', { fileId, employeeId: employee.id, name: employee.name, profession: employee.profession, monthlySalary: employee.monthlySalary, code: employee.code });
             }
 
             async function deleteEmployeeOnServer(fileId, employeeId, password) {
-                return await apiRequest('/delete-employee', 'DELETE', { fileId, employeeId, password });
+                return await apiRequest('/files/delete-employee', 'DELETE', { fileId, employeeId, password });
             }
 
             async function copyFolderOnServer(fileId, newName) {
@@ -430,7 +420,7 @@
             }
 
             async function deleteFolderOnServer(fileId, password) {
-                return await apiRequest('/delete-folder', 'POST', { folderId: fileId, password });
+                return await apiRequest('/files/delete-folder', 'POST', { folderId: fileId, password });
             }
 
             function getFileByRestaurantId(rid) {
@@ -543,13 +533,15 @@
                 }
                 filteredFiles.forEach(file => {
                     const employeeCount = file.employees ? file.employees.length : 0;
+                    const createdAt = file.createdAt ? new Date(file.createdAt) : new Date();
+                    const dateStr = createdAt.getFullYear() + '-' + String(createdAt.getMonth() + 1).padStart(2, '0') + '-' + String(createdAt.getDate()).padStart(2, '0');
                     const card = document.createElement('div');
                     card.className = 'file-card';
                     card.innerHTML = `
                         <div class="file-icon"><i class="las la-folder"></i></div>
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-[var(--color-white)] text-base">${file.name || 'ملف بدون اسم'}</p>
-                            <p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · أنشئ ${new Date(file.createdAt).toLocaleDateString('ar-EG')}</p>
+                            <p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · ${dateStr}</p>
                         </div>
                         <div class="flex gap-2 flex-shrink-0">
                             <button class="btn-outline btn-xs open-folder-btn" data-id="${file.id}"><i class="las la-folder-open"></i> فتح</button>
