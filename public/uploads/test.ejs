@@ -52,10 +52,6 @@
                 </div>
             </div>
             <nav class="flex-1">
-                <!-- <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a> -->
-
                 <div class="sidebar-section-title">الكاش</div>
                 <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
@@ -70,8 +66,7 @@
                 <a href="/employee-advance" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
                 <a href="/employee-salary" class="sidebar-item" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
 
-
-                  <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
                     <a href="" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
                 </div>
             </nav>
@@ -202,6 +197,12 @@
         let expandedMonthFolders = {};
         let expandedDayFolders = {};
 
+        const arabicMonths = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        const arabicDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
         function getReportDateKey(report) {
             if (report.timestamp) {
                 return report.timestamp.slice(0, 10);
@@ -305,7 +306,7 @@
                 if (year && month) {
                     const monthKey = `${year}-${month}`;
                     if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = { days: {} };
+                        groupedByMonth[monthKey] = { days: {}, monthNum: parseInt(month, 10), year: year };
                     }
                     const dayKey = day || '__noDay__';
                     if (!groupedByMonth[monthKey].days[dayKey]) {
@@ -315,7 +316,7 @@
                 } else {
                     const monthKey = '__undated__';
                     if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = { days: {} };
+                        groupedByMonth[monthKey] = { days: {}, monthNum: null, year: null };
                     }
                     const dayKey = '__undated__';
                     if (!groupedByMonth[monthKey].days[dayKey]) {
@@ -326,10 +327,22 @@
             });
 
             let html = '';
-            const monthKeys = Object.keys(groupedByMonth).sort().reverse();
+            const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
+                if (a === '__undated__') return 1;
+                if (b === '__undated__') return -1;
+                return b.localeCompare(a);
+            });
+
             monthKeys.forEach(monthKey => {
-                const monthTitle = (monthKey === '__undated__') ? 'غير مؤرخ' : monthKey;
                 const monthData = groupedByMonth[monthKey];
+                let monthTitle = monthKey;
+                if (monthKey !== '__undated__') {
+                    const monthNum = monthData.monthNum;
+                    const monthName = arabicMonths[monthNum - 1] || '';
+                    monthTitle = `${monthKey} - ${monthName}`;
+                } else {
+                    monthTitle = 'غير مؤرخ';
+                }
                 const monthExpanded = expandedMonthFolders[monthKey] || false;
                 html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
                 html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
@@ -343,18 +356,30 @@
                     if (b === '__noDay__' || b === '__undated__') return -1;
                     return a.localeCompare(b);
                 });
+
                 dayKeys.forEach(dayKey => {
                     const dayStateKey = monthKey + '_' + dayKey;
                     const dayExpanded = expandedDayFolders[dayStateKey] || false;
                     const reportsForDay = monthData.days[dayKey];
+
                     if (dayKey === '__noDay__' || dayKey === '__undated__') {
                         reportsForDay.forEach(report => {
                             html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
                         });
                     } else {
+                        let dayTitle = dayKey;
+                        if (monthKey !== '__undated__') {
+                            const year = monthData.year;
+                            const monthNum = monthData.monthNum;
+                            const dayNum = parseInt(dayKey, 10);
+                            const dateObj = new Date(year, monthNum - 1, dayNum);
+                            const weekdayIndex = dateObj.getDay();
+                            const weekdayName = arabicDays[weekdayIndex];
+                            dayTitle = `${dayKey} - ${weekdayName}`;
+                        }
                         html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
                         html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
-                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayKey}</span></div>`;
+                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
                         html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
                         html += `</div>`;
                         html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
@@ -597,27 +622,6 @@
 
         window.addEventListener('click', (e) => {
             if (e.target === successModal) hideSuccess();
-        });
-
-        const userAvatarImg = document.getElementById('userAvatar');
-        userAvatarImg.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        userAvatarImg.src = ev.target.result;
-                        const headerAv = document.getElementById('headerAvatar');
-                        if (headerAv) headerAv.src = ev.target.result;
-                        showSuccess('تم تحديث الصورة الشخصية.');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
         });
 
         const themeToggleBtn = document.getElementById('themetoggle');
