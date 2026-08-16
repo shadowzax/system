@@ -202,17 +202,6 @@
         let expandedMonthFolders = {};
         let expandedDayFolders = {};
 
-        // Arabic month names
-        const arabicMonths = [
-            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-        ];
-
-        function getArabicMonthName(monthNumber) {
-            const index = parseInt(monthNumber, 10) - 1;
-            return arabicMonths[index] || monthNumber;
-        }
-
         function getReportDateKey(report) {
             if (report.timestamp) {
                 return report.timestamp.slice(0, 10);
@@ -293,34 +282,42 @@
                 return;
             }
 
-            // Group by month then by day
             const groupedByMonth = {};
             filteredReports.forEach(report => {
+                let year = null;
+                let month = null;
+                let day = null;
                 const dateStr = report.date || '';
-                const parts = dateStr.split('-');
-                if (parts.length >= 3) {
-                    const year = parts[0];
-                    const month = parts[1];
-                    const day = parts[2];
-                    const monthKey = `${year}-${month}`;
-                    const dayKey = day;
-                    if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = {
-                            monthName: getArabicMonthName(month) + ' ' + year,
-                            days: {}
-                        };
+                const match = dateStr.match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
+                if (match) {
+                    year = match[1];
+                    month = match[2].padStart(2, '0');
+                    day = match[3] ? match[3].padStart(2, '0') : null;
+                } else if (report.timestamp) {
+                    const tsMatch = report.timestamp.slice(0,10).match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
+                    if (tsMatch) {
+                        year = tsMatch[1];
+                        month = tsMatch[2].padStart(2, '0');
+                        day = tsMatch[3] ? tsMatch[3].padStart(2, '0') : null;
                     }
+                }
+
+                if (year && month) {
+                    const monthKey = `${year}-${month}`;
+                    if (!groupedByMonth[monthKey]) {
+                        groupedByMonth[monthKey] = { days: {} };
+                    }
+                    const dayKey = day || '__noDay__';
                     if (!groupedByMonth[monthKey].days[dayKey]) {
                         groupedByMonth[monthKey].days[dayKey] = [];
                     }
                     groupedByMonth[monthKey].days[dayKey].push(report);
                 } else {
-                    // Fallback for unknown date
-                    const monthKey = 'unknown';
+                    const monthKey = '__undated__';
                     if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = { monthName: 'غير مؤرخ', days: {} };
+                        groupedByMonth[monthKey] = { days: {} };
                     }
-                    const dayKey = 'unknown';
+                    const dayKey = '__undated__';
                     if (!groupedByMonth[monthKey].days[dayKey]) {
                         groupedByMonth[monthKey].days[dayKey] = [];
                     }
@@ -329,34 +326,48 @@
             });
 
             let html = '';
-            Object.keys(groupedByMonth).forEach(monthKey => {
+            const monthKeys = Object.keys(groupedByMonth).sort().reverse();
+            monthKeys.forEach(monthKey => {
+                const monthTitle = (monthKey === '__undated__') ? 'غير مؤرخ' : monthKey;
                 const monthData = groupedByMonth[monthKey];
                 const monthExpanded = expandedMonthFolders[monthKey] || false;
                 html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
                 html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
-                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthData.monthName}</span></div>`;
+                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
                 html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
                 html += `</div>`;
                 html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
-                Object.keys(monthData.days).forEach(dayKey => {
+
+                const dayKeys = Object.keys(monthData.days).sort((a, b) => {
+                    if (a === '__noDay__' || a === '__undated__') return 1;
+                    if (b === '__noDay__' || b === '__undated__') return -1;
+                    return a.localeCompare(b);
+                });
+                dayKeys.forEach(dayKey => {
                     const dayStateKey = monthKey + '_' + dayKey;
                     const dayExpanded = expandedDayFolders[dayStateKey] || false;
-                    html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
-                    html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
-                    html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayKey}</span></div>`;
-                    html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
-                    html += `</div>`;
-                    html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
-                    monthData.days[dayKey].forEach(report => {
-                        html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
-                    });
-                    html += `</div></div>`;
+                    const reportsForDay = monthData.days[dayKey];
+                    if (dayKey === '__noDay__' || dayKey === '__undated__') {
+                        reportsForDay.forEach(report => {
+                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                        });
+                    } else {
+                        html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
+                        html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
+                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayKey}</span></div>`;
+                        html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                        html += `</div>`;
+                        html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
+                        reportsForDay.forEach(report => {
+                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                        });
+                        html += `</div></div>`;
+                    }
                 });
                 html += `</div></div>`;
             });
             recentReportsList.innerHTML = html;
 
-            // Attach event listeners for month and day folder toggling
             document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
                 header.addEventListener('click', function(e) {
                     if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
@@ -402,7 +413,6 @@
             if (!content) return;
             const isHidden = content.classList.toggle('hidden');
             expandedMonthFolders[monthKey] = !isHidden;
-            // Update button text
             const btn = document.querySelector(`.month-toggle-btn[data-key="${monthKey}"]`);
             if (btn) {
                 btn.textContent = isHidden ? 'فتح' : 'إغلاق';
