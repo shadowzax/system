@@ -1951,7 +1951,7 @@
                 }).then((result) => {
                     if (result.isConfirmed && result.value) {
                         const password = result.value;
-                        fetch(apiBase + '/api/expenses/delete', {
+                        fetch(apiBase + '/expenses-delete', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1991,7 +1991,7 @@
                 const total = totalAmountEl.textContent;
                 const dateStr = getReportDateString();
 
-                fetch(apiBase + '/api/expenses/store', {
+                fetch(apiBase + '/expenses-store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2033,7 +2033,7 @@
                 const total = totalAmountEl.textContent;
                 const dateStr = getReportDateString();
 
-                fetch(apiBase + '/api/expenses/update', {
+                fetch(apiBase + '/expenses-update', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
