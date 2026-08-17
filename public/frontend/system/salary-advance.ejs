@@ -595,6 +595,7 @@
             padding: 10px 12px;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
+            vertical-align: middle;
         }
         .restaurant-table th {
             background: var(--darker-bg);
@@ -603,6 +604,7 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
         .restaurant-table td .input-field {
             background: transparent;
@@ -611,19 +613,22 @@
             font-size: 0.95rem;
             color: var(--color-white);
             width: 100%;
+            border-radius: 6px;
         }
         .restaurant-table td .input-field:focus {
             border-bottom: 1px solid var(--color-primary);
             box-shadow: none;
+            background: rgba(13, 153, 255, 0.04);
         }
         .restaurant-table .total-row td {
             border-top: 2px solid var(--color-primary);
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--color-primary);
+            background: var(--darker-bg);
         }
-        .restaurant-table .total-row td:last-child {
-            color: var(--color-primary);
+        .restaurant-table .total-row td:first-child {
+            color: var(--color-muted);
         }
         .view-table {
             width: 100%;
@@ -1076,7 +1081,7 @@
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
-                    <div class="title-icon"><i class="las la-chart-pie"></i></div>
+                    <div class="title-icon"><i class="las la-hand-holding-usd"></i></div>
                     <h1>السلف</h1>
                     <p>إدارة السلف</p>
                 </div>
@@ -1131,17 +1136,27 @@
                     </div>
                 </div>
                 <div class="info-card mt-6" id="reportViewCard" style="display:none;">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="text-center w-full">
+                    <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
+                        <div class="w-full md:w-auto md:flex-1"></div>
+                        <div class="w-full md:w-auto md:flex-1 text-center">
                             <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
                             <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
                             <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                        </div>
+                        <div class="w-full md:w-auto md:flex-1 flex justify-center md:justify-end">
+                            <div class="flex gap-3 flex-wrap justify-center">
+                                <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة هذا التقرير</button>
+                                <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i> إغلاق</button>
+                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="view-table" id="viewReportTable2">
                             <thead>
-                                <tr><th style="width:55%;">البيان</th><th style="width:45%;">المبلغ (ج.م)</th></tr>
+                                <tr>
+                                    <th style="width:55%;">البيان</th>
+                                    <th style="width:45%;">المبلغ (ج.م)</th>
+                                </tr>
                             </thead>
                             <tbody id="viewReportTbody2"></tbody>
                             <tfoot>
@@ -1152,10 +1167,6 @@
                             </tfoot>
                         </table>
                     </div>
-                    <div class="mt-6 flex justify-center gap-3 flex-wrap">
-                        <button class="btn-outline btn-sm" id="printStoredReportBtn2"><i class="las la-print"></i> طباعة هذا التقرير</button>
-                        <button class="btn-outline btn-sm" id="closeReportViewBtn2"><i class="las la-times"></i> إغلاق</button>
-                    </div>
                 </div>
                 <div class="mt-6 info-card" id="recentReportsCard">
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -1163,12 +1174,31 @@
                             <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-history text-primary"></i> آخر تقارير السلف</h3>
                             <p class="text-sm text-[var(--color-muted)]">عرض آخر تقارير السلف التي تم تخزينها</p>
                         </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-[var(--color-muted)]">ترتيب:</label>
+                            <select id="sortOrderSelect" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                <option value="newest">الأحدث</option>
+                                <option value="oldest">الأقدم</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="mt-4 space-y-3" id="recentReportsList"></div>
-                    <div class="flex items-center justify-between mt-4">
-                        <button id="prevReportsPageBtn" class="btn-outline btn-sm" disabled><i class="las la-chevron-right"></i> السابق</button>
-                        <span id="reportsPageIndicator" class="text-sm text-[var(--color-muted)]">1 / 1</span>
-                        <button id="nextReportsPageBtn" class="btn-outline btn-sm" disabled>التالي <i class="las la-chevron-left"></i></button>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                            <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
+                            <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
+                            <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1653,6 +1683,7 @@
                 }
                 currentReportsPage = 1;
                 renderRecentReportsPage();
+                document.getElementById('reportsPageSize').value = reportsPageSize;
             }
 
             function getSortTime(report) {
@@ -1681,17 +1712,34 @@
                 const pageReports = allReports.slice(start, end);
                 let html = '';
                 pageReports.forEach((report) => {
-                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs edit-report-btn" data-id="' + report.id + '"><i class="las la-edit"></i> تعديل</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs edit-report-btn" data-id="' + report.id + '" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
                 });
                 recentReportsList.innerHTML = html;
-                document.querySelectorAll('.view-report-btn').forEach(btn => btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); }));
-                document.querySelectorAll('.edit-report-btn').forEach(btn => btn.addEventListener('click', function() { editReportById(this.getAttribute('data-id')); }));
-                document.querySelectorAll('.delete-report-btn').forEach(btn => btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); }));
+                document.querySelectorAll('.view-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('.edit-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { editReportById(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('.delete-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); });
+                });
                 document.getElementById('reportsPageIndicator').textContent = currentReportsPage + ' / ' + totalPages;
                 document.getElementById('prevReportsPageBtn').disabled = currentReportsPage <= 1;
                 document.getElementById('nextReportsPageBtn').disabled = currentReportsPage >= totalPages;
             }
 
+            document.getElementById('sortOrderSelect').addEventListener('change', function() {
+                sortOrder = this.value;
+                currentReportsPage = 1;
+                renderRecentReportsPage();
+            });
+
+            document.getElementById('reportsPageSize').addEventListener('change', function() {
+                reportsPageSize = parseInt(this.value);
+                currentReportsPage = 1;
+                renderRecentReportsPage();
+            });
             document.getElementById('prevReportsPageBtn').addEventListener('click', function() {
                 if (currentReportsPage > 1) { currentReportsPage--; renderRecentReportsPage(); }
             });
@@ -1914,8 +1962,8 @@
                 Swal.fire('تم', 'تم تصدير التقرير بصيغة CSV بنجاح.', 'success');
             });
 
-            document.getElementById('closeReportViewBtn2').addEventListener('click', hideReportView);
-            document.getElementById('printStoredReportBtn2').addEventListener('click', function() {
+            document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
+            document.getElementById('printDetailReportBtn').addEventListener('click', function() {
                 if (!currentViewReportId) return;
                 let report = null;
                 if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(currentViewReportId));
