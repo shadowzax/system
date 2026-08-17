@@ -177,7 +177,31 @@
         </div>
     </div>
     <script>
-        window.expensesReports = <%- JSON.stringify(JSON.parse(user.expenses)) %>;
+        window.expensesReports = <%- JSON.stringify((function(){
+            function parseArr(arr) {
+                if (!arr) return [];
+                if (typeof arr === 'string') {
+                    try { return JSON.parse(arr) || []; } catch (e) { return []; }
+                }
+                return Array.isArray(arr) ? arr : [];
+            }
+            var u = (typeof user !== 'undefined') ? user : null;
+            var allReports = [];
+            [
+                { arr: parseArr(u && u.expenses), source: 'expenses', sourceLabel: 'خوارج' },
+                { arr: parseArr(u && u.transfers), source: 'transfers', sourceLabel: 'تحويلات' },
+                { arr: parseArr(u && u.fees), source: 'fees', sourceLabel: 'فيز' },
+                { arr: parseArr(u && u.advances), source: 'advances', sourceLabel: 'سلف' }
+            ].forEach(function(group) {
+                group.arr.forEach(function(r) {
+                    allReports.push(Object.assign({}, r, {
+                        source: group.source,
+                        sourceLabel: group.sourceLabel
+                    }));
+                });
+            });
+            return allReports;
+        })()) %>;
     </script>
     <script>
         const reportViewCard = document.getElementById('reportViewCard');
@@ -203,9 +227,36 @@
         ];
         const arabicDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
+        function normalizeArabicDigits(str) {
+            if (!str) return str;
+            const arabic = '٠١٢٣٤٥٦٧٨٩';
+            const persian = '۰۱۲۳۴۵۶۷۸۹';
+            return String(str)
+                .replace(/[\u0660-\u0669]/g, d => String(arabic.indexOf(d)))
+                .replace(/[\u06F0-\u06F9]/g, d => String(persian.indexOf(d)))
+                .replace(/[\u200e\u200f]/g, '')
+                .trim();
+        }
+
         function getReportDateKey(report) {
+            if (!report) return null;
+
+            if (report.date) {
+                const dateStr = normalizeArabicDigits(report.date);
+                // YYYY-MM-DD أو YYYY/MM/DD
+                let m = dateStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+                if (m) {
+                    return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+                }
+                // DD/MM/YYYY أو DD-MM-YYYY
+                m = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+                if (m) {
+                    return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+                }
+            }
+
             if (report.timestamp) {
-                return report.timestamp.slice(0, 10);
+                return String(report.timestamp).slice(0, 10);
             }
             return null;
         }
@@ -244,155 +295,25 @@
             recentReportsCard.style.display = 'none';
         }
 
-        function loadRecentReports() {
-            const reports = window.expensesReports || [];
-            const searchQuery = reportSearchInput.value.toLowerCase().trim();
-            let filteredReports = reports;
+        function buildReportListItem(report) {
+            const dateSourceLine = `${report.date || ''}${report.sourceLabel ? ' • ' + report.sourceLabel : ''}`.trim();
+            return `<div class="report-list-item">
+                <div class="report-info">
+                    <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
+                    <div>
+                        <p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p>
+                        <p class="text-xs text-[var(--color-muted)]">${dateSourceLine || ''}</p>
+                    </div>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير">
+                        <i class="las la-eye"></i> عرض
+                    </button>
+                </div>
+            </div>`;
+        }
 
-            if (searchQuery) {
-                filteredReports = filteredReports.filter(report => {
-                    const nameMatch = (report.name || '').toLowerCase().includes(searchQuery);
-                    const dateMatch = (report.date || '').toLowerCase().includes(searchQuery);
-                    return nameMatch || dateMatch;
-                });
-            }
-
-            if (selectedDateFilter) {
-                filteredReports = filteredReports.filter(report => {
-                    const reportDateKey = getReportDateKey(report);
-                    return reportDateKey === selectedDateFilter;
-                });
-            }
-
-            if (selectedDateFilter) {
-                dateResultsContainer.style.display = 'block';
-                renderDateResultsTable(filteredReports);
-                recentReportsList.innerHTML = '';
-                return;
-            } else {
-                dateResultsContainer.style.display = 'none';
-                dateResultsTbody.innerHTML = '';
-            }
-
-            if (filteredReports.length === 0) {
-                if (reportSearchInput.value.trim()) {
-                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-search"></i><p>لا توجد نتائج مطابقة لبحثك</p></div>';
-                } else {
-                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-folder-open"></i><p>لا توجد تقارير محفوظة بعد</p></div>';
-                }
-                return;
-            }
-
-            const groupedByMonth = {};
-            filteredReports.forEach(report => {
-                let year = null;
-                let month = null;
-                let day = null;
-                const dateStr = report.date || '';
-                const match = dateStr.match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
-                if (match) {
-                    year = match[1];
-                    month = match[2].padStart(2, '0');
-                    day = match[3] ? match[3].padStart(2, '0') : null;
-                } else if (report.timestamp) {
-                    const tsMatch = report.timestamp.slice(0,10).match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
-                    if (tsMatch) {
-                        year = tsMatch[1];
-                        month = tsMatch[2].padStart(2, '0');
-                        day = tsMatch[3] ? tsMatch[3].padStart(2, '0') : null;
-                    }
-                }
-
-                if (year && month) {
-                    const monthKey = `${year}-${month}`;
-                    if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = { days: {}, monthNum: parseInt(month, 10), year: year };
-                    }
-                    const dayKey = day || '__noDay__';
-                    if (!groupedByMonth[monthKey].days[dayKey]) {
-                        groupedByMonth[monthKey].days[dayKey] = [];
-                    }
-                    groupedByMonth[monthKey].days[dayKey].push(report);
-                } else {
-                    const monthKey = '__undated__';
-                    if (!groupedByMonth[monthKey]) {
-                        groupedByMonth[monthKey] = { days: {}, monthNum: null, year: null };
-                    }
-                    const dayKey = '__undated__';
-                    if (!groupedByMonth[monthKey].days[dayKey]) {
-                        groupedByMonth[monthKey].days[dayKey] = [];
-                    }
-                    groupedByMonth[monthKey].days[dayKey].push(report);
-                }
-            });
-
-            let html = '';
-            const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
-                if (a === '__undated__') return 1;
-                if (b === '__undated__') return -1;
-                return b.localeCompare(a);
-            });
-
-            monthKeys.forEach(monthKey => {
-                const monthData = groupedByMonth[monthKey];
-                let monthTitle = monthKey;
-                if (monthKey !== '__undated__') {
-                    const monthNum = monthData.monthNum;
-                    const monthName = arabicMonths[monthNum - 1] || '';
-                    monthTitle = `${monthKey} - ${monthName}`;
-                } else {
-                    monthTitle = 'غير مؤرخ';
-                }
-                const monthExpanded = expandedMonthFolders[monthKey] || false;
-                html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
-                html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
-                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
-                html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
-                html += `</div>`;
-                html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
-
-                const dayKeys = Object.keys(monthData.days).sort((a, b) => {
-                    if (a === '__noDay__' || a === '__undated__') return 1;
-                    if (b === '__noDay__' || b === '__undated__') return -1;
-                    return a.localeCompare(b);
-                });
-
-                dayKeys.forEach(dayKey => {
-                    const dayStateKey = monthKey + '_' + dayKey;
-                    const dayExpanded = expandedDayFolders[dayStateKey] || false;
-                    const reportsForDay = monthData.days[dayKey];
-
-                    if (dayKey === '__noDay__' || dayKey === '__undated__') {
-                        reportsForDay.forEach(report => {
-                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
-                        });
-                    } else {
-                        let dayTitle = dayKey;
-                        if (monthKey !== '__undated__') {
-                            const year = monthData.year;
-                            const monthNum = monthData.monthNum;
-                            const dayNum = parseInt(dayKey, 10);
-                            const dateObj = new Date(year, monthNum - 1, dayNum);
-                            const weekdayIndex = dateObj.getDay();
-                            const weekdayName = arabicDays[weekdayIndex];
-                            dayTitle = `${dayKey} - ${weekdayName}`;
-                        }
-                        html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
-                        html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
-                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
-                        html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
-                        html += `</div>`;
-                        html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
-                        reportsForDay.forEach(report => {
-                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
-                        });
-                        html += `</div></div>`;
-                    }
-                });
-                html += `</div></div>`;
-            });
-            recentReportsList.innerHTML = html;
-
+        function attachReportListEvents() {
             document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
                 header.addEventListener('click', function(e) {
                     if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
@@ -433,6 +354,141 @@
             });
         }
 
+        function loadRecentReports() {
+            const reports = window.expensesReports || [];
+            const searchQuery = reportSearchInput.value.toLowerCase().trim();
+            let filteredReports = reports;
+
+            if (searchQuery) {
+                filteredReports = filteredReports.filter(report => {
+                    const nameMatch = (report.name || '').toLowerCase().includes(searchQuery);
+                    const dateMatch = (report.date || '').toLowerCase().includes(searchQuery);
+                    const sourceMatch = (report.sourceLabel || '').toLowerCase().includes(searchQuery);
+                    return nameMatch || dateMatch || sourceMatch;
+                });
+            }
+
+            if (selectedDateFilter) {
+                filteredReports = filteredReports.filter(report => getReportDateKey(report) === selectedDateFilter);
+            }
+
+            if (selectedDateFilter) {
+                dateResultsContainer.style.display = 'block';
+                renderDateResultsTable(filteredReports);
+                recentReportsList.innerHTML = '';
+                return;
+            } else {
+                dateResultsContainer.style.display = 'none';
+                dateResultsTbody.innerHTML = '';
+            }
+
+            if (filteredReports.length === 0) {
+                if (reportSearchInput.value.trim()) {
+                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-search"></i><p>لا توجد نتائج مطابقة لبحثك</p></div>';
+                } else {
+                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-folder-open"></i><p>لا توجد تقارير محفوظة بعد</p></div>';
+                }
+                return;
+            }
+
+            const groupedByMonth = {};
+            filteredReports.forEach(report => {
+                const dateKey = getReportDateKey(report);
+                let year = null,
+                    month = null,
+                    day = null;
+                if (dateKey) {
+                    const parts = dateKey.split('-');
+                    if (parts.length === 3) {
+                        year = parts[0];
+                        month = parts[1];
+                        day = parts[2];
+                    }
+                }
+                const monthKey = (year && month) ? `${year}-${month}` : '__undated__';
+                if (!groupedByMonth[monthKey]) {
+                    groupedByMonth[monthKey] = {
+                        days: {},
+                        monthNum: month ? parseInt(month, 10) : null,
+                        year: year
+                    };
+                }
+                const dayKey = day || (dateKey ? '__noDay__' : '__undated__');
+                if (!groupedByMonth[monthKey].days[dayKey]) groupedByMonth[monthKey].days[dayKey] = [];
+                groupedByMonth[monthKey].days[dayKey].push(report);
+            });
+
+            let html = '';
+            const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
+                if (a === '__undated__') return 1;
+                if (b === '__undated__') return -1;
+                return b.localeCompare(a);
+            });
+
+            monthKeys.forEach(monthKey => {
+                const monthData = groupedByMonth[monthKey];
+                let monthTitle = monthKey;
+                if (monthKey !== '__undated__' && monthData.monthNum) {
+                    const monthName = arabicMonths[monthData.monthNum - 1] || '';
+                    monthTitle = `${monthKey} - ${monthName}`;
+                } else if (monthKey === '__undated__') {
+                    monthTitle = 'غير مؤرخ';
+                }
+                const monthExpanded = expandedMonthFolders[monthKey] || false;
+                html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
+                html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
+                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
+                html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                html += `</div>`;
+                html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
+
+                const dayKeys = Object.keys(monthData.days).sort((a, b) => {
+                    if (a === '__undated__' || a === '__noDay__') return 1;
+                    if (b === '__undated__' || b === '__noDay__') return -1;
+                    return a.localeCompare(b);
+                });
+
+                dayKeys.forEach(dayKey => {
+                    const dayStateKey = monthKey + '_' + dayKey;
+                    const dayExpanded = expandedDayFolders[dayStateKey] || false;
+                    const reportsForDay = monthData.days[dayKey];
+                    reportsForDay.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+                    if (dayKey === '__noDay__' || dayKey === '__undated__') {
+                        reportsForDay.forEach(report => {
+                            html += buildReportListItem(report);
+                        });
+                    } else {
+                        let dayTitle = dayKey;
+                        if (monthKey !== '__undated__') {
+                            const year = monthData.year;
+                            const monthNum = monthData.monthNum;
+                            const dayNum = parseInt(dayKey, 10);
+                            if (year && monthNum && !isNaN(dayNum)) {
+                                const dateObj = new Date(year, monthNum - 1, dayNum);
+                                const weekdayName = arabicDays[dateObj.getDay()];
+                                dayTitle = `${dayKey} - ${weekdayName}`;
+                            }
+                        }
+                        html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
+                        html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
+                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
+                        html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                        html += `</div>`;
+                        html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
+                        reportsForDay.forEach(report => {
+                            html += buildReportListItem(report);
+                        });
+                        html += `</div></div>`;
+                    }
+                });
+                html += `</div></div>`;
+            });
+            recentReportsList.innerHTML = html;
+
+            attachReportListEvents();
+        }
+
         function toggleMonthFolder(monthKey) {
             const content = document.querySelector(`[data-month-content="${monthKey}"]`);
             if (!content) return;
@@ -465,7 +521,7 @@
             reports.forEach(report => {
                 const tr = document.createElement('tr');
                 const tdName = document.createElement('td');
-                tdName.textContent = report.name || 'تقرير';
+                tdName.textContent = `${report.name || 'تقرير'}${report.sourceLabel ? ' (' + report.sourceLabel + ')' : ''}`;
                 const tdDate = document.createElement('td');
                 tdDate.textContent = report.date || '';
                 const tdTotal = document.createElement('td');
