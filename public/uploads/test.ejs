@@ -1,259 +1,650 @@
-function normalizeArabicDigits(str) {
-    if (!str) return str;
-    const arabic = '٠١٢٣٤٥٦٧٨٩';
-    const persian = '۰۱۲۳۴۵۶۷۸۹';
-    return String(str)
-        .replace(/[\u0660-\u0669]/g, d => String(arabic.indexOf(d)))
-        .replace(/[\u06F0-\u06F9]/g, d => String(persian.indexOf(d)))
-        .replace(/[\u200e\u200f]/g, '')
-        .trim();
-}
-
-function getReportDateKey(report) {
-    if (!report) return null;
-
-    if (report.date) {
-        const dateStr = normalizeArabicDigits(report.date);
-        // YYYY-MM-DD أو YYYY/MM/DD
-        let m = dateStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-        if (m) {
-            return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
-        }
-        // DD/MM/YYYY أو DD-MM-YYYY
-        m = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-        if (m) {
-            return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
-        }
-    }
-
-    if (report.timestamp) {
-        return String(report.timestamp).slice(0, 10);
-    }
-    return null;
-}
-
-function loadRecentReports() {
-    const reports = window.expensesReports || [];
-    const searchQuery = reportSearchInput.value.toLowerCase().trim();
-    let filteredReports = reports;
-
-    if (searchQuery) {
-        filteredReports = filteredReports.filter(report => {
-            const nameMatch = (report.name || '').toLowerCase().includes(searchQuery);
-            const dateMatch = (report.date || '').toLowerCase().includes(searchQuery);
-            const sourceMatch = (report.sourceLabel || '').toLowerCase().includes(searchQuery);
-            return nameMatch || dateMatch || sourceMatch;
-        });
-    }
-
-    if (selectedDateFilter) {
-        filteredReports = filteredReports.filter(report => getReportDateKey(report) === selectedDateFilter);
-    }
-
-    if (selectedDateFilter) {
-        dateResultsContainer.style.display = 'block';
-        renderDateResultsTable(filteredReports);
-        recentReportsList.innerHTML = '';
-        return;
-    } else {
-        dateResultsContainer.style.display = 'none';
-        dateResultsTbody.innerHTML = '';
-    }
-
-    if (filteredReports.length === 0) {
-        if (reportSearchInput.value.trim()) {
-            recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-search"></i><p>لا توجد نتائج مطابقة لبحثك</p></div>';
-        } else {
-            recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-folder-open"></i><p>لا توجد تقارير محفوظة بعد</p></div>';
-        }
-        return;
-    }
-
-    const groupedByMonth = {};
-    filteredReports.forEach(report => {
-        const dateKey = getReportDateKey(report);
-        let year = null,
-            month = null,
-            day = null;
-        if (dateKey) {
-            const parts = dateKey.split('-');
-            if (parts.length === 3) {
-                year = parts[0];
-                month = parts[1];
-                day = parts[2];
-            }
-        }
-        const monthKey = (year && month) ? `${year}-${month}` : '__undated__';
-        if (!groupedByMonth[monthKey]) {
-            groupedByMonth[monthKey] = {
-                days: {},
-                monthNum: month ? parseInt(month, 10) : null,
-                year: year
-            };
-        }
-        const dayKey = day || (dateKey ? '__noDay__' : '__undated__');
-        if (!groupedByMonth[monthKey].days[dayKey]) groupedByMonth[monthKey].days[dayKey] = [];
-        groupedByMonth[monthKey].days[dayKey].push(report);
-    });
-
-    let html = '';
-    const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
-        if (a === '__undated__') return 1;
-        if (b === '__undated__') return -1;
-        return b.localeCompare(a);
-    });
-
-    monthKeys.forEach(monthKey => {
-        const monthData = groupedByMonth[monthKey];
-        let monthTitle = monthKey;
-        if (monthKey !== '__undated__' && monthData.monthNum) {
-            const monthName = arabicMonths[monthData.monthNum - 1] || '';
-            monthTitle = `${monthKey} - ${monthName}`;
-        } else if (monthKey === '__undated__') {
-            monthTitle = 'غير مؤرخ';
-        }
-        const monthExpanded = expandedMonthFolders[monthKey] || false;
-        html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
-        html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
-        html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
-        html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
-        html += `</div>`;
-        html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
-
-        const dayKeys = Object.keys(monthData.days).sort((a, b) => {
-            if (a === '__undated__' || a === '__noDay__') return 1;
-            if (b === '__undated__' || b === '__noDay__') return -1;
-            return a.localeCompare(b);
-        });
-
-        dayKeys.forEach(dayKey => {
-            const dayStateKey = monthKey + '_' + dayKey;
-            const dayExpanded = expandedDayFolders[dayStateKey] || false;
-            const reportsForDay = monthData.days[dayKey];
-            reportsForDay.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-
-            if (dayKey === '__noDay__' || dayKey === '__undated__') {
-                reportsForDay.forEach(report => {
-                    html += buildReportListItem(report);
-                });
-            } else {
-                let dayTitle = dayKey;
-                if (monthKey !== '__undated__') {
-                    const year = monthData.year;
-                    const monthNum = monthData.monthNum;
-                    const dayNum = parseInt(dayKey, 10);
-                    if (year && monthNum && !isNaN(dayNum)) {
-                        const dateObj = new Date(year, monthNum - 1, dayNum);
-                        const weekdayName = arabicDays[dateObj.getDay()];
-                        dayTitle = `${dayKey} - ${weekdayName}`;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>آخر تقارير الخوارج</title>
+    <meta name="description" content="عرض جميع تقارير الخوارج">
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="apple-touch-icon" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/reports.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
                     }
                 }
-                html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
-                html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
-                html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
-                html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">
+                            <%= user?.name || "مستخدم" %>
+                        </p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role">
+                            <%= user?.job_title || user?.account_type || "مستخدم" %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1">
+                <div class="sidebar-section-title">الكاش</div>
+                <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item " data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <div class="sidebar-section-title">الملف الشخصي</div>
+                <a href="/settings" class="sidebar-item " data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/me/reports" class="sidebar-item active" data-page="reports"><i class="las la-chart-bar"></i><span>آخر التقارير</span></a>
+
+                <div class="sidebar-section-title">المالية</div>
+                <a href="/employee-files" class="sidebar-item" data-page="files"><i class="las la-folder"></i><span>الملفات والموظفين</span></a>
+                <a href="/employee-advance" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <a href="/employee-salary" class="sidebar-item" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
+
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                </div>
+            </nav>
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                </div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
+            </div>
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg" class="header-avatar" alt="avatar">
+                </div>
+            </header>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="title-cell">
+                    <div class="title-icon"><i class="las la-history"></i></div>
+                    <h1>آخر تقارير الخوارج</h1>
+                    <p>سجل التقارير المخزنة</p>
+                </div>
+                <div class="info-card mt-6" id="reportViewCard" style="display:none;">
+                    <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
+                        <div class="w-full md:w-auto md:flex-1"></div>
+                        <div class="w-full md:w-auto md:flex-1 text-center">
+                            <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
+                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
+                            <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                        </div>
+                        <div class="w-full md:w-auto md:flex-1 flex justify-center md:justify-end">
+                            <div class="flex gap-3 flex-wrap justify-center">
+                                <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة هذا التقرير</button>
+                                <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i> إغلاق</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="view-table" id="viewReportTable2">
+                            <thead>
+                                <tr>
+                                    <th style="width:55%;">البيان</th>
+                                    <th style="width:45%;">المبلغ (ج.م)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewReportTbody2"></tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td>الإجمالي</td>
+                                    <td id="viewReportTotal2">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="mt-6 info-card" id="recentReportsCard">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-history text-primary"></i> جميع التقارير</h3>
+                            <p class="text-sm text-[var(--color-muted)]">عرض جميع التقارير المخزنة</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <input type="date" id="reportDatePicker" class="input-field" />
+                            <div class="relative flex-1 sm:w-64">
+                                <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
+                                <input type="text" id="reportSearchInput" class="input-field pr-10" placeholder="ابحث بالاسم أو التاريخ...">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dateResultsContainer" style="display:none;" class="mt-4 overflow-x-auto">
+                        <table class="date-results-table" id="dateResultsTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:40%;">اسم التقرير</th>
+                                    <th style="width:25%;">التاريخ</th>
+                                    <th style="width:20%;">الإجمالي (ج.م)</th>
+                                    <th style="width:15%;">عرض</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dateResultsTbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4" id="recentReportsList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="printArea" style="display:none;"></div>
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
+            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
+            <p id="successMessage" class="text-[var(--color-muted)]"></p>
+            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
+        </div>
+    </div>
+    <script>
+        window.expensesReports = <%- JSON.stringify(JSON.parse(user.expenses)) %>;
+    </script>
+    <script>
+        const reportViewCard = document.getElementById('reportViewCard');
+        const viewReportTitle2 = document.getElementById('viewReportTitle2');
+        const viewReportDate2 = document.getElementById('viewReportDate2');
+        const viewReportTbody2 = document.getElementById('viewReportTbody2');
+        const viewReportTotal2 = document.getElementById('viewReportTotal2');
+        const recentReportsCard = document.getElementById('recentReportsCard');
+        const recentReportsList = document.getElementById('recentReportsList');
+        const reportSearchInput = document.getElementById('reportSearchInput');
+        const dateResultsContainer = document.getElementById('dateResultsContainer');
+        const dateResultsTbody = document.getElementById('dateResultsTbody');
+        const reportDatePicker = document.getElementById('reportDatePicker');
+
+        let currentViewReportId = null;
+        let selectedDateFilter = null;
+        let expandedMonthFolders = {};
+        let expandedDayFolders = {};
+
+        const arabicMonths = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        const arabicDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+        function getReportDateKey(report) {
+            if (report.timestamp) {
+                return report.timestamp.slice(0, 10);
+            }
+            return null;
+        }
+
+        function hideReportView() {
+            reportViewCard.style.display = 'none';
+            recentReportsCard.style.display = 'block';
+            currentViewReportId = null;
+        }
+
+        function viewReportById(reportId) {
+            const reports = window.expensesReports || [];
+            const report = reports.find(r => r.id === reportId);
+            if (!report) {
+                showSuccess('التقرير غير موجود.');
+                return;
+            }
+            currentViewReportId = reportId;
+            viewReportTitle2.textContent = report.name || 'تقرير';
+            viewReportDate2.textContent = report.date || '';
+            viewReportTbody2.innerHTML = '';
+            if (report.rows && report.rows.length) {
+                report.rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    const tdDesc = document.createElement('td');
+                    tdDesc.textContent = row.desc || '';
+                    const tdAmount = document.createElement('td');
+                    tdAmount.textContent = row.amount || '0';
+                    tr.appendChild(tdDesc);
+                    tr.appendChild(tdAmount);
+                    viewReportTbody2.appendChild(tr);
+                });
+            }
+            viewReportTotal2.textContent = report.total || '0';
+            reportViewCard.style.display = 'block';
+            recentReportsCard.style.display = 'none';
+        }
+
+        function loadRecentReports() {
+            const reports = window.expensesReports || [];
+            const searchQuery = reportSearchInput.value.toLowerCase().trim();
+            let filteredReports = reports;
+
+            if (searchQuery) {
+                filteredReports = filteredReports.filter(report => {
+                    const nameMatch = (report.name || '').toLowerCase().includes(searchQuery);
+                    const dateMatch = (report.date || '').toLowerCase().includes(searchQuery);
+                    return nameMatch || dateMatch;
+                });
+            }
+
+            if (selectedDateFilter) {
+                filteredReports = filteredReports.filter(report => {
+                    const reportDateKey = getReportDateKey(report);
+                    return reportDateKey === selectedDateFilter;
+                });
+            }
+
+            if (selectedDateFilter) {
+                dateResultsContainer.style.display = 'block';
+                renderDateResultsTable(filteredReports);
+                recentReportsList.innerHTML = '';
+                return;
+            } else {
+                dateResultsContainer.style.display = 'none';
+                dateResultsTbody.innerHTML = '';
+            }
+
+            if (filteredReports.length === 0) {
+                if (reportSearchInput.value.trim()) {
+                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-search"></i><p>لا توجد نتائج مطابقة لبحثك</p></div>';
+                } else {
+                    recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-folder-open"></i><p>لا توجد تقارير محفوظة بعد</p></div>';
+                }
+                return;
+            }
+
+            const groupedByMonth = {};
+            filteredReports.forEach(report => {
+                let year = null;
+                let month = null;
+                let day = null;
+                const dateStr = report.date || '';
+                const match = dateStr.match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
+                if (match) {
+                    year = match[1];
+                    month = match[2].padStart(2, '0');
+                    day = match[3] ? match[3].padStart(2, '0') : null;
+                } else if (report.timestamp) {
+                    const tsMatch = report.timestamp.slice(0,10).match(/(\d{4})[-\/](\d{1,2})(?:[-\/](\d{1,2}))?/);
+                    if (tsMatch) {
+                        year = tsMatch[1];
+                        month = tsMatch[2].padStart(2, '0');
+                        day = tsMatch[3] ? tsMatch[3].padStart(2, '0') : null;
+                    }
+                }
+
+                if (year && month) {
+                    const monthKey = `${year}-${month}`;
+                    if (!groupedByMonth[monthKey]) {
+                        groupedByMonth[monthKey] = { days: {}, monthNum: parseInt(month, 10), year: year };
+                    }
+                    const dayKey = day || '__noDay__';
+                    if (!groupedByMonth[monthKey].days[dayKey]) {
+                        groupedByMonth[monthKey].days[dayKey] = [];
+                    }
+                    groupedByMonth[monthKey].days[dayKey].push(report);
+                } else {
+                    const monthKey = '__undated__';
+                    if (!groupedByMonth[monthKey]) {
+                        groupedByMonth[monthKey] = { days: {}, monthNum: null, year: null };
+                    }
+                    const dayKey = '__undated__';
+                    if (!groupedByMonth[monthKey].days[dayKey]) {
+                        groupedByMonth[monthKey].days[dayKey] = [];
+                    }
+                    groupedByMonth[monthKey].days[dayKey].push(report);
+                }
+            });
+
+            let html = '';
+            const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
+                if (a === '__undated__') return 1;
+                if (b === '__undated__') return -1;
+                return b.localeCompare(a);
+            });
+
+            monthKeys.forEach(monthKey => {
+                const monthData = groupedByMonth[monthKey];
+                let monthTitle = monthKey;
+                if (monthKey !== '__undated__') {
+                    const monthNum = monthData.monthNum;
+                    const monthName = arabicMonths[monthNum - 1] || '';
+                    monthTitle = `${monthKey} - ${monthName}`;
+                } else {
+                    monthTitle = 'غير مؤرخ';
+                }
+                const monthExpanded = expandedMonthFolders[monthKey] || false;
+                html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
+                html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
+                html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
+                html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
                 html += `</div>`;
-                html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
-                reportsForDay.forEach(report => {
-                    html += buildReportListItem(report);
+                html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
+
+                const dayKeys = Object.keys(monthData.days).sort((a, b) => {
+                    if (a === '__noDay__' || a === '__undated__') return 1;
+                    if (b === '__noDay__' || b === '__undated__') return -1;
+                    return a.localeCompare(b);
+                });
+
+                dayKeys.forEach(dayKey => {
+                    const dayStateKey = monthKey + '_' + dayKey;
+                    const dayExpanded = expandedDayFolders[dayStateKey] || false;
+                    const reportsForDay = monthData.days[dayKey];
+
+                    if (dayKey === '__noDay__' || dayKey === '__undated__') {
+                        reportsForDay.forEach(report => {
+                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                        });
+                    } else {
+                        let dayTitle = dayKey;
+                        if (monthKey !== '__undated__') {
+                            const year = monthData.year;
+                            const monthNum = monthData.monthNum;
+                            const dayNum = parseInt(dayKey, 10);
+                            const dateObj = new Date(year, monthNum - 1, dayNum);
+                            const weekdayIndex = dateObj.getDay();
+                            const weekdayName = arabicDays[weekdayIndex];
+                            dayTitle = `${dayKey} - ${weekdayName}`;
+                        }
+                        html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
+                        html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
+                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
+                        html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                        html += `</div>`;
+                        html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
+                        reportsForDay.forEach(report => {
+                            html += `<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p><p class="text-xs text-[var(--color-muted)]">${report.date || ''}</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير"><i class="las la-eye"></i> عرض</button></div></div>`;
+                        });
+                        html += `</div></div>`;
+                    }
                 });
                 html += `</div></div>`;
+            });
+            recentReportsList.innerHTML = html;
+
+            document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
+                    const monthKey = this.getAttribute('data-key');
+                    toggleMonthFolder(monthKey);
+                });
+            });
+
+            document.querySelectorAll('.folder-header[data-toggle="day"]').forEach(header => {
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
+                    const dayStateKey = this.getAttribute('data-key');
+                    toggleDayFolder(dayStateKey);
+                });
+            });
+
+            document.querySelectorAll('.month-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const monthKey = this.getAttribute('data-key');
+                    toggleMonthFolder(monthKey);
+                });
+            });
+
+            document.querySelectorAll('.day-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dayStateKey = this.getAttribute('data-key');
+                    toggleDayFolder(dayStateKey);
+                });
+            });
+
+            document.querySelectorAll('.view-report-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reportId = this.getAttribute('data-id');
+                    viewReportById(reportId);
+                });
+            });
+        }
+
+        function toggleMonthFolder(monthKey) {
+            const content = document.querySelector(`[data-month-content="${monthKey}"]`);
+            if (!content) return;
+            const isHidden = content.classList.toggle('hidden');
+            expandedMonthFolders[monthKey] = !isHidden;
+            const btn = document.querySelector(`.month-toggle-btn[data-key="${monthKey}"]`);
+            if (btn) {
+                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
+            }
+        }
+
+        function toggleDayFolder(dayStateKey) {
+            const content = document.querySelector(`[data-day-content="${dayStateKey}"]`);
+            if (!content) return;
+            const isHidden = content.classList.toggle('hidden');
+            expandedDayFolders[dayStateKey] = !isHidden;
+            const btn = document.querySelector(`.day-toggle-btn[data-key="${dayStateKey}"]`);
+            if (btn) {
+                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
+            }
+        }
+
+        function renderDateResultsTable(reports) {
+            dateResultsContainer.style.display = 'block';
+            dateResultsTbody.innerHTML = '';
+            if (reports.length === 0) {
+                dateResultsTbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-[var(--color-muted)]">لا توجد تقارير لهذا اليوم</td></tr>';
+                return;
+            }
+            reports.forEach(report => {
+                const tr = document.createElement('tr');
+                const tdName = document.createElement('td');
+                tdName.textContent = report.name || 'تقرير';
+                const tdDate = document.createElement('td');
+                tdDate.textContent = report.date || '';
+                const tdTotal = document.createElement('td');
+                tdTotal.textContent = report.total || '0';
+                const tdAction = document.createElement('td');
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'btn-outline btn-xs view-report-btn';
+                viewBtn.setAttribute('data-id', report.id);
+                viewBtn.innerHTML = '<i class="las la-eye"></i> عرض';
+                viewBtn.addEventListener('click', function() {
+                    viewReportById(report.id);
+                });
+                tdAction.appendChild(viewBtn);
+                tr.appendChild(tdName);
+                tr.appendChild(tdDate);
+                tr.appendChild(tdTotal);
+                tr.appendChild(tdAction);
+                dateResultsTbody.appendChild(tr);
+            });
+        }
+
+        reportDatePicker.addEventListener('change', function() {
+            selectedDateFilter = this.value;
+            if (!selectedDateFilter) {
+                selectedDateFilter = null;
+            }
+            loadRecentReports();
+        });
+
+        if (reportSearchInput) {
+            reportSearchInput.addEventListener('input', function() {
+                loadRecentReports();
+            });
+        }
+
+        function buildPrintHTML(name, dateStr, rowsData, totalText) {
+            const LOGO_URL = 'https://files.catbox.moe/05wiyk.png';
+            let html = '';
+            html += '<div style="text-align:center; margin-bottom:2mm;">';
+            html += '<img src="' + LOGO_URL + '" style="width:20mm; height:auto; margin:0 auto; display:block;" alt="Logo" />';
+            html += '<div class="restaurant-name" style="font-size:20px; font-weight:800; margin-top:1mm; text-align:center;">' + (name || '') + '</div>';
+            html += '<div class="print-date" style="font-size:11px; font-weight:600; margin-top:0.5mm; text-align:center;">' + (dateStr || '') + '</div>';
+            html += '</div>';
+            html += '<div class="header-separator" style="width:100%; height:2px; background:#000; margin-bottom:3mm;"></div>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; border:1px solid #000;">';
+            html += '<thead><tr><th style="width:62%; padding:4px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700; font-size:11px;">البيان</th><th style="width:38%; padding:4px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700; font-size:11px;">المبلغ (ج.م)</th></tr></thead><tbody>';
+            if (rowsData && rowsData.length) {
+                rowsData.forEach(row => {
+                    html += '<tr><td style="padding:4px 5px; border:0.5px solid #000; text-align:center;">' + (row.desc || '') + '</td><td style="padding:4px 5px; border:0.5px solid #000; text-align:center;">' + (row.amount || '0') + '</td></tr>';
+                });
+            }
+            html += '<tr class="total-row"><td style="padding:4px 5px; border:0.5px solid #000; text-align:center; font-weight:800; font-size:14px; background:#f4f4f4;">الإجمالي</td><td style="padding:4px 5px; border:0.5px solid #000; text-align:center; font-weight:800; font-size:14px; background:#f4f4f4;">' + (totalText || '0') + '</td></tr>';
+            html += '</tbody></table>';
+            html += '<div class="footer" style="margin-top:6mm; padding-top:2mm; border-top:1px dashed #333; text-align:center; font-size:11px; color:#000; font-weight:700; line-height:1.5;">';
+            html += '<div class="dev" style="font-size:10px; font-weight:600; color:#111; margin-top:1mm;"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div>';
+            html += '<div class="dev-version" style="font-size:10px; font-weight:600; color:#111; margin-top:0.5mm;">v3.2</div>';
+            html += '</div>';
+            return html;
+        }
+
+        document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
+        document.getElementById('printDetailReportBtn').addEventListener('click', function() {
+            if (!currentViewReportId) return;
+            const reports = window.expensesReports || [];
+            const report = reports.find(r => r.id === currentViewReportId);
+            if (!report) return;
+            const printArea = document.getElementById('printArea');
+            const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ desc: r.desc || '', amount: r.amount || '0' })) : [];
+            printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
+            printArea.style.display = 'block';
+            setTimeout(() => {
+                window.print();
+                printArea.style.display = 'none';
+            }, 300);
+        });
+
+        const sidebar = document.getElementById('dashboardSidebar');
+        const headerAvatar = document.getElementById('headerAvatar');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-open');
+            sidebar.classList.remove('mobile-closed');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            sidebar.classList.add('mobile-closed');
+        }
+
+        if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1025) {
+                sidebar.classList.remove('mobile-open', 'mobile-closed');
+            } else {
+                if (!sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.add('mobile-closed');
+                }
             }
         });
-        html += `</div></div>`;
-    });
-    recentReportsList.innerHTML = html;
 
-    attachReportListEvents();
-}
-
-function buildReportListItem(report) {
-    const dateSourceLine = `${report.date || ''}${report.sourceLabel ? ' • ' + report.sourceLabel : ''}`.trim();
-    return `<div class="report-list-item">
-        <div class="report-info">
-            <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
-            <div>
-                <p class="font-medium text-[var(--color-white)]">${report.name || 'تقرير'}</p>
-                <p class="text-xs text-[var(--color-muted)]">${dateSourceLine || ''}</p>
-            </div>
-        </div>
-        <div class="report-actions">
-            <button class="btn-outline btn-xs view-report-btn" data-id="${report.id}" title="عرض التقرير">
-                <i class="las la-eye"></i> عرض
-            </button>
-        </div>
-    </div>`;
-}
-
-function attachReportListEvents() {
-    document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
-        header.addEventListener('click', function(e) {
-            if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
-            const monthKey = this.getAttribute('data-key');
-            toggleMonthFolder(monthKey);
-        });
-    });
-
-    document.querySelectorAll('.folder-header[data-toggle="day"]').forEach(header => {
-        header.addEventListener('click', function(e) {
-            if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
-            const dayStateKey = this.getAttribute('data-key');
-            toggleDayFolder(dayStateKey);
-        });
-    });
-
-    document.querySelectorAll('.month-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        headerAvatar.addEventListener('click', function(e) {
             e.stopPropagation();
-            const monthKey = this.getAttribute('data-key');
-            toggleMonthFolder(monthKey);
+            if (window.innerWidth < 1025) {
+                if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                else openSidebar();
+            }
         });
-    });
 
-    document.querySelectorAll('.day-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dayStateKey = this.getAttribute('data-key');
-            toggleDayFolder(dayStateKey);
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
+                if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) {
+                    closeSidebar();
+                }
+            }
         });
-    });
 
-    document.querySelectorAll('.view-report-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const reportId = this.getAttribute('data-id');
-            viewReportById(reportId);
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.id === 'logoutBtn') return;
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                if (window.innerWidth < 1025) {
+                    closeSidebar();
+                }
+            });
         });
-    });
-}
 
-function renderDateResultsTable(reports) {
-    dateResultsContainer.style.display = 'block';
-    dateResultsTbody.innerHTML = '';
-    if (reports.length === 0) {
-        dateResultsTbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-[var(--color-muted)]">لا توجد تقارير لهذا اليوم</td></tr>';
-        return;
-    }
-    reports.forEach(report => {
-        const tr = document.createElement('tr');
-        const tdName = document.createElement('td');
-        tdName.textContent = `${report.name || 'تقرير'}${report.sourceLabel ? ' (' + report.sourceLabel + ')' : ''}`;
-        const tdDate = document.createElement('td');
-        tdDate.textContent = report.date || '';
-        const tdTotal = document.createElement('td');
-        tdTotal.textContent = report.total || '0';
-        const tdAction = document.createElement('td');
-        const viewBtn = document.createElement('button');
-        viewBtn.className = 'btn-outline btn-xs view-report-btn';
-        viewBtn.setAttribute('data-id', report.id);
-        viewBtn.innerHTML = '<i class="las la-eye"></i> عرض';
-        viewBtn.addEventListener('click', function() {
-            viewReportById(report.id);
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) {
+                window.location.href = '/';
+            }
         });
-        tdAction.appendChild(viewBtn);
-        tr.appendChild(tdName);
-        tr.appendChild(tdDate);
-        tr.appendChild(tdTotal);
-        tr.appendChild(tdAction);
-        dateResultsTbody.appendChild(tr);
-    });
-}
+
+        const successModal = document.getElementById('successModal');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
+        const okSuccessBtn = document.getElementById('okSuccessBtn');
+        const successMessageEl = document.getElementById('successMessage');
+
+        function showSuccess(msg) {
+            successMessageEl.textContent = msg;
+            successModal.classList.add('active');
+        }
+
+        function hideSuccess() {
+            successModal.classList.remove('active');
+        }
+
+        closeSuccessModal.addEventListener('click', hideSuccess);
+        okSuccessBtn.addEventListener('click', hideSuccess);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === successModal) hideSuccess();
+        });
+
+        const themeToggleBtn = document.getElementById('themetoggle');
+        const body = document.body;
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            body.classList.toggle('light', !isDark);
+            themeToggleBtn.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = body.classList.contains('light') === false;
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecentReports();
+        });
+    </script>
+</body>
+</html>
