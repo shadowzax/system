@@ -1432,6 +1432,7 @@
             let reportsPageSize = 5;
             let currentEditReportId = null;
             let sortOrder = 'newest';
+            let previousState = null;
 
             document.getElementById('userFullName').textContent = userData.name || 'مستخدم';
             document.getElementById('role').textContent = userData.job_title || userData.account_type || 'مستخدم';
@@ -2061,12 +2062,30 @@
                         if (idxAll !== -1) allReports[idxAll] = data.report;
                         renderRecentReportsPage();
                         Swal.fire('تم التعديل', data.message, 'success');
+                        restorePreviousState();
                         cancelEditMode();
                     } else {
                         Swal.fire('خطأ', data.message, 'error');
                     }
                 })
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
+            }
+
+            function restorePreviousState() {
+                if (previousState) {
+                    restaurantNameInput.value = previousState.name || '';
+                    updateDateToggleUI(previousState.isAuto !== undefined ? previousState.isAuto : true);
+                    if (previousState.customDate) reportDateInput.value = previousState.customDate;
+                    else reportDateInput.value = formatDateForInput(new Date());
+                    loadTableData(previousState.rows || []);
+                    previousState = null;
+                }
+            }
+
+            function cancelEditMode() {
+                currentEditReportId = null;
+                storeBtn.innerHTML = '<i class="las la-save"></i> تخزين';
+                cancelEditBtn.classList.add('hidden');
             }
 
             function editReportById(reportId) {
@@ -2080,6 +2099,18 @@
                     }
                 }
                 if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
+
+                if (currentEditReportId) {
+                    cancelEditMode();
+                }
+
+                previousState = {
+                    name: restaurantNameInput.value || '',
+                    isAuto: dateToggleBtn.classList.contains('active'),
+                    customDate: reportDateInput.value,
+                    rows: getTableData()
+                };
+
                 currentEditReportId = reportId;
                 restaurantNameInput.value = report.name || '';
                 if (report.date) {
@@ -2105,21 +2136,21 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            function cancelEditMode() {
-                currentEditReportId = null;
-                storeBtn.innerHTML = '<i class="las la-save"></i> تخزين';
-                cancelEditBtn.classList.add('hidden');
-            }
-
             cancelEditBtn.addEventListener('click', function() {
+                if (previousState) {
+                    restorePreviousState();
+                }
                 cancelEditMode();
                 Swal.fire('تم', 'تم إلغاء التعديل.', 'info');
             });
 
             storeBtn.addEventListener('click', function() {
                 saveToSession();
-                if (currentEditReportId) updateCurrentReport();
-                else storeCurrentReport();
+                if (currentEditReportId) {
+                    updateCurrentReport();
+                } else {
+                    storeCurrentReport();
+                }
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
