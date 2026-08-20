@@ -1202,7 +1202,6 @@
                         else emp.monthlyData[monthKey].days[day] = String(amount);
                     }
                     updateSalaryRowSummary(employeeId);
-                    Swal.fire({ icon: 'success', title: 'تم', text: amount === 0 ? 'تم حذف القيمة' : 'تم حفظ القيمة', timer: 1200, showConfirmButton: false });
                 } catch (error) {
                     Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                     input.value = input.defaultValue || '';
@@ -1412,7 +1411,6 @@
                     await sendAdvanceToServer(fileId, employeeId, day, amount);
                     updateAdvanceRowSummary(employeeId);
                     updateAdvancesTableFootSummary();
-                    Swal.fire({ icon: 'success', title: 'تم', text: amount === 0 ? 'تم حذف السلفة' : 'تم حفظ السلفة', timer: 1200, showConfirmButton: false });
                 } catch (error) {
                     Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                 }
