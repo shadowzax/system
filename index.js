@@ -198,7 +198,6 @@ app.get("/admin/resturant/1", (req, res) => {
 });
 app.get("/admin/reports/1", async (req, res) => {
     let reports = [];
-
     try {
         const response = await fetch("https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=1");
         if (response.ok) {
@@ -230,7 +229,7 @@ app.get("/admin/reports/1", async (req, res) => {
         console.error('Error fetching reports:', err);
     }
 
-    res.render("admin/1-ebnhamido-reports", {
+    res.render("../admin/1-ebnhamido-reports", {
         title: "",
         description: "",
         reports
