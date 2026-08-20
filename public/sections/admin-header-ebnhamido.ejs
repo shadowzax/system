@@ -15,47 +15,49 @@
                     </div>
                 </div>
             </div>
-<nav class="flex-1">
+<nav class="flex-1" id="adminSidebarNav">
     <div class="sidebar-section-title">فرع السلام</div>
 
     <a
         href="/admin/resturant/1"
         class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
-        data-restaurant-id="id_ibn_hamido"
+        data-restaurant-id="restaurant-1"
     >
-        <img src="/logos/1.png" class="restaurant-logo" alt="logo">
+        <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
         <span>ابن حميدو</span>
     </a>
 
     <a
         href="/admin/reports/1"
         class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>"
-        data-restaurant-id="id_ibn_hamido"
+        data-restaurant-id="reports-1"
     >
-        <img src="/logos/1.png" class="restaurant-logo" alt="logo">
+        <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
         <span>تقارير ابن حميدو</span>
     </a>
 
     <a
         href="/admin/resturant/2"
         class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>"
-        data-restaurant-id="id_ibn_hamido"
+        data-restaurant-id="restaurant-2"
     >
-        <img src="/logos/2.png" class="restaurant-logo" alt="logo">
+        <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
         <span>مطاعم نعمه</span>
     </a>
 
     <a
         href="/admin/reports/2"
         class="sidebar-item restaurant-item <%= activePage === 'neama-reports' ? 'active' : '' %>"
-        data-restaurant-id="id_ibn_hamido"
+        data-restaurant-id="reports-2"
     >
-        <img src="/logos/2.png" class="restaurant-logo" alt="logo">
+        <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
         <span>تقارير مطاعم نعمه</span>
     </a>
+
     <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
         <a
-            id="logoutBtn"
+            href="/login"
+            id="adminSidebarLogoutBtn"
             class="sidebar-item"
             style="color: #ef4444;"
         >
@@ -66,27 +68,35 @@
 </nav>
 
 <script>
-    document.getElementById("logoutBtn").addEventListener("click", function (e) {
-        e.preventDefault();
+    (function () {
+        const logoutButton = document.getElementById("adminSidebarLogoutBtn");
 
-        Swal.fire({
-            title: "تسجيل الخروج؟",
-            text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "تسجيل الخروج",
-            cancelButtonText: "إلغاء",
-            confirmButtonColor: "#ef4444"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.cookie =
-                    "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        if (!logoutButton) return;
 
-                window.location.href = "/login";
-            }
+        logoutButton.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "تسجيل الخروج؟",
+                text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "تسجيل الخروج",
+                cancelButtonText: "إلغاء",
+                confirmButtonColor: "#ef4444",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.cookie =
+                        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                    window.location.href = "/login";
+                }
+            });
         });
-    });
+    })();
 </script>
+
 
 
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
