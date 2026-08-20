@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0d99ff">
-    <title>إدارة المطاعم</title>
+    <title>إدارة <%= restaurant.name %></title>
     <meta name="description" content="نظام إدارة الرواتب باليومية">
     <link rel="icon" type="image/png" href="/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -210,9 +210,9 @@
     <div id="printArea" style="display:none;"></div>
     <div class="bottom-mobile-nav" id="bottomMobileNav">
         <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item active" data-restaurant-id="1">
-            <img src="https://i.ibb.co/fYds0Vcq/458109350-8047883141947002-8357149268094311983-n-removebg-preview.png" class="restaurant-logo" alt="logo">
-            <span>ابن حميدو</span>
+        <a href="#" class="bottom-nav-item active" data-restaurant-id="<%= restaurant.id %>">
+            <img src="<%= restaurant.logo %>" class="restaurant-logo" alt="logo">
+            <span><%= restaurant.name %></span>
         </a>
     </div>
     <div class="modal-overlay" id="copyFolderModal">
@@ -296,7 +296,7 @@
     <script>
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
         (function() {
-            const RESTAURANT_ID = "1";
+            const RESTAURANT_ID = "<%= restaurant.id %>";
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const Swal = window.Swal;
 
