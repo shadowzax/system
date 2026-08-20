@@ -913,10 +913,6 @@
                 </div>
             </div>
             <nav class="flex-1">
-                <!-- <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a> -->
-
                 <div class="sidebar-section-title">الكاش</div>
                 <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
@@ -964,7 +960,7 @@
                 <div class="title-cell">
                     <div class="title-icon"><i class="las la-money-bill-wave"></i></div>
                     <h1>الرواتب اليومية</h1>
-                    <p>يارب</p>
+                    <p>إدارة الرواتب اليومية للموظفين</p>
                 </div>
                 <div id="filesView">
                     <div class="info-card">
@@ -1073,8 +1069,14 @@
 
             const STORAGE_KEY = 'dailySalaryAppData_v3';
             const API_BASE = '<%= api %>' + '/api/admin';
+            const RESTAURANT_ID = "1";
+
+            const isAdmin = window.__APP_DATA__.user && window.__APP_DATA__.user.account_type === 'admin';
 
             function getToken() {
+                if (window.__APP_DATA__ && window.__APP_DATA__.token) {
+                    return window.__APP_DATA__.token;
+                }
                 return localStorage.getItem('token') || localStorage.getItem('authToken') || '';
             }
 
@@ -1183,10 +1185,12 @@
                         method: 'POST',
                         headers,
                         body: JSON.stringify({
+                            token: token,
                             fileId: fileId,
                             employeeId: employeeId,
                             day: day,
-                            amount: amount
+                            amount: amount,
+                            restaurant_id: RESTAURANT_ID
                         })
                     });
                     const data = await response.json();
@@ -1235,7 +1239,7 @@
             function renderFilesList() {
                 const query = fileSearchInput ? fileSearchInput.value.toLowerCase().trim() : '';
                 filesList.innerHTML = '';
-                const filteredFiles = appData.files.filter(file => file.name && file.name.toLowerCase().includes(query));
+                const filteredFiles = appData.files.filter(file => file.restaurant_id === RESTAURANT_ID && file.name && file.name.toLowerCase().includes(query));
                 if (filteredFiles.length === 0) {
                     filesList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]"><i class="las la-folder-open text-5xl block mb-3 opacity-30"></i><p>لا توجد ملفات</p><p class="text-xs mt-1">لا يمكن إنشاء ملفات جديدة</p></div>';
                     return;
@@ -1244,8 +1248,7 @@
                     const employeeCount = file.employees ? file.employees.length : 0;
                     const div = document.createElement('div');
                     div.className = 'file-card';
-                    div.innerHTML =
-                        `<div class="file-icon"><i class="las la-folder"></i></div><div class="flex-1 min-w-0"><p class="font-bold text-[var(--color-white)] text-base">${file.name || 'ملف بدون اسم'}</p><p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · أنشئ ${new Date(file.createdAt).toLocaleDateString('ar-EG')}</p></div><div class="flex gap-2 flex-shrink-0"><button class="btn-outline btn-xs open-file-btn" data-id="${file.id}" title="فتح الملف"><i class="las la-folder-open"></i> فتح</button></div>`;
+                    div.innerHTML = `<div class="file-icon"><i class="las la-folder"></i></div><div class="flex-1 min-w-0"><p class="font-bold text-[var(--color-white)] text-base">${file.name || 'ملف بدون اسم'}</p><p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · أنشئ ${new Date(file.createdAt).toLocaleDateString('ar-EG')}</p></div><div class="flex gap-2 flex-shrink-0"><button class="btn-outline btn-xs open-file-btn" data-id="${file.id}" title="فتح الملف"><i class="las la-folder-open"></i> فتح</button></div>`;
                     filesList.appendChild(div);
                 });
                 document.querySelectorAll('.open-file-btn').forEach(btn => { btn.addEventListener('click', function() { openFile(this.getAttribute('data-id')); }); });
@@ -1339,15 +1342,14 @@
                 sharedTableBody.innerHTML = '';
                 sharedTableFoot.innerHTML = '';
                 if (!file || !file.employees || file.employees.length === 0) {
-                    sharedTableBody.innerHTML = '<tr><td colspan="' + (daysInMonth + 6) +
-                        '" class="text-center py-8 text-[var(--color-muted)]"><i class="las la-users text-4xl block mb-2 opacity-30"></i>لا يوجد موظفين في هذا الملف</td></tr>';
+                    sharedTableBody.innerHTML = '<tr><td colspan="' + (daysInMonth + 5) + '" class="text-center py-8 text-[var(--color-muted)]"><i class="las la-users text-4xl block mb-2 opacity-30"></i>لا يوجد موظفين في هذا الملف</td></tr>';
                     return;
                 }
                 let headRow = '<tr><th class="emp-header">الموظف</th>';
                 for (let d = 1; d <= daysInMonth; d++) {
                     headRow += '<th class="day-num-header">' + d + '</th>';
                 }
-                headRow += '<th class="emp-header">إجمالي الأيام</th><th class="emp-header">صافي الراتب</th><th class="emp-header">إجمالي السلف</th><th class="emp-header">الأيام المخصومة</th><th class="emp-header">إجمالي الخصومات</th><th class="emp-header">اليومية</th></tr>';
+                headRow += '<th class="emp-header">إجمالي الأيام</th><th class="emp-header">راتب الأيام</th><th class="emp-header">إجمالي السلف</th><th class="emp-header">اليومية</th><th class="emp-header">صافي الراتب</th></tr>';
                 sharedTableHead.innerHTML = headRow;
                 file.employees.forEach(emp => {
                     const monthlySalary = parseNumber(emp.monthlySalary || 0);
@@ -1356,8 +1358,7 @@
                     if (!dayData.days) dayData.days = {};
                     let totalDays = 0;
                     let row = '<tr>';
-                    row += '<td class="emp-cell"><div class="emp-name-display">' + (emp.name || 'بدون اسم') +
-                        '</div><div class="emp-code-display">كود: ' + (emp.code || '---') + ' · ' + (emp.profession || '---') + '</div></td>';
+                    row += '<td class="emp-cell"><div class="emp-name-display">' + (emp.name || 'بدون اسم') + '</div><div class="emp-code-display">كود: ' + (emp.code || '---') + ' · ' + (emp.profession || '---') + '</div></td>';
                     for (let d = 1; d <= daysInMonth; d++) {
                         const multiplierVal = dayData.days[d] !== undefined ? dayData.days[d] : '';
                         const numVal = parseNumber(multiplierVal);
@@ -1367,20 +1368,17 @@
                         if (isZero) cls = ' has-value-zero';
                         else if (hasVal && numVal !== 0) cls = ' has-value';
                         if (hasVal && numVal !== 0) totalDays += numVal;
-                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d +
-                            '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal +
-                            '" inputmode="decimal" placeholder="0"></td>';
+                        const disabledAttr = isAdmin ? '' : ' disabled';
+                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"' + disabledAttr + '></td>';
                     }
                     const totalSalary = dayRate * totalDays;
                     const totalLoans = getEmployeeTotalLoans(emp);
-                    const deductedDays = daysInMonth - totalDays;
-                    const totalDeductions = deductedDays * dayRate;
+                    const netSalary = totalSalary - totalLoans;
                     row += '<td class="emp-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(totalDays) + '</td>';
                     row += '<td class="emp-cell" style="color:#10b981;font-weight:700;">' + formatNumber(totalSalary) + '</td>';
                     row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
-                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(deductedDays) + '</td>';
-                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
                     row += '<td class="emp-cell" style="color:var(--color-muted);font-weight:600;">' + formatNumber(dayRate) + '</td>';
+                    row += '<td class="emp-cell" style="color:#10b981;font-weight:800;">' + formatNumber(netSalary) + '</td>';
                     row += '</tr>';
                     sharedTableBody.innerHTML += row;
                 });
@@ -1388,7 +1386,7 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     footRow += '<td class="summary-value-cell">-</td>';
                 }
-                footRow += '<td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td></tr>';
+                footRow += '<td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td><td class="summary-label-cell"></td></tr>';
                 sharedTableFoot.innerHTML = footRow;
                 bindTableInputEvents();
                 updateTableFootSummary();
@@ -1419,7 +1417,7 @@
                 if (!file || !file.employees) return;
                 const daysInMonth = getDaysInMonth(monthKey);
                 const footCells = sharedTableFoot.querySelectorAll('td');
-                if (footCells.length < daysInMonth + 6) return;
+                if (footCells.length < daysInMonth + 5) return;
                 for (let d = 1; d <= daysInMonth; d++) {
                     let dayTotal = 0;
                     file.employees.forEach(emp => {
@@ -1455,8 +1453,7 @@
                 }
                 const totalSalary = dayRate * totalDays;
                 const totalLoans = getEmployeeTotalLoans(emp);
-                const deductedDays = daysInMonth - totalDays;
-                const totalDeductions = deductedDays * dayRate;
+                const netSalary = totalSalary - totalLoans;
                 const rows = sharedTableBody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const firstCell = row.querySelector('td.emp-cell');
@@ -1464,19 +1461,17 @@
                         const rowEmpId = row.querySelector('.day-input')?.getAttribute('data-eid');
                         if (rowEmpId === empId) {
                             const cells = row.querySelectorAll('td.emp-cell');
-                            if (cells.length >= 6) {
+                            if (cells.length >= 5) {
                                 cells[1].textContent = formatNumber(totalDays);
                                 cells[1].style.color = 'var(--color-primary)';
                                 cells[2].textContent = formatNumber(totalSalary);
                                 cells[2].style.color = '#10b981';
                                 cells[3].textContent = formatNumber(totalLoans);
                                 cells[3].style.color = '#ef4444';
-                                cells[4].textContent = formatNumber(deductedDays);
-                                cells[4].style.color = '#f59e0b';
-                                cells[5].textContent = formatNumber(totalDeductions);
-                                cells[5].style.color = '#f59e0b';
-                                cells[6].textContent = formatNumber(dayRate);
-                                cells[6].style.color = 'var(--color-muted)';
+                                cells[4].textContent = formatNumber(dayRate);
+                                cells[4].style.color = 'var(--color-muted)';
+                                cells[5].textContent = formatNumber(netSalary);
+                                cells[5].style.color = '#10b981';
                             }
                         }
                     }
@@ -1484,6 +1479,7 @@
             }
 
             function bindTableInputEvents() {
+                if (!isAdmin) return;
                 sharedTableBody.querySelectorAll('.day-input').forEach(input => {
                     input.addEventListener('input', function() {
                         const val = convertArabicNumerals(this.value).replace(/,/g, '');
@@ -1580,27 +1576,20 @@
                 }
                 const monthKey = inputToMonthKey(employeeMonthFilter.value) || getCurrentMonthKey();
                 const daysInMonth = getDaysInMonth(monthKey);
-                let html = '<div class="print-header"><h2>' + (file.name || 'كشف رواتب يومية') + '</h2><div class="sub">' +
-                    formatMonthDisplay(monthKey) + '</div></div>';
-                html += '<table><thead><tr><th>الموظف</th><th>الراتب الشهري</th><th>اليومية</th><th>إجمالي الأيام</th><th>إجمالي السلف</th><th>الأيام المخصومة</th><th>إجمالي الخصومات</th><th>صافي الراتب</th></tr></thead><tbody>';
+                let html = '<div class="print-header"><h2>' + (file.name || 'كشف رواتب يومية') + '</h2><div class="sub">' + formatMonthDisplay(monthKey) + '</div></div>';
+                html += '<table><thead><tr><th>الموظف</th><th>الراتب الشهري</th><th>اليومية</th><th>إجمالي الأيام</th><th>راتب الأيام</th><th>إجمالي السلف</th><th>صافي الراتب</th></tr></thead><tbody>';
                 let counter = 1;
                 file.employees.forEach(emp => {
                     const monthlySalary = parseNumber(emp.monthlySalary || 0);
                     const dayRate = monthlySalary / 30;
                     const totalDays = getEmployeeTotalDays(currentFileId, emp.id, monthKey);
-                    const totalLoans = getEmployeeTotalLoans(emp);
-                    const deductedDays = daysInMonth - totalDays;
-                    const totalDeductions = deductedDays * dayRate;
                     const totalSalary = dayRate * totalDays;
-                    html += '<tr><td>' + counter++ + ' - ' + (emp.name || '---') + ' (كود: ' + (emp.code || '---') +
-                        ')</td><td>' + formatNumber(monthlySalary) + '</td><td>' + formatNumber(dayRate) +
-                        '</td><td>' + formatNumber(totalDays) + '</td><td>' + formatNumber(totalLoans) +
-                        '</td><td>' + formatNumber(deductedDays) + '</td><td>' + formatNumber(totalDeductions) +
-                        '</td><td style="font-weight:bold;color:#059669;">' + formatNumber(totalSalary) + '</td></tr>';
+                    const totalLoans = getEmployeeTotalLoans(emp);
+                    const netSalary = totalSalary - totalLoans;
+                    html += '<tr><td>' + counter++ + ' - ' + (emp.name || '---') + ' (كود: ' + (emp.code || '---') + ')</td><td>' + formatNumber(monthlySalary) + '</td><td>' + formatNumber(dayRate) + '</td><td>' + formatNumber(totalDays) + '</td><td>' + formatNumber(totalSalary) + '</td><td>' + formatNumber(totalLoans) + '</td><td style="font-weight:bold;color:#059669;">' + formatNumber(netSalary) + '</td></tr>';
                 });
                 html += '</tbody></table>';
-                html +=
-                    '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v5.2</div></div>';
+                html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v5.2</div></div>';
                 const printArea = document.getElementById('printArea');
                 printArea.innerHTML = html;
                 printArea.style.display = 'block';
@@ -1625,9 +1614,9 @@
             function loadInitialData() {
                 const serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.files && Array.isArray(serverData.files)) {
-                    appData.files = serverData.files;
+                    appData.files = serverData.files.filter(file => file.restaurant_id === RESTAURANT_ID);
                 } else if (serverData && Array.isArray(serverData)) {
-                    appData.files = serverData;
+                    appData.files = serverData.filter(file => file.restaurant_id === RESTAURANT_ID);
                 }
                 appData.files.forEach(file => {
                     if (file.employees && Array.isArray(file.employees)) {
