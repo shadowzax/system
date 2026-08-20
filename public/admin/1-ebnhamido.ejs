@@ -52,45 +52,28 @@
             <nav class="flex-1" id="adminSidebarNav">
                 <div class="sidebar-section-title">فرع السلام</div>
 
-                <a
-                    href="/admin/resturant/1"
-                    class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
-                >
+                <a href="/admin/resturant/1" class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>">
                     <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
                     <span>ابن حميدو</span>
                 </a>
 
-                <a
-                    href="/admin/reports/1"
-                    class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>"
-                >
+                <a href="/admin/reports/1" class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>">
                     <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
                     <span>تقارير ابن حميدو</span>
                 </a>
 
-                <a
-                    href="/admin/resturant/2"
-                    class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>"
-                >
+                <a href="/admin/resturant/2" class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>">
                     <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
                     <span>مطاعم نعمه</span>
                 </a>
 
-                <a
-                    href="/admin/reports/2"
-                    class="sidebar-item restaurant-item <%= activePage === 'neama-reports' ? 'active' : '' %>"
-                >
+                <a href="/admin/reports/2" class="sidebar-item restaurant-item <%= activePage === 'neama-reports' ? 'active' : '' %>">
                     <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
                     <span>تقارير مطاعم نعمه</span>
                 </a>
 
                 <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a
-                        href="/login"
-                        id="adminSidebarLogoutBtn"
-                        class="sidebar-item"
-                        style="color: #ef4444;"
-                    >
+                    <a href="/login" id="adminSidebarLogoutBtn" class="sidebar-item" style="color: #ef4444;">
                         <i class="las la-sign-out-alt"></i>
                         <span>تسجيل الخروج</span>
                     </a>
@@ -587,6 +570,10 @@
             function renderFoldersList() {
                 const query = folderSearchInput ? folderSearchInput.value.toLowerCase().trim() : '';
                 foldersList.innerHTML = '';
+                if (!query) {
+                    foldersList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]">اكتب للبحث عن ملف...</div>';
+                    return;
+                }
                 const filteredFiles = appData.files.filter(file => file.name && file.name.toLowerCase().includes(query));
                 if (filteredFiles.length === 0) {
                     foldersList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]">لا توجد ملفات</div>';
@@ -729,6 +716,7 @@
                 foldersContainer.style.display = 'block';
                 employeesTableContainer.style.display = 'none';
                 currentRestaurantId = null;
+                folderSearchInput.value = '';
                 renderFoldersList();
             });
 
