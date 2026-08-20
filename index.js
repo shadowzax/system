@@ -185,6 +185,70 @@ app.get("/me/reports", (req, res) => {
         description: ""
     });
 });
+/*--------------------------------------------*/
+app.get("/outgoing", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/outgoing", {
+        title: "خوارج",
+        description: ""
+    });
+});
+app.get("/", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/outgoing", {
+        title: "خوارج",
+        description: ""
+    });
+});
+app.get("/visa", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/visa", {
+        title: "فيز",
+        description: ""
+    });
+});
+
+app.get("/cash", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/cash", {
+        title: "تحويلات كاش",
+        description: ""
+    });
+});
+app.get("/advances", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/salary-advance", {
+        title: "تحويلات كاش",
+        description: ""
+    });
+});
+app.get("/settings", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("settings/settings", {
+        title: "تحويلات كاش",
+        description: ""
+    });
+});
+
+// - Admin - //
 /*------------------------------------------*/
 app.get("/admin/resturant/1", (req, res) => {
     if (!req.isAuthenticated) {
@@ -260,7 +324,7 @@ app.get("/admin/resturant/2", (req, res) => {
         description: "",
         activePage: "neama-restaurant",
         restaurant: {
-            id: 1,
+            id: 2,
             name: "مطاعم نعمه",
             section: "السلام",
             logo: "/logos/2.png"
@@ -316,69 +380,6 @@ app.get("/admin/reports/2", async (req, res) => {
     });
 });
 /*-----------------------------------------*/
-app.get("/outgoing", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("system/outgoing", {
-        title: "خوارج",
-        description: ""
-    });
-});
-app.get("/", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("system/outgoing", {
-        title: "خوارج",
-        description: ""
-    });
-});
-app.get("/visa", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("system/visa", {
-        title: "فيز",
-        description: ""
-    });
-});
-
-app.get("/cash", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("system/cash", {
-        title: "تحويلات كاش",
-        description: ""
-    });
-});
-app.get("/advances", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("system/salary-advance", {
-        title: "تحويلات كاش",
-        description: ""
-    });
-});
-app.get("/settings", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
-    res.render("settings/settings", {
-        title: "تحويلات كاش",
-        description: ""
-    });
-});
-
-
 
 
 app.listen(PORT, () => {
