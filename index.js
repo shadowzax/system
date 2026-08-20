@@ -258,7 +258,7 @@ app.get("/admin/resturant/2", (req, res) => {
     res.render("../admin/1-ebnhamido", {
         title: "مطاعم نعمه",
         description: "",
-        activePage: "restaurant",
+        activePage: "neama-restaurant",
         restaurant: {
             id: 1,
             name: "مطاعم نعمه",
@@ -305,7 +305,7 @@ app.get("/admin/reports/2", async (req, res) => {
         title: "تقارير مطاعم نعمه",
         description: "",
         reports,
-        activePage: "reports",
+        activePage: "neama-reports",
 
         restaurant: {
             id: 2,
