@@ -261,7 +261,7 @@ app.get("/admin/resturant/2", (req, res) => {
         activePage: "restaurant",
         restaurant: {
             id: 1,
-            name: "ابن حميدو السلام",
+            name: "مطاعم نعمه",
             section: "السلام",
             logo: "/logos/2.png"
         }
