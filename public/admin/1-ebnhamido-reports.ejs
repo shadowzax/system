@@ -605,13 +605,6 @@
             });
         });
 
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) {
-                window.location.href = '/';
-            }
-        });
 
         const successModal = document.getElementById('successModal');
         const closeSuccessModal = document.getElementById('closeSuccessModal');
