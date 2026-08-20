@@ -244,7 +244,7 @@
     <script>
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
         (function() {
-            const RESTAURANT_ID = "1";
+            const RESTAURANT_ID = "id_ibn_hamido";
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const Swal = window.Swal;
 
@@ -963,12 +963,12 @@
                     const netSalary = daysSalary - totalLoans;
                     const deductedDays = daysInMonth - attendanceDays;
                     const totalDeductions = deductedDays * dayRate;
-                    row += '<td class="emp-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(attendanceDays) + '</td>';
-                    row += '<td class="emp-cell" style="color:#0d99ff;font-weight:700;">' + formatNumber(daysSalary) + '</td>';
-                    row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
-                    row += '<td class="emp-cell" style="color:var(--color-muted);font-weight:600;">' + formatNumber(dayRate) + '</td>';
-                    row += '<td class="emp-cell" style="color:#10b981;font-weight:700;">' + formatNumber(netSalary) + '</td>';
-                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(attendanceDays) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:#0d99ff;font-weight:700;">' + formatNumber(daysSalary) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:var(--color-muted);font-weight:600;">' + formatNumber(dayRate) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:#10b981;font-weight:700;">' + formatNumber(netSalary) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
                     row += '</tr>';
                     sharedTableBody.innerHTML += row;
                 });
@@ -1018,20 +1018,20 @@
                 rows.forEach(row => {
                     const rowEmpId = row.querySelector('.day-input')?.getAttribute('data-eid');
                     if (rowEmpId === empId) {
-                        const cells = row.querySelectorAll('td.emp-cell');
-                        if (cells.length >= 6) {
-                            cells[0].textContent = formatNumber(attendanceDays);
-                            cells[0].style.color = 'var(--color-primary)';
-                            cells[1].textContent = formatNumber(daysSalary);
-                            cells[1].style.color = '#0d99ff';
-                            cells[2].textContent = formatNumber(totalLoans);
-                            cells[2].style.color = '#ef4444';
-                            cells[3].textContent = formatNumber(dayRate);
-                            cells[3].style.color = 'var(--color-muted)';
-                            cells[4].textContent = formatNumber(netSalary);
-                            cells[4].style.color = '#10b981';
-                            cells[5].textContent = formatNumber(totalDeductions);
-                            cells[5].style.color = '#f59e0b';
+                        const summaryCells = row.querySelectorAll('td.emp-cell.summary-cell');
+                        if (summaryCells.length === 6) {
+                            summaryCells[0].textContent = formatNumber(attendanceDays);
+                            summaryCells[0].style.color = 'var(--color-primary)';
+                            summaryCells[1].textContent = formatNumber(daysSalary);
+                            summaryCells[1].style.color = '#0d99ff';
+                            summaryCells[2].textContent = formatNumber(totalLoans);
+                            summaryCells[2].style.color = '#ef4444';
+                            summaryCells[3].textContent = formatNumber(dayRate);
+                            summaryCells[3].style.color = 'var(--color-muted)';
+                            summaryCells[4].textContent = formatNumber(netSalary);
+                            summaryCells[4].style.color = '#10b981';
+                            summaryCells[5].textContent = formatNumber(totalDeductions);
+                            summaryCells[5].style.color = '#f59e0b';
                         }
                     }
                 });
@@ -1167,7 +1167,7 @@
                         else if (hasVal && numVal === 0) cls = ' has-value-zero';
                         row += '<td><input type="text" class="day-input' + cls + '" id="advance-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + advanceVal + '" inputmode="decimal" placeholder="0"></td>';
                     }
-                    row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
+                    row += '<td class="emp-cell summary-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
                     row += '</tr>';
                     advancesTableBody.innerHTML += row;
                 });
@@ -1235,10 +1235,10 @@
                 rows.forEach(row => {
                     const rowEmpId = row.querySelector('.day-input')?.getAttribute('data-eid');
                     if (rowEmpId === empId) {
-                        const cells = row.querySelectorAll('td.emp-cell');
-                        if (cells.length >= 1) {
-                            cells[cells.length - 1].textContent = formatNumber(totalLoans);
-                            cells[cells.length - 1].style.color = '#ef4444';
+                        const summaryCell = row.querySelector('td.emp-cell.summary-cell');
+                        if (summaryCell) {
+                            summaryCell.textContent = formatNumber(totalLoans);
+                            summaryCell.style.color = '#ef4444';
                         }
                     }
                 });
@@ -1532,7 +1532,7 @@
                         const isDark = body.classList.contains('light') === false;
                         const newTheme = isDark ? 'light' : 'dark';
                         applyTheme(newTheme);
-                        localStorage.setItem('newTheme', newTheme);
+                        localStorage.setItem('theme', newTheme);
                     });
                 });
                 loadAppDataFromServer();
