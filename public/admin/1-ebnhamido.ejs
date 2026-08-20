@@ -55,7 +55,7 @@
     <a
         href="/admin/resturant/1"
         class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
-        data-restaurant-id="restaurant-1"
+        data-restaurant-id="1"
     >
         <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
         <span>ابن حميدو</span>
@@ -73,7 +73,7 @@
     <a
         href="/admin/resturant/2"
         class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>"
-        data-restaurant-id="restaurant-2"
+        data-restaurant-id="2"
     >
         <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
         <span>مطاعم نعمه</span>
@@ -102,7 +102,7 @@
 </nav>
 
 <script>
-    document.getElementById("logoutBtn").addEventListener("click", function (e) {
+    document.getElementById("adminSidebarLogoutBtn").addEventListener("click", function (e) {
         e.preventDefault();
 
         Swal.fire({
@@ -287,7 +287,7 @@
     <div id="printArea" style="display:none;"></div>
     <div class="bottom-mobile-nav" id="bottomMobileNav">
         <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item active" data-restaurant-id="id_ibn_hamido">
+        <a href="#" class="bottom-nav-item active" data-restaurant-id="1">
             <img src="https://i.ibb.co/fYds0Vcq/458109350-8047883141947002-8357149268094311983-n-removebg-preview.png" class="restaurant-logo" alt="logo">
             <span>ابن حميدو</span>
         </a>
@@ -581,11 +581,14 @@
             const sidebarRestaurantItems = document.querySelectorAll('.sidebar-item.restaurant-item');
             sidebarRestaurantItems.forEach(item => {
                 item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    sidebarRestaurantItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    selectRestaurant(this.getAttribute('data-restaurant-id'));
-                    if (window.innerWidth < 1025) closeSidebar();
+                    const rid = this.getAttribute('data-restaurant-id');
+                    if (rid === RESTAURANT_ID) {
+                        e.preventDefault();
+                        sidebarRestaurantItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        selectRestaurant(rid);
+                        if (window.innerWidth < 1025) closeSidebar();
+                    }
                 });
             });
 
@@ -1659,7 +1662,7 @@
                         const isDark = body.classList.contains('light') === false;
                         const newTheme = isDark ? 'light' : 'dark';
                         applyTheme(newTheme);
-                        localStorage.setItem('newTheme', newTheme);
+                        localStorage.setItem('theme', newTheme);
                     });
                 });
                 loadAppDataFromServer();
