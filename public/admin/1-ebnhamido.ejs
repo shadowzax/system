@@ -14,6 +14,55 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        .toast-message {
+            min-width: 220px;
+            max-width: 320px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            background: #1f2937;
+            color: #f9fafb;
+            font-family: 'Alexandria', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: toastIn 0.35s ease forwards;
+            pointer-events: auto;
+        }
+        .toast-message.success {
+            background: #065f46;
+            border-right: 4px solid #10b981;
+        }
+        .toast-message.error {
+            background: #7f1d1d;
+            border-right: 4px solid #ef4444;
+        }
+        .toast-message.hide {
+            animation: toastOut 0.4s ease forwards;
+        }
+        @keyframes toastIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -323,6 +372,8 @@
         </div>
     </div>
 
+    <div id="toastContainer"></div>
+
     <script>
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
         (function() {
@@ -376,6 +427,18 @@
                     throw new Error(data.message || 'حدث خطأ');
                 }
                 return data;
+            }
+
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast-message ' + type;
+                toast.innerHTML = '<i class="las ' + (type === 'success' ? 'la-check-circle' : 'la-exclamation-circle') + '"></i> ' + message;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
             }
 
             function deduplicateEmployees(employees) {
@@ -889,7 +952,7 @@
                     await updateEmployeeOnServer(currentRestaurantId, emp);
                     closeEmployeeFormModal();
                     renderEmployeesTable();
-                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم تحديث بيانات الموظف' });
+                    showToast('تم تحديث بيانات الموظف', 'success');
                 } catch (error) {
                     Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                 }
@@ -938,7 +1001,7 @@
                     }
                     closeAddEmployeeModal();
                     renderEmployeesTable();
-                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم إضافة الموظف بنجاح' });
+                    showToast('تم إضافة الموظف بنجاح', 'success');
                 } catch (error) {
                     Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                 }
@@ -982,7 +1045,7 @@
                             file2.employees = file2.employees.filter(e => e.id !== empId);
                         }
                         renderEmployeesTable();
-                        Swal.fire({ icon: 'success', title: 'تم', text: 'تم حذف الموظف' });
+                        showToast('تم حذف الموظف', 'success');
                     } catch (error) {
                         Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                     }
@@ -1189,7 +1252,7 @@
                 const day = parseInt(input.getAttribute('data-day'));
                 const rawVal = convertArabicNumerals(input.value).replace(/,/g, '').trim();
                 const amount = rawVal === '' ? 0 : parseFloat(rawVal);
-                if (isNaN(amount)) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'قيمة غير صحيحة' }); return; }
+                if (isNaN(amount)) { showToast('قيمة غير صحيحة', 'error'); return; }
                 try {
                     await sendSalaryToServer(fileId, employeeId, day, amount);
                     const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1202,8 +1265,9 @@
                         else emp.monthlyData[monthKey].days[day] = String(amount);
                     }
                     updateSalaryRowSummary(employeeId);
+                    showToast(amount === 0 ? 'تم حذف القيمة' : 'تم حفظ القيمة', 'success');
                 } catch (error) {
-                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                    showToast(error.message || 'حدث خطأ', 'error');
                     input.value = input.defaultValue || '';
                 }
             }
@@ -1397,7 +1461,7 @@
                 const day = parseInt(input.getAttribute('data-day'));
                 const rawVal = convertArabicNumerals(input.value).replace(/,/g, '').trim();
                 const amount = rawVal === '' ? 0 : parseFloat(rawVal);
-                if (isNaN(amount)) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'قيمة غير صحيحة' }); return; }
+                if (isNaN(amount)) { showToast('قيمة غير صحيحة', 'error'); return; }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
                 const file = getFileByRestaurantId(fileId);
                 const emp = file.employees.find(e => e.id === employeeId);
@@ -1411,8 +1475,9 @@
                     await sendAdvanceToServer(fileId, employeeId, day, amount);
                     updateAdvanceRowSummary(employeeId);
                     updateAdvancesTableFootSummary();
+                    showToast(amount === 0 ? 'تم حذف السلفة' : 'تم حفظ السلفة', 'success');
                 } catch (error) {
-                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                    showToast(error.message || 'حدث خطأ', 'error');
                 }
             }
 
