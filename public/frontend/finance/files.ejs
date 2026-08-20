@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -792,6 +793,7 @@
                                         <th>#</th>
                                         <th>الكود</th>
                                         <th>الاسم</th>
+                                        <th>الهاتف</th>
                                         <th>المهنة</th>
                                         <th>الراتب الشهري</th>
                                         <th>اليومية</th>
@@ -818,15 +820,15 @@
                         <label class="text-sm text-[var(--color-muted)] block mb-1">كود الموظف</label>
                         <div class="readonly-label" id="empCodeDisplay">---</div>
                     </div>
-                    <div class="mb-3" id="empNameReadonlyDiv">
-                        <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم</label>
-                        <div class="readonly-label" id="empNameDisplay">---</div>
-                    </div>
                 </div>
                 <div id="empEditableFields">
                     <div id="empNameInputWrap" class="mb-3">
                         <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم</label>
                         <input type="text" id="empNameInput" class="input-field" placeholder="أدخل اسم الموظف">
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-sm text-[var(--color-muted)] block mb-1">رقم الهاتف</label>
+                        <input type="text" id="empPhoneInput" class="input-field" placeholder="أدخل رقم الهاتف" inputmode="tel">
                     </div>
                     <div class="mb-3">
                         <label class="text-sm text-[var(--color-muted)] block mb-1">المهنة</label>
@@ -856,36 +858,35 @@
             </div>
         </div>
     </div>
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-content text-center">
-            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
-            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
-            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
-            <p id="successMessage" class="text-[var(--color-muted)]"></p>
-            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
-        </div>
-    </div>
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal-content text-center">
-            <button class="modal-close" id="closeConfirmModal"><i class="las la-times"></i></button>
-            <i class="las la-question-circle text-5xl text-warning mb-4"></i>
-            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تأكيد</h3>
-            <p id="confirmMessage" class="text-[var(--color-muted)]"></p>
+    <div class="modal-overlay" id="copyFileModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCopyFileModal"><i class="las la-times"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-[var(--color-white)] text-center">نسخ الملف</h3>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">اسم الملف الجديد</label>
+                <input type="text" id="copyFileNameInput" class="input-field" placeholder="أدخل اسم الملف الجديد">
+            </div>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">كلمة المرور</label>
+                <input type="password" id="copyFilePasswordInput" class="input-field" placeholder="أدخل كلمة المرور">
+            </div>
+            <input type="hidden" id="copyFileId">
             <div class="flex gap-3 mt-5 justify-center">
-                <button class="btn-primary btn-sm" id="confirmYesBtn" style="background:#ef4444;">نعم</button>
-                <button class="btn-outline btn-sm" id="confirmNoBtn">لا</button>
+                <button class="btn-primary btn-sm" id="saveCopyFileBtn"><i class="las la-copy"></i> نسخ</button>
+                <button class="btn-outline btn-sm" id="cancelCopyFileBtn"><i class="las la-times"></i> إلغاء</button>
             </div>
         </div>
     </div>
     <script>
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         (function() {
             var API_BASE = "<%= api %>" + '/api/admin/files';
             var appData = { files: [] };
             var currentFileId = null;
-            var confirmCallback = null;
+            var RESTAURANT_ID = "1";
             var sidebar = document.getElementById('dashboardSidebar');
             var headerAvatar = document.getElementById('headerAvatar');
 
@@ -935,7 +936,16 @@
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) window.location.href = '/';
+                    Swal.fire({
+                        title: 'تسجيل الخروج',
+                        text: 'هل أنت متأكد من تسجيل الخروج؟',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'نعم',
+                        cancelButtonText: 'لا'
+                    }).then(function(result) {
+                        if (result.isConfirmed) window.location.href = '/';
+                    });
                 });
             }
             var bottomNavItems = document.querySelectorAll('.bottom-nav-item');
@@ -962,49 +972,55 @@
                 var activeItem = document.querySelector('.bottom-nav-item.active');
                 if (activeItem) moveNotch(activeItem);
             });
-            var successModal = document.getElementById('successModal');
-            var successMessageEl = document.getElementById('successMessage');
 
-            function showSuccess(msg) {
-                successMessageEl.textContent = msg;
-                successModal.classList.add('active');
+            function showAlert(message, type) {
+                Swal.fire({
+                    icon: type || 'success',
+                    text: message,
+                    confirmButtonText: 'حسناً'
+                });
             }
 
-            function hideSuccess() {
-                successModal.classList.remove('active');
-            }
-            document.getElementById('closeSuccessModal').addEventListener('click', hideSuccess);
-            document.getElementById('okSuccessBtn').addEventListener('click', hideSuccess);
-            window.addEventListener('click', function(e) {
-                if (e.target === successModal) hideSuccess();
-            });
-            var confirmModal = document.getElementById('confirmModal');
-            var confirmMessageEl = document.getElementById('confirmMessage');
-
-            function showConfirm(msg, callback) {
-                confirmMessageEl.textContent = msg;
-                confirmCallback = callback;
-                confirmModal.classList.add('active');
+            function showConfirm(message, callback) {
+                Swal.fire({
+                    title: 'تأكيد',
+                    text: message,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'نعم',
+                    cancelButtonText: 'لا'
+                }).then(function(result) {
+                    if (result.isConfirmed) callback();
+                });
             }
 
-            function hideConfirm() {
-                confirmModal.classList.remove('active');
-                confirmCallback = null;
+            function showPasswordPrompt(message, callback) {
+                Swal.fire({
+                    title: 'أدخل كلمة المرور',
+                    text: message,
+                    input: 'password',
+                    inputPlaceholder: 'كلمة المرور',
+                    inputAttributes: {
+                        autocapitalize: 'off',
+                        autocorrect: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'تأكيد',
+                    cancelButtonText: 'إلغاء',
+                    preConfirm: function(password) {
+                        if (!password) {
+                            Swal.showValidationMessage('كلمة المرور مطلوبة');
+                        }
+                        return password;
+                    }
+                }).then(function(result) {
+                    if (result.isConfirmed) callback(result.value);
+                });
             }
-            document.getElementById('closeConfirmModal').addEventListener('click', hideConfirm);
-            document.getElementById('confirmNoBtn').addEventListener('click', hideConfirm);
-            document.getElementById('confirmYesBtn').addEventListener('click', function() {
-                if (confirmCallback) {
-                    confirmCallback();
-                    confirmCallback = null;
-                }
-                hideConfirm();
-            });
-            window.addEventListener('click', function(e) {
-                if (e.target === confirmModal) hideConfirm();
-            });
+
             var employeeFormModal = document.getElementById('employeeFormModal');
             var fileFormModal = document.getElementById('fileFormModal');
+            var copyFileModal = document.getElementById('copyFileModal');
             document.getElementById('closeEmployeeFormModal').addEventListener('click', function() {
                 employeeFormModal.classList.remove('active');
             });
@@ -1017,9 +1033,16 @@
             document.getElementById('cancelFileBtn').addEventListener('click', function() {
                 fileFormModal.classList.remove('active');
             });
+            document.getElementById('closeCopyFileModal').addEventListener('click', function() {
+                copyFileModal.classList.remove('active');
+            });
+            document.getElementById('cancelCopyFileBtn').addEventListener('click', function() {
+                copyFileModal.classList.remove('active');
+            });
             window.addEventListener('click', function(e) {
                 if (e.target === employeeFormModal) employeeFormModal.classList.remove('active');
                 if (e.target === fileFormModal) fileFormModal.classList.remove('active');
+                if (e.target === copyFileModal) copyFileModal.classList.remove('active');
             });
             var filesView = document.getElementById('filesView');
             var employeesView = document.getElementById('employeesView');
@@ -1050,7 +1073,8 @@
                         '</p><p class="text-xs text-[var(--color-muted)]">' + employeeCount +
                         ' موظف · أنشئ ' + new Date(file.createdAt).toLocaleDateString('ar-EG') +
                         '</p></div><div class="flex gap-2 flex-shrink-0"><button class="btn-outline btn-xs open-file-btn" data-id="' +
-                        file.id + '" title="فتح الملف"><i class="las la-folder-open"></i> فتح</button><button class="btn-outline btn-xs delete-file-btn" data-id="' +
+                        file.id + '" title="فتح الملف"><i class="las la-folder-open"></i> فتح</button><button class="btn-outline btn-xs copy-file-btn" data-id="' +
+                        file.id + '" title="نسخ الملف"><i class="las la-copy"></i></button><button class="btn-outline btn-xs delete-file-btn" data-id="' +
                         file.id + '" title="حذف الملف" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i></button></div>';
                     filesList.appendChild(div);
                 });
@@ -1059,12 +1083,19 @@
                         openFile(this.getAttribute('data-id'));
                     });
                 });
+                document.querySelectorAll('.copy-file-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var fid = this.getAttribute('data-id');
+                        openCopyModal(fid);
+                    });
+                });
                 document.querySelectorAll('.delete-file-btn').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         var fid = this.getAttribute('data-id');
-                        showConfirm('هل أنت متأكد من حذف هذا الملف وجميع موظفيه؟', function() {
-                            deleteFile(fid);
+                        showPasswordPrompt('هل أنت متأكد من حذف هذا الملف وجميع موظفيه؟', function(password) {
+                            deleteFile(fid, password);
                         });
                     });
                 });
@@ -1072,6 +1103,55 @@
             if (fileSearchInput) {
                 fileSearchInput.addEventListener('input', renderFilesList);
             }
+
+            function openCopyModal(fileId) {
+                document.getElementById('copyFileId').value = fileId;
+                document.getElementById('copyFileNameInput').value = '';
+                document.getElementById('copyFilePasswordInput').value = '';
+                copyFileModal.classList.add('active');
+            }
+
+            function saveCopyFile() {
+                var fileId = document.getElementById('copyFileId').value;
+                var newName = document.getElementById('copyFileNameInput').value.trim();
+                var password = document.getElementById('copyFilePasswordInput').value.trim();
+                if (!newName) {
+                    showAlert('يرجى إدخال اسم الملف الجديد.', 'warning');
+                    return;
+                }
+                if (!password) {
+                    showAlert('يرجى إدخال كلمة المرور.', 'warning');
+                    return;
+                }
+                fetch(API_BASE + '/copy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fileId: fileId,
+                        name: newName,
+                        restaurant_id: RESTAURANT_ID,
+                        password: password
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(result) {
+                    if (result.success && result.file) {
+                        if (result.file.restaurant_id === RESTAURANT_ID) {
+                            appData.files.push(result.file);
+                        }
+                        copyFileModal.classList.remove('active');
+                        renderFilesList();
+                        showAlert(result.message || 'تم نسخ الملف بنجاح.', 'success');
+                    } else {
+                        showAlert(result.message || 'فشل نسخ الملف', 'error');
+                    }
+                })
+                .catch(function(err) {
+                    showAlert('حدث خطأ: ' + err.message, 'error');
+                });
+            }
+
+            document.getElementById('saveCopyFileBtn').addEventListener('click', saveCopyFile);
 
             function openFile(fileId) {
                 currentFileId = fileId;
@@ -1092,11 +1172,11 @@
                 renderFilesList();
             }
 
-            function deleteFile(fileId) {
-                fetch(API_BASE + '/delete-file', {
-                    method: 'DELETE',
+            function deleteFile(fileId, password) {
+                fetch(API_BASE + '/delete-folder', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId: fileId })
+                    body: JSON.stringify({ folderId: fileId, password: password })
                 })
                 .then(function(res) { return res.json(); })
                 .then(function(result) {
@@ -1104,13 +1184,13 @@
                         appData.files = appData.files.filter(function(f) { return f.id !== fileId; });
                         if (currentFileId === fileId) closeFile();
                         renderFilesList();
-                        showSuccess(result.message || 'تم حذف الملف بنجاح.');
+                        showAlert(result.message || 'تم حذف الملف بنجاح.', 'success');
                     } else {
-                        showSuccess(result.message || 'فشل حذف الملف');
+                        showAlert(result.message || 'فشل حذف الملف', 'error');
                     }
                 })
                 .catch(function(err) {
-                    showSuccess('حدث خطأ: ' + err.message);
+                    showAlert('حدث خطأ: ' + err.message, 'error');
                 });
             }
 
@@ -1128,7 +1208,7 @@
                 var file = appData.files.find(function(f) { return f.id === currentFileId; });
                 if (!file || !file.employees || file.employees.length === 0) {
                     employeesTableBody.innerHTML =
-                        '<tr><td colspan="7" class="text-center py-8 text-[var(--color-muted)]"><i class="las la-users text-4xl block mb-2 opacity-30"></i>لا يوجد موظفين في هذا الملف</td></tr>';
+                        '<tr><td colspan="8" class="text-center py-8 text-[var(--color-muted)]"><i class="las la-users text-4xl block mb-2 opacity-30"></i>لا يوجد موظفين في هذا الملف</td></tr>';
                     return;
                 }
                 file.employees.forEach(function(emp, index) {
@@ -1140,7 +1220,8 @@
                         '<td>' + (index + 1) +
                         '</td><td><span class="emp-code">' + (emp.code || '---') +
                         '</span></td><td><div class="emp-name">' + (emp.name || '---') +
-                        '</div></td><td>' + (emp.profession || '---') +
+                        '</div></td><td>' + (emp.phone || '---') +
+                        '</td><td>' + (emp.profession || '---') +
                         '</td><td>' + monthly +
                         '</td><td><span class="daily-salary">' + dailyStr +
                         '</span></td><td><div class="emp-actions"><button class="btn-outline btn-xs edit-emp-btn" data-eid="' +
@@ -1156,8 +1237,8 @@
                 employeesTableBody.querySelectorAll('.delete-emp-btn').forEach(function(btn) {
                     btn.addEventListener('click', function() {
                         var eid = this.getAttribute('data-eid');
-                        showConfirm('هل أنت متأكد من حذف هذا الموظف؟', function() {
-                            deleteEmployee(eid);
+                        showPasswordPrompt('هل أنت متأكد من حذف هذا الموظف؟', function(password) {
+                            deleteEmployee(eid, password);
                         });
                     });
                 });
@@ -1184,26 +1265,26 @@
                 employeeSearchInput.addEventListener('input', applyEmployeeFilter);
             }
 
-            function deleteEmployee(employeeId) {
+            function deleteEmployee(employeeId, password) {
                 var fileId = currentFileId;
                 if (!fileId) return;
                 fetch(API_BASE + '/delete-employee', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId: fileId, employeeId: employeeId })
+                    body: JSON.stringify({ fileId: fileId, employeeId: employeeId, password: password })
                 })
                 .then(function(res) { return res.json(); })
                 .then(function(result) {
                     if (result.success && result.file) {
                         updateLocalFile(fileId, result.file);
                         renderEmployeesTable();
-                        showSuccess(result.message || 'تم حذف الموظف بنجاح.');
+                        showAlert(result.message || 'تم حذف الموظف بنجاح.', 'success');
                     } else {
-                        showSuccess(result.message || 'فشل حذف الموظف');
+                        showAlert(result.message || 'فشل حذف الموظف', 'error');
                     }
                 })
                 .catch(function(err) {
-                    showSuccess('حدث خطأ: ' + err.message);
+                    showAlert('حدث خطأ: ' + err.message, 'error');
                 });
             }
 
@@ -1215,16 +1296,14 @@
                 var editableWrap = document.getElementById('empEditableFields');
                 var nameInputWrap = document.getElementById('empNameInputWrap');
                 var nameInput = document.getElementById('empNameInput');
-                var nameReadonlyDiv = document.getElementById('empNameReadonlyDiv');
                 var codeDisplay = document.getElementById('empCodeDisplay');
-                var nameDisplay = document.getElementById('empNameDisplay');
                 var professionInput = document.getElementById('empProfessionInput');
                 var salaryInput = document.getElementById('empMonthlySalaryInput');
+                var phoneInput = document.getElementById('empPhoneInput');
                 editIdInput.value = editId || '';
                 if (editId) {
                     title.textContent = 'تعديل بيانات الموظف';
                     readonlyWrap.style.display = 'block';
-                    nameReadonlyDiv.style.display = 'none';
                     nameInputWrap.style.display = 'block';
                     var file = appData.files.find(function(f) { return f.id === currentFileId; });
                     if (file) {
@@ -1232,6 +1311,7 @@
                         if (emp) {
                             codeDisplay.textContent = emp.code || '---';
                             nameInput.value = emp.name || '';
+                            phoneInput.value = emp.phone || '';
                             professionInput.value = emp.profession || '';
                             salaryInput.value = emp.monthlySalary || '';
                         }
@@ -1241,6 +1321,7 @@
                     readonlyWrap.style.display = 'none';
                     nameInputWrap.style.display = 'block';
                     nameInput.value = '';
+                    phoneInput.value = '';
                     professionInput.value = '';
                     salaryInput.value = '';
                 }
@@ -1252,19 +1333,21 @@
                 var nameInput = document.getElementById('empNameInput');
                 var professionInput = document.getElementById('empProfessionInput');
                 var salaryInput = document.getElementById('empMonthlySalaryInput');
+                var phoneInput = document.getElementById('empPhoneInput');
                 var fileId = currentFileId;
                 if (!fileId) return;
 
                 if (editId) {
                     var employeeName = nameInput.value.trim();
                     if (!employeeName) {
-                        showSuccess('يرجى إدخال اسم الموظف.');
+                        showAlert('يرجى إدخال اسم الموظف.', 'warning');
                         return;
                     }
                     var payload = {
                         fileId: fileId,
                         employeeId: editId,
                         name: employeeName,
+                        phone: phoneInput.value.trim(),
                         profession: professionInput.value.trim(),
                         monthlySalary: salaryInput.value.trim()
                     };
@@ -1279,23 +1362,24 @@
                             updateLocalFile(fileId, result.file);
                             document.getElementById('employeeFormModal').classList.remove('active');
                             renderEmployeesTable();
-                            showSuccess(result.message || 'تم تحديث بيانات الموظف بنجاح.');
+                            showAlert(result.message || 'تم تحديث بيانات الموظف بنجاح.', 'success');
                         } else {
-                            showSuccess(result.message || 'فشل تحديث الموظف');
+                            showAlert(result.message || 'فشل تحديث الموظف', 'error');
                         }
                     })
                     .catch(function(err) {
-                        showSuccess('حدث خطأ: ' + err.message);
+                        showAlert('حدث خطأ: ' + err.message, 'error');
                     });
                 } else {
                     var name = nameInput.value.trim();
                     if (!name) {
-                        showSuccess('يرجى إدخال اسم الموظف.');
+                        showAlert('يرجى إدخال اسم الموظف.', 'warning');
                         return;
                     }
                     var payload = {
                         fileId: fileId,
                         name: name,
+                        phone: phoneInput.value.trim(),
                         profession: professionInput.value.trim(),
                         monthlySalary: salaryInput.value.trim()
                     };
@@ -1310,13 +1394,13 @@
                             updateLocalFile(fileId, result.file);
                             document.getElementById('employeeFormModal').classList.remove('active');
                             renderEmployeesTable();
-                            showSuccess(result.message || 'تم إضافة الموظف بنجاح.');
+                            showAlert(result.message || 'تم إضافة الموظف بنجاح.', 'success');
                         } else {
-                            showSuccess(result.message || 'فشل إضافة الموظف');
+                            showAlert(result.message || 'فشل إضافة الموظف', 'error');
                         }
                     })
                     .catch(function(err) {
-                        showSuccess('حدث خطأ: ' + err.message);
+                        showAlert('حدث خطأ: ' + err.message, 'error');
                     });
                 }
             }
@@ -1328,27 +1412,29 @@
             document.getElementById('saveFileBtn').addEventListener('click', function() {
                 var name = document.getElementById('fileNameInput').value.trim();
                 if (!name) {
-                    showSuccess('يرجى إدخال اسم الملف.');
+                    showAlert('يرجى إدخال اسم الملف.', 'warning');
                     return;
                 }
                 fetch(API_BASE + '/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name })
+                    body: JSON.stringify({ name: name, restaurant_id: RESTAURANT_ID })
                 })
                 .then(function(res) { return res.json(); })
                 .then(function(result) {
                     if (result.success && result.file) {
-                        appData.files.push(result.file);
+                        if (result.file.restaurant_id === RESTAURANT_ID) {
+                            appData.files.push(result.file);
+                        }
                         fileFormModal.classList.remove('active');
                         renderFilesList();
-                        showSuccess(result.message || 'تم إنشاء الملف بنجاح.');
+                        showAlert(result.message || 'تم إنشاء الملف بنجاح.', 'success');
                     } else {
-                        showSuccess(result.message || 'فشل إنشاء الملف');
+                        showAlert(result.message || 'فشل إنشاء الملف', 'error');
                     }
                 })
                 .catch(function(err) {
-                    showSuccess('حدث خطأ: ' + err.message);
+                    showAlert('حدث خطأ: ' + err.message, 'error');
                 });
             });
             document.getElementById('backToFilesBtn').addEventListener('click', closeFile);
@@ -1360,13 +1446,17 @@
             function loadInitialData() {
                 var serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.success && Array.isArray(serverData.files)) {
-                    appData.files = serverData.files;
+                    appData.files = serverData.files.filter(function(file) {
+                        return file.restaurant_id === RESTAURANT_ID;
+                    });
                     renderFilesList();
                 } else if (serverData && Array.isArray(serverData)) {
-                    appData.files = serverData;
+                    appData.files = serverData.filter(function(file) {
+                        return file.restaurant_id === RESTAURANT_ID;
+                    });
                     renderFilesList();
                 } else {
-                    showSuccess('فشل تحميل الملفات');
+                    showAlert('فشل تحميل الملفات', 'error');
                 }
             }
 
