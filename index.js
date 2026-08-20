@@ -191,7 +191,7 @@ app.get("/admin/resturant/1", (req, res) => {
         return res.redirect("/login");
     }
 
-    res.render("admin/1-ebnhamido", {
+    res.render("../admin/1-ebnhamido", {
         title: "ابن حميدو السلام",
         description: ""
     });
