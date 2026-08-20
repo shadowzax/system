@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="/css/admin.css">
     <script>
         tailwind.config = {
@@ -80,7 +81,8 @@
                             <i class="fas fa-moon icon moon-icon"></i>
                         </div>
                     </button>
-                    <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">            </header>
+                    <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
+            </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon">
@@ -89,7 +91,7 @@
                     <h1>ابن حميدو السلام</h1>
                     <div class="restaurant-meta">
                         <span>القسم: السلام</span>
-                        <span>ID: id_ibn_hamido</span>
+                        <span>ID: 1</span>
                     </div>
                 </div>
 
@@ -129,6 +131,7 @@
                                 <button class="btn-outline btn-sm" id="backToFoldersBtn"><i class="las la-arrow-right"></i> رجوع</button>
                                 <h3 class="text-lg font-bold text-[var(--color-white)]" id="currentFolderName"></h3>
                             </div>
+                            <button class="btn-primary btn-sm" id="addEmployeeBtn"><i class="las la-user-plus"></i> إضافة موظف</button>
                         </div>
                         <div class="mb-4">
                             <div class="relative">
@@ -143,6 +146,7 @@
                                         <th>#</th>
                                         <th>الكود</th>
                                         <th>الاسم</th>
+                                        <th>رقم الهاتف</th>
                                         <th>المهنة</th>
                                         <th>الراتب الشهري</th>
                                         <th>اليومية</th>
@@ -222,38 +226,14 @@
             <span>ابن حميدو</span>
         </a>
     </div>
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-content text-center">
-            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
-            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
-            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
-            <p id="successMessage" class="text-[var(--color-muted)]"></p>
-            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
-        </div>
-    </div>
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal-content text-center">
-            <button class="modal-close" id="closeConfirmModal"><i class="las la-times"></i></button>
-            <i class="las la-question-circle text-5xl text-warning mb-4"></i>
-            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تأكيد</h3>
-            <p id="confirmMessage" class="text-[var(--color-muted)]"></p>
-            <div id="confirmPasswordWrap" style="display:none;" class="mt-3">
-                <label class="text-sm text-[var(--color-muted)] block mb-1">كلمة المرور</label>
-                <input type="password" id="confirmPasswordInput" class="input-field" placeholder="أدخل كلمة المرور">
-            </div>
-            <div class="flex gap-3 mt-5 justify-center">
-                <button class="btn-primary btn-sm" id="confirmYesBtn" style="background:#ef4444;">نعم</button>
-                <button class="btn-outline btn-sm" id="confirmNoBtn">لا</button>
-            </div>
-        </div>
-    </div>
     <div class="modal-overlay" id="copyFolderModal">
         <div class="modal-content">
             <button class="modal-close" id="closeCopyFolderModal"><i class="las la-times"></i></button>
             <i class="las la-copy text-4xl text-primary mb-3"></i>
             <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">نسخ الملف</h3>
-            <p class="text-sm text-[var(--color-muted)] mb-4">أدخل اسم الملف الجديد</p>
+            <p class="text-sm text-[var(--color-muted)] mb-4">أدخل اسم الملف الجديد وكلمة المرور</p>
             <input type="text" id="copyFolderNameInput" class="input-field mb-4" placeholder="اسم الملف الجديد">
+            <input type="password" id="copyFolderPasswordInput" class="input-field mb-4" placeholder="كلمة المرور">
             <div class="flex gap-3 justify-end">
                 <button class="btn-outline btn-sm" id="cancelCopyFolderBtn">إلغاء</button>
                 <button class="btn-primary btn-sm" id="confirmCopyFolderBtn">نسخ</button>
@@ -265,16 +245,18 @@
             <button class="modal-close" id="closeEmployeeFormModal"><i class="las la-times"></i></button>
             <h3 class="text-xl font-bold mb-4 text-[var(--color-white)] text-center" id="employeeFormTitle">تعديل بيانات الموظف</h3>
             <div id="employeeFormFields">
-                <div id="empReadonlyFields">
-                    <div class="mb-3">
-                        <label class="text-sm text-[var(--color-muted)] block mb-1">كود الموظف</label>
-                        <div class="readonly-label" id="empCodeDisplay">002</div>
-                    </div>
-                </div>
                 <div id="empEditableFields">
+                    <div class="mb-3">
+                        <label class="text-sm text-[var(--color-muted)] block mb-1">الكود</label>
+                        <input type="text" id="empCodeInput" class="input-field" placeholder="أدخل الكود">
+                    </div>
                     <div class="mb-3">
                         <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم</label>
                         <input type="text" id="empNameInput" class="input-field" placeholder="أدخل اسم الموظف">
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-sm text-[var(--color-muted)] block mb-1">رقم الهاتف</label>
+                        <input type="text" id="empPhoneInput" class="input-field" placeholder="أدخل رقم الهاتف">
                     </div>
                     <div class="mb-3">
                         <label class="text-sm text-[var(--color-muted)] block mb-1">المهنة</label>
@@ -293,17 +275,50 @@
             </div>
         </div>
     </div>
-    <div id="toast" class="toast"></div>
+    <div class="modal-overlay" id="addEmployeeModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close" id="closeAddEmployeeModal"><i class="las la-times"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-[var(--color-white)] text-center">إضافة موظف جديد</h3>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم</label>
+                <input type="text" id="addEmpNameInput" class="input-field" placeholder="أدخل اسم الموظف">
+            </div>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">رقم الهاتف</label>
+                <input type="text" id="addEmpPhoneInput" class="input-field" placeholder="أدخل رقم الهاتف">
+            </div>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">المهنة</label>
+                <input type="text" id="addEmpProfessionInput" class="input-field" placeholder="أدخل المهنة">
+            </div>
+            <div class="mb-3">
+                <label class="text-sm text-[var(--color-muted)] block mb-1">الراتب الشهري (ج.م)</label>
+                <input type="text" id="addEmpMonthlySalaryInput" class="input-field" placeholder="أدخل الراتب الشهري" inputmode="decimal">
+            </div>
+            <div class="flex gap-3 mt-5 justify-center">
+                <button class="btn-primary btn-sm" id="saveAddEmployeeBtn"><i class="las la-save"></i> حفظ</button>
+                <button class="btn-outline btn-sm" id="cancelAddEmployeeBtn"><i class="las la-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
         (function() {
+            const RESTAURANT_ID = "1";
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
+            const Swal = window.Swal;
+
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, m => arabicToEnglishMap[m] || m); }
+
             function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
+
             function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
+
             function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8); }
+
             function getCurrentMonthKey() { const now = new Date(); return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'); }
+
             function getFolderMonthKey(fileId) {
                 const file = appData.files.find(f => f.id === fileId);
                 if (file && file.createdAt) {
@@ -314,7 +329,9 @@
                 }
                 return getCurrentMonthKey();
             }
+
             function getDaysInMonth(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); return new Date(year, month, 0).getDate(); }
+
             function formatMonthDisplay(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']; return monthNames[month - 1] + ' ' + year; }
 
             const API_BASE = '<%= api %>' + '/api/admin';
@@ -322,13 +339,7 @@
             let appData = { files: [] };
             let currentRestaurantId = null;
             let currentViewMode = 'files';
-            let confirmCallback = null;
             let pendingCopyFolderId = null;
-            let pendingDeleteEmployee = null;
-
-            const restaurantIds = {
-                'id_ibn_hamido': 'ابن حميدو'
-            };
 
             async function apiRequest(path, method = 'GET', body = null) {
                 const headers = { 'Content-Type': 'application/json' };
@@ -358,7 +369,6 @@
                 if (!employee) return;
                 if (!employee.monthlyData) employee.monthlyData = {};
                 if (!employee.monthlyAdvances) employee.monthlyAdvances = {};
-
                 let monthKey;
                 if (fileCreatedAt) {
                     const d = new Date(fileCreatedAt);
@@ -367,7 +377,6 @@
                     }
                 }
                 if (!monthKey) monthKey = getCurrentMonthKey();
-
                 if (Array.isArray(employee.salaryRecords) && employee.salaryRecords.length > 0) {
                     employee.salaryRecords.forEach(rec => {
                         if (rec.days && typeof rec.days === 'object') {
@@ -384,7 +393,6 @@
                     });
                     delete employee.salaryRecords;
                 }
-
                 if (Array.isArray(employee.advances) && employee.advances.length > 0) {
                     employee.advances.forEach(adv => {
                         if (adv.days && typeof adv.days === 'object') {
@@ -412,15 +420,27 @@
             }
 
             async function updateEmployeeOnServer(fileId, employee) {
-                return await apiRequest('/files/update-employee', 'PUT', { fileId, employeeId: employee.id, name: employee.name, profession: employee.profession, monthlySalary: employee.monthlySalary, code: employee.code });
+                return await apiRequest('/files/update-employee', 'PUT', {
+                    fileId,
+                    employeeId: employee.id,
+                    name: employee.name,
+                    phone: employee.phone || '',
+                    profession: employee.profession,
+                    monthlySalary: employee.monthlySalary,
+                    code: employee.code
+                });
             }
 
             async function deleteEmployeeOnServer(fileId, employeeId, password) {
                 return await apiRequest('/files/delete-employee', 'DELETE', { fileId, employeeId, password });
             }
 
-            async function copyFolderOnServer(fileId, newName) {
-                return await apiRequest('/files/copy', 'POST', { fileId, newName });
+            async function addEmployeeOnServer(fileId, name, phone, profession, monthlySalary) {
+                return await apiRequest('/files/add-employee', 'POST', { fileId, name, phone, profession, monthlySalary });
+            }
+
+            async function copyFolderOnServer(fileId, newName, password, restaurantId) {
+                return await apiRequest('/files/copy', 'POST', { fileId, name: newName, password, restaurant_id: restaurantId });
             }
 
             async function deleteFolderOnServer(fileId, password) {
@@ -447,15 +467,15 @@
                 }
             }
 
-            function getEmployeeTotalDays(fileId, employeeId, monthKey) {
+            function getEmployeeAttendanceDays(fileId, employeeId, monthKey) {
                 const dayData = getEmployeeDayData(fileId, employeeId, monthKey, 'salary');
-                let totalDays = 0;
+                let count = 0;
                 if (dayData.days) {
                     for (const day in dayData.days) {
-                        totalDays += parseNumber(dayData.days[day] || 0);
+                        if (parseNumber(dayData.days[day]) > 0) count++;
                     }
                 }
-                return totalDays;
+                return count;
             }
 
             function getEmployeeTotalLoans(employee) {
@@ -475,6 +495,7 @@
 
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
+
             function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
             function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
@@ -482,9 +503,10 @@
             if (headerAvatar) { headerAvatar.addEventListener('click', function(e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
             document.addEventListener('click', function(e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
             const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); if (confirm('هل أنت متأكد من تسجيل الخروج؟')) window.location.href = '/'; }); }
+            if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); Swal.fire({ title: 'تأكيد', text: 'هل أنت متأكد من تسجيل الخروج؟', icon: 'question', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'لا', confirmButtonColor: '#ef4444' }).then((res) => { if (res.isConfirmed) window.location.href = '/'; }); }); }
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
             const navNotch = document.getElementById('navNotch');
+
             function moveNotch(activeItem) { if (!navNotch || !activeItem) return; const rect = activeItem.getBoundingClientRect(); const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect(); const centerX = rect.left + rect.width / 2 - navRect.left; navNotch.style.left = centerX + 'px'; }
             bottomNavItems.forEach(item => { item.addEventListener('click', function(e) { e.preventDefault(); bottomNavItems.forEach(i => i.classList.remove('active')); this.classList.add('active'); moveNotch(this); selectRestaurant(this.getAttribute('data-restaurant-id')); }); });
             const initialActiveBottom = document.querySelector('.bottom-nav-item.active');
@@ -526,6 +548,15 @@
             const currentFolderName = document.getElementById('currentFolderName');
             const salariesMonthBadge = document.getElementById('salariesMonthBadge');
             const advancesMonthBadge = document.getElementById('advancesMonthBadge');
+            const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+            const addEmployeeModal = document.getElementById('addEmployeeModal');
+            const closeAddEmployeeModalBtn = document.getElementById('closeAddEmployeeModal');
+            const cancelAddEmployeeBtn = document.getElementById('cancelAddEmployeeBtn');
+            const saveAddEmployeeBtn = document.getElementById('saveAddEmployeeBtn');
+            const addEmpNameInput = document.getElementById('addEmpNameInput');
+            const addEmpPhoneInput = document.getElementById('addEmpPhoneInput');
+            const addEmpProfessionInput = document.getElementById('addEmpProfessionInput');
+            const addEmpMonthlySalaryInput = document.getElementById('addEmpMonthlySalaryInput');
 
             function renderFoldersList() {
                 const query = folderSearchInput ? folderSearchInput.value.toLowerCase().trim() : '';
@@ -568,29 +599,35 @@
 
             function copyFolder(folderId) {
                 const sourceFile = appData.files.find(f => f.id === folderId);
-                if (!sourceFile) { showToast('الملف غير موجود', 'error'); return; }
+                if (!sourceFile) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 pendingCopyFolderId = folderId;
                 document.getElementById('copyFolderNameInput').value = sourceFile.name + ' (نسخة)';
+                document.getElementById('copyFolderPasswordInput').value = '';
                 document.getElementById('copyFolderModal').classList.add('active');
             }
 
             async function performCopyFolder() {
                 const folderId = pendingCopyFolderId;
                 if (!folderId) return;
+                const sourceFile = appData.files.find(f => f.id === folderId);
+                if (!sourceFile) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 const newName = document.getElementById('copyFolderNameInput').value.trim();
-                if (!newName) { showToast('يرجى إدخال اسم', 'error'); return; }
+                const password = document.getElementById('copyFolderPasswordInput').value.trim();
+                if (!newName) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'يرجى إدخال اسم الملف الجديد' }); return; }
+                if (!password) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'كلمة المرور مطلوبة' }); return; }
                 try {
-                    const result = await copyFolderOnServer(folderId, newName);
+                    const restaurantId = sourceFile.restaurant_id || sourceFile.id;
+                    const result = await copyFolderOnServer(folderId, newName, password, restaurantId);
                     if (result.file) {
-                        appData.files.push(result.file);
+                        if (result.file.restaurant_id === RESTAURANT_ID) appData.files.push(result.file);
                     } else {
                         await loadAppDataFromServer();
                     }
                     hideCopyFolderModal();
                     renderFoldersList();
-                    showToast('تم نسخ الملف بنجاح');
+                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم نسخ الملف بنجاح' });
                 } catch (error) {
-                    showToast('خطأ: ' + error.message, 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                     hideCopyFolderModal();
                 }
             }
@@ -598,6 +635,7 @@
             function hideCopyFolderModal() {
                 document.getElementById('copyFolderModal').classList.remove('active');
                 pendingCopyFolderId = null;
+                document.getElementById('copyFolderPasswordInput').value = '';
             }
 
             document.getElementById('closeCopyFolderModal').addEventListener('click', hideCopyFolderModal);
@@ -607,31 +645,32 @@
 
             async function deleteFolder(folderId) {
                 const fileIndex = appData.files.findIndex(f => f.id === folderId);
-                if (fileIndex === -1) { showToast('الملف غير موجود', 'error'); return; }
-                document.getElementById('confirmPasswordWrap').style.display = 'block';
-                document.getElementById('confirmPasswordInput').value = '';
-                showConfirm('هل أنت متأكد من حذف هذا الملف؟ سيتم حذف جميع الموظفين والبيانات المرتبطة به.', async function() {
-                    const password = document.getElementById('confirmPasswordInput').value.trim();
-                    if (!password) {
-                        showToast('كلمة المرور مطلوبة', 'error');
-                        return false;
-                    }
-                    try {
-                        await deleteFolderOnServer(folderId, password);
-                        appData.files.splice(fileIndex, 1);
-                        if (currentRestaurantId === folderId) {
-                            currentRestaurantId = null;
-                            foldersContainer.style.display = 'block';
-                            employeesTableContainer.style.display = 'none';
-                        }
-                        renderFoldersList();
-                        showToast('تم حذف الملف بنجاح');
-                        return true;
-                    } catch (error) {
-                        showToast('خطأ: ' + error.message, 'error');
-                        return false;
-                    }
+                if (fileIndex === -1) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
+                const { value: password } = await Swal.fire({
+                    title: 'تأكيد حذف الملف',
+                    text: 'هل أنت متأكد من حذف هذا الملف؟ سيتم حذف جميع الموظفين والبيانات المرتبطة به.',
+                    icon: 'warning',
+                    input: 'password',
+                    inputPlaceholder: 'أدخل كلمة المرور',
+                    showCancelButton: true,
+                    confirmButtonText: 'حذف',
+                    cancelButtonText: 'إلغاء',
+                    confirmButtonColor: '#ef4444'
                 });
+                if (!password) return;
+                try {
+                    await deleteFolderOnServer(folderId, password);
+                    appData.files.splice(fileIndex, 1);
+                    if (currentRestaurantId === folderId) {
+                        currentRestaurantId = null;
+                        foldersContainer.style.display = 'block';
+                        employeesTableContainer.style.display = 'none';
+                    }
+                    renderFoldersList();
+                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم حذف الملف بنجاح' });
+                } catch (error) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                }
             }
 
             if (folderSearchInput) {
@@ -738,17 +777,17 @@
             function renderEmployeesTable() {
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file || !file.employees) {
-                    employeesTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-[var(--color-muted)]">لا يوجد موظفين</td></tr>';
+                    employeesTableBody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-[var(--color-muted)]">لا يوجد موظفين</td></tr>';
                     return;
                 }
                 const query = employeeSearchInput ? employeeSearchInput.value.toLowerCase().trim() : '';
                 const filtered = file.employees.filter(emp => {
-                    const searchText = (emp.name || '') + ' ' + (emp.code || '') + ' ' + (emp.profession || '');
+                    const searchText = (emp.name || '') + ' ' + (emp.code || '') + ' ' + (emp.profession || '') + ' ' + (emp.phone || '');
                     return searchText.toLowerCase().includes(query);
                 });
                 employeesTableBody.innerHTML = '';
                 if (filtered.length === 0) {
-                    employeesTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-[var(--color-muted)]">لا توجد نتائج</td></tr>';
+                    employeesTableBody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-[var(--color-muted)]">لا توجد نتائج</td></tr>';
                     return;
                 }
                 let counter = 1;
@@ -760,6 +799,7 @@
                         <td>${counter++}</td>
                         <td>${emp.code || '---'}</td>
                         <td>${emp.name || 'بدون اسم'}</td>
+                        <td>${emp.phone || '---'}</td>
                         <td>${emp.profession || '---'}</td>
                         <td>${formatNumber(monthlySalary)}</td>
                         <td>${formatNumber(dailyRate)}</td>
@@ -772,7 +812,6 @@
                     `;
                     employeesTableBody.appendChild(tr);
                 });
-
                 document.querySelectorAll('.edit-emp-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const empId = this.getAttribute('data-eid');
@@ -782,7 +821,6 @@
                         }
                     });
                 });
-
                 document.querySelectorAll('.delete-emp-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const empId = this.getAttribute('data-eid');
@@ -796,8 +834,9 @@
 
             function openEmployeeFormModal(emp) {
                 document.getElementById('empEditId').value = emp.id;
-                document.getElementById('empCodeDisplay').textContent = emp.code || '---';
+                document.getElementById('empCodeInput').value = emp.code || '';
                 document.getElementById('empNameInput').value = emp.name || '';
+                document.getElementById('empPhoneInput').value = emp.phone || '';
                 document.getElementById('empProfessionInput').value = emp.profession || '';
                 document.getElementById('empMonthlySalaryInput').value = emp.monthlySalary || '';
                 document.getElementById('employeeFormModal').classList.add('active');
@@ -817,24 +856,86 @@
                 if (!file) return;
                 const emp = file.employees.find(e => e.id === empId);
                 if (!emp) return;
+                const code = document.getElementById('empCodeInput').value.trim();
                 const name = document.getElementById('empNameInput').value.trim();
+                const phone = document.getElementById('empPhoneInput').value.trim();
                 const profession = document.getElementById('empProfessionInput').value.trim();
                 const salary = document.getElementById('empMonthlySalaryInput').value.trim();
-                if (!name || !profession || !salary) {
-                    showToast('جميع الحقول مطلوبة', 'error');
+                if (!code || !name || !profession || !salary) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'جميع الحقول المطلوبة مطلوبة' });
                     return;
                 }
+                emp.code = code;
                 emp.name = name;
+                emp.phone = phone;
                 emp.profession = profession;
                 emp.monthlySalary = salary;
                 try {
                     await updateEmployeeOnServer(currentRestaurantId, emp);
                     closeEmployeeFormModal();
                     renderEmployeesTable();
-                    showToast('تم تحديث بيانات الموظف');
+                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم تحديث بيانات الموظف' });
                 } catch (error) {
-                    showToast('خطأ: ' + error.message, 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                 }
+            });
+
+            document.querySelectorAll('#employeeFormModal input').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('saveEmployeeBtn').click();
+                    }
+                });
+            });
+
+            function openAddEmployeeModal() {
+                addEmpNameInput.value = '';
+                addEmpPhoneInput.value = '';
+                addEmpProfessionInput.value = '';
+                addEmpMonthlySalaryInput.value = '';
+                addEmployeeModal.classList.add('active');
+            }
+
+            function closeAddEmployeeModal() {
+                addEmployeeModal.classList.remove('active');
+            }
+
+            addEmployeeBtn.addEventListener('click', openAddEmployeeModal);
+            closeAddEmployeeModalBtn.addEventListener('click', closeAddEmployeeModal);
+            cancelAddEmployeeBtn.addEventListener('click', closeAddEmployeeModal);
+            window.addEventListener('click', (e) => { if (e.target === addEmployeeModal) closeAddEmployeeModal(); });
+
+            saveAddEmployeeBtn.addEventListener('click', async function() {
+                const name = addEmpNameInput.value.trim();
+                const phone = addEmpPhoneInput.value.trim();
+                const profession = addEmpProfessionInput.value.trim();
+                const monthlySalary = addEmpMonthlySalaryInput.value.trim();
+                if (!name || !profession || !monthlySalary) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'الاسم والمهنة والراتب الشهري مطلوبة' });
+                    return;
+                }
+                try {
+                    const result = await addEmployeeOnServer(currentRestaurantId, name, phone, profession, monthlySalary);
+                    const file = getFileByRestaurantId(currentRestaurantId);
+                    if (file && result.employee) {
+                        file.employees.push(result.employee);
+                    }
+                    closeAddEmployeeModal();
+                    renderEmployeesTable();
+                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم إضافة الموظف بنجاح' });
+                } catch (error) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                }
+            });
+
+            document.querySelectorAll('#addEmployeeModal input').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('saveAddEmployeeBtn').click();
+                    }
+                });
             });
 
             function deleteEmployee(fileId, empId) {
@@ -842,63 +943,36 @@
                 if (!file) return;
                 const emp = file.employees.find(e => e.id === empId);
                 if (!emp) return;
-                pendingDeleteEmployee = { fileId, empId };
-                document.getElementById('confirmPasswordWrap').style.display = 'block';
-                document.getElementById('confirmPasswordInput').value = '';
-                showConfirm('هل أنت متأكد من حذف الموظف "' + (emp.name || '---') + '"؟', confirmDeleteEmployee);
-            }
-
-            async function confirmDeleteEmployee() {
-                if (!pendingDeleteEmployee) return false;
-                const { fileId, empId } = pendingDeleteEmployee;
-                const password = document.getElementById('confirmPasswordInput').value.trim();
-                if (!password) {
-                    showToast('كلمة المرور مطلوبة', 'error');
-                    return false;
-                }
-                try {
-                    await deleteEmployeeOnServer(fileId, empId, password);
-                    const file = getFileByRestaurantId(fileId);
-                    if (file) {
-                        file.employees = file.employees.filter(e => e.id !== empId);
-                    }
-                    renderEmployeesTable();
-                    showToast('تم حذف الموظف');
-                    pendingDeleteEmployee = null;
-                    return true;
-                } catch (error) {
-                    showToast('خطأ: ' + error.message, 'error');
-                    return false;
-                }
-            }
-
-            function showConfirm(msg, callback) {
-                confirmMessageEl.textContent = msg;
-                confirmCallback = callback;
-                confirmModal.classList.add('active');
-            }
-
-            function hideConfirm() {
-                confirmModal.classList.remove('active');
-                confirmCallback = null;
-                pendingDeleteEmployee = null;
-                document.getElementById('confirmPasswordWrap').style.display = 'none';
-                document.getElementById('confirmPasswordInput').value = '';
-            }
-
-            document.getElementById('closeConfirmModal').addEventListener('click', hideConfirm);
-            document.getElementById('confirmNoBtn').addEventListener('click', hideConfirm);
-            document.getElementById('confirmYesBtn').addEventListener('click', async function() {
-                if (confirmCallback) {
-                    const result = await confirmCallback();
-                    if (result === false) {
+                Swal.fire({
+                    title: 'تأكيد حذف الموظف',
+                    text: 'هل أنت متأكد من حذف الموظف "' + (emp.name || '---') + '"?',
+                    icon: 'warning',
+                    input: 'password',
+                    inputPlaceholder: 'أدخل كلمة المرور',
+                    showCancelButton: true,
+                    confirmButtonText: 'حذف',
+                    cancelButtonText: 'إلغاء',
+                    confirmButtonColor: '#ef4444'
+                }).then(async (result) => {
+                    if (!result.value) return;
+                    const password = result.value;
+                    if (!password) {
+                        Swal.fire({ icon: 'error', title: 'خطأ', text: 'كلمة المرور مطلوبة' });
                         return;
                     }
-                    confirmCallback = null;
-                }
-                hideConfirm();
-            });
-            window.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirm(); });
+                    try {
+                        await deleteEmployeeOnServer(fileId, empId, password);
+                        const file2 = getFileByRestaurantId(fileId);
+                        if (file2) {
+                            file2.employees = file2.employees.filter(e => e.id !== empId);
+                        }
+                        renderEmployeesTable();
+                        Swal.fire({ icon: 'success', title: 'تم', text: 'تم حذف الموظف' });
+                    } catch (error) {
+                        Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                    }
+                });
+            }
 
             function renderSharedTable() {
                 const file = getFileByRestaurantId(currentRestaurantId);
@@ -919,14 +993,20 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     headRow += '<th class="day-num-header">' + d + '</th>';
                 }
-                headRow += '<th class="emp-header">إجمالي الأيام</th><th class="emp-header">صافي الراتب</th><th class="emp-header">إجمالي السلف</th><th class="emp-header">الأيام المخصومة</th><th class="emp-header">إجمالي الخصومات</th><th class="emp-header">اليومية</th></tr>';
+                headRow += '<th class="emp-header">أيام الحضور</th>';
+                headRow += '<th class="emp-header">راتب الأيام</th>';
+                headRow += '<th class="emp-header">إجمالي السلف</th>';
+                headRow += '<th class="emp-header">اليومية</th>';
+                headRow += '<th class="emp-header">صافي الراتب</th>';
+                headRow += '<th class="emp-header">إجمالي الخصومات</th>';
+                headRow += '</tr>';
                 sharedTableHead.innerHTML = headRow;
                 file.employees.forEach(emp => {
                     const monthlySalary = parseNumber(emp.monthlySalary || 0);
                     const dayRate = monthlySalary / 30;
                     const dayData = getEmployeeDayData(currentRestaurantId, emp.id, monthKey, 'salary');
                     if (!dayData.days) dayData.days = {};
-                    let totalDays = 0;
+                    let attendanceDays = 0;
                     let row = '<tr>';
                     row += '<td class="emp-cell"><div class="emp-name-display">' + (emp.name || 'بدون اسم') + '</div><div class="emp-code-display">كود: ' + (emp.code || '---') + ' · ' + (emp.profession || '---') + '</div></td>';
                     for (let d = 1; d <= daysInMonth; d++) {
@@ -937,19 +1017,20 @@
                         let cls = '';
                         if (isZero) cls = ' has-value-zero';
                         else if (hasVal && numVal !== 0) cls = ' has-value';
-                        if (hasVal && numVal !== 0) totalDays += numVal;
+                        if (hasVal && numVal > 0) attendanceDays++;
                         row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"></td>';
                     }
-                    const totalSalary = dayRate * totalDays;
                     const totalLoans = getEmployeeTotalLoans(emp);
-                    const deductedDays = daysInMonth - totalDays;
+                    const daysSalary = dayRate * attendanceDays;
+                    const netSalary = daysSalary - totalLoans;
+                    const deductedDays = daysInMonth - attendanceDays;
                     const totalDeductions = deductedDays * dayRate;
-                    row += '<td class="emp-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(totalDays) + '</td>';
-                    row += '<td class="emp-cell" style="color:#10b981;font-weight:700;">' + formatNumber(totalSalary) + '</td>';
+                    row += '<td class="emp-cell" style="color:var(--color-primary);font-weight:700;">' + formatNumber(attendanceDays) + '</td>';
+                    row += '<td class="emp-cell" style="color:#0d99ff;font-weight:700;">' + formatNumber(daysSalary) + '</td>';
                     row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
-                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(deductedDays) + '</td>';
-                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
                     row += '<td class="emp-cell" style="color:var(--color-muted);font-weight:600;">' + formatNumber(dayRate) + '</td>';
+                    row += '<td class="emp-cell" style="color:#10b981;font-weight:700;">' + formatNumber(netSalary) + '</td>';
+                    row += '<td class="emp-cell" style="color:#f59e0b;font-weight:700;">' + formatNumber(totalDeductions) + '</td>';
                     row += '</tr>';
                     sharedTableBody.innerHTML += row;
                 });
@@ -982,17 +1063,18 @@
                 const daysInMonth = getDaysInMonth(monthKey);
                 const monthlySalary = parseNumber(emp.monthlySalary || 0);
                 const dayRate = monthlySalary / 30;
-                let totalDays = 0;
+                let attendanceDays = 0;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const input = document.getElementById('day-input-' + empId + '-' + d);
                     if (input) {
                         const val = parseNumber(input.value);
-                        if (!isNaN(val) && val !== 0) totalDays += val;
+                        if (!isNaN(val) && val > 0) attendanceDays++;
                     }
                 }
-                const totalSalary = dayRate * totalDays;
                 const totalLoans = getEmployeeTotalLoans(emp);
-                const deductedDays = daysInMonth - totalDays;
+                const daysSalary = dayRate * attendanceDays;
+                const netSalary = daysSalary - totalLoans;
+                const deductedDays = daysInMonth - attendanceDays;
                 const totalDeductions = deductedDays * dayRate;
                 const rows = sharedTableBody.querySelectorAll('tr');
                 rows.forEach(row => {
@@ -1000,18 +1082,18 @@
                     if (rowEmpId === empId) {
                         const cells = row.querySelectorAll('td.emp-cell');
                         if (cells.length >= 6) {
-                            cells[1].textContent = formatNumber(totalDays);
-                            cells[1].style.color = 'var(--color-primary)';
-                            cells[2].textContent = formatNumber(totalSalary);
-                            cells[2].style.color = '#10b981';
-                            cells[3].textContent = formatNumber(totalLoans);
-                            cells[3].style.color = '#ef4444';
-                            cells[4].textContent = formatNumber(deductedDays);
-                            cells[4].style.color = '#f59e0b';
+                            cells[0].textContent = formatNumber(attendanceDays);
+                            cells[0].style.color = 'var(--color-primary)';
+                            cells[1].textContent = formatNumber(daysSalary);
+                            cells[1].style.color = '#0d99ff';
+                            cells[2].textContent = formatNumber(totalLoans);
+                            cells[2].style.color = '#ef4444';
+                            cells[3].textContent = formatNumber(dayRate);
+                            cells[3].style.color = 'var(--color-muted)';
+                            cells[4].textContent = formatNumber(netSalary);
+                            cells[4].style.color = '#10b981';
                             cells[5].textContent = formatNumber(totalDeductions);
                             cells[5].style.color = '#f59e0b';
-                            cells[6].textContent = formatNumber(dayRate);
-                            cells[6].style.color = 'var(--color-muted)';
                         }
                     }
                 });
@@ -1092,7 +1174,7 @@
                 const day = parseInt(input.getAttribute('data-day'));
                 const rawVal = convertArabicNumerals(input.value).replace(/,/g, '').trim();
                 const amount = rawVal === '' ? 0 : parseFloat(rawVal);
-                if (isNaN(amount)) { showToast('قيمة غير صحيحة', 'error'); return; }
+                if (isNaN(amount)) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'قيمة غير صحيحة' }); return; }
                 try {
                     await sendSalaryToServer(fileId, employeeId, day, amount);
                     const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1105,9 +1187,9 @@
                         else emp.monthlyData[monthKey].days[day] = String(amount);
                     }
                     updateSalaryRowSummary(employeeId);
-                    showToast(amount === 0 ? 'تم حذف القيمة' : 'تم حفظ القيمة');
+                    Swal.fire({ icon: 'success', title: 'تم', text: amount === 0 ? 'تم حذف القيمة' : 'تم حفظ القيمة', timer: 1200, showConfirmButton: false });
                 } catch (error) {
-                    showToast('خطأ: ' + error.message, 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                     input.value = input.defaultValue || '';
                 }
             }
@@ -1124,7 +1206,7 @@
                 advancesTableBody.innerHTML = '';
                 advancesTableFoot.innerHTML = '';
                 if (!file.employees || file.employees.length === 0) {
-                    advancesTableBody.innerHTML = '<tr><td colspan="' + (daysInMonth + 3) + '" class="text-center py-8 text-[var(--color-muted)]">لا يوجد موظفين</td></tr>';
+                    advancesTableBody.innerHTML = '<tr><td colspan="' + (daysInMonth + 2) + '" class="text-center py-8 text-[var(--color-muted)]">لا يوجد موظفين</td></tr>';
                     return;
                 }
                 let headRow = '<tr><th class="emp-header">الموظف</th>';
@@ -1301,7 +1383,7 @@
                 const day = parseInt(input.getAttribute('data-day'));
                 const rawVal = convertArabicNumerals(input.value).replace(/,/g, '').trim();
                 const amount = rawVal === '' ? 0 : parseFloat(rawVal);
-                if (isNaN(amount)) { showToast('قيمة غير صحيحة', 'error'); return; }
+                if (isNaN(amount)) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'قيمة غير صحيحة' }); return; }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
                 const file = getFileByRestaurantId(fileId);
                 const emp = file.employees.find(e => e.id === employeeId);
@@ -1315,16 +1397,16 @@
                     await sendAdvanceToServer(fileId, employeeId, day, amount);
                     updateAdvanceRowSummary(employeeId);
                     updateAdvancesTableFootSummary();
-                    showToast(amount === 0 ? 'تم حذف السلفة' : 'تم حفظ السلفة');
+                    Swal.fire({ icon: 'success', title: 'تم', text: amount === 0 ? 'تم حذف السلفة' : 'تم حفظ السلفة', timer: 1200, showConfirmButton: false });
                 } catch (error) {
-                    showToast('خطأ: ' + error.message, 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
                 }
             }
 
             function exportSalariesToExcel() {
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file || !file.employees || file.employees.length === 0) {
-                    showToast('لا يوجد موظفين للتصدير', 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'لا يوجد موظفين للتصدير' });
                     return;
                 }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1332,7 +1414,7 @@
                 const data = [];
                 const header = ['الموظف'];
                 for (let d = 1; d <= daysInMonth; d++) header.push(d);
-                header.push('إجمالي الأيام', 'صافي الراتب', 'إجمالي السلف', 'الأيام المخصومة', 'إجمالي الخصومات', 'اليومية');
+                header.push('أيام الحضور', 'راتب الأيام', 'إجمالي السلف', 'اليومية', 'صافي الراتب', 'إجمالي الخصومات');
                 data.push(header);
                 file.employees.forEach(emp => {
                     const row = [];
@@ -1341,17 +1423,18 @@
                     const dayRate = monthlySalary / 30;
                     const dayData = getEmployeeDayData(currentRestaurantId, emp.id, monthKey, 'salary');
                     if (!dayData.days) dayData.days = {};
-                    let totalDays = 0;
+                    let attendanceDays = 0;
                     for (let d = 1; d <= daysInMonth; d++) {
                         const val = dayData.days[d] !== undefined ? parseNumber(dayData.days[d]) : '';
                         row.push(val === '' ? '' : val);
-                        if (val !== '' && !isNaN(val) && val !== 0) totalDays += val;
+                        if (val !== '' && !isNaN(val) && val > 0) attendanceDays++;
                     }
-                    const totalSalary = dayRate * totalDays;
                     const totalLoans = getEmployeeTotalLoans(emp);
-                    const deductedDays = daysInMonth - totalDays;
+                    const daysSalary = dayRate * attendanceDays;
+                    const netSalary = daysSalary - totalLoans;
+                    const deductedDays = daysInMonth - attendanceDays;
                     const totalDeductions = deductedDays * dayRate;
-                    row.push(formatNumber(totalDays), formatNumber(totalSalary), formatNumber(totalLoans), formatNumber(deductedDays), formatNumber(totalDeductions), formatNumber(dayRate));
+                    row.push(formatNumber(attendanceDays), formatNumber(daysSalary), formatNumber(totalLoans), formatNumber(dayRate), formatNumber(netSalary), formatNumber(totalDeductions));
                     data.push(row);
                 });
                 const ws = XLSX.utils.aoa_to_sheet(data);
@@ -1363,7 +1446,7 @@
             function printSalaries() {
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file || !file.employees || file.employees.length === 0) {
-                    showToast('لا يوجد موظفين للطباعة', 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'لا يوجد موظفين للطباعة' });
                     return;
                 }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1373,24 +1456,25 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     html += '<th>' + d + '</th>';
                 }
-                html += '<th>إجمالي الأيام</th><th>صافي الراتب</th><th>إجمالي السلف</th><th>الأيام المخصومة</th><th>إجمالي الخصومات</th><th>اليومية</th></tr></thead><tbody>';
+                html += '<th>أيام الحضور</th><th>راتب الأيام</th><th>إجمالي السلف</th><th>اليومية</th><th>صافي الراتب</th><th>إجمالي الخصومات</th></tr></thead><tbody>';
                 file.employees.forEach(emp => {
                     const monthlySalary = parseNumber(emp.monthlySalary || 0);
                     const dayRate = monthlySalary / 30;
                     const dayData = getEmployeeDayData(currentRestaurantId, emp.id, monthKey, 'salary');
                     if (!dayData.days) dayData.days = {};
-                    let totalDays = 0;
+                    let attendanceDays = 0;
                     html += '<tr><td>' + (emp.name || '---') + ' (كود: ' + (emp.code || '---') + ')</td>';
                     for (let d = 1; d <= daysInMonth; d++) {
                         const val = dayData.days[d] !== undefined ? parseNumber(dayData.days[d]) : 0;
                         html += '<td>' + val + '</td>';
-                        if (val !== 0) totalDays += val;
+                        if (val > 0) attendanceDays++;
                     }
-                    const totalSalary = dayRate * totalDays;
                     const totalLoans = getEmployeeTotalLoans(emp);
-                    const deductedDays = daysInMonth - totalDays;
+                    const daysSalary = dayRate * attendanceDays;
+                    const netSalary = daysSalary - totalLoans;
+                    const deductedDays = daysInMonth - attendanceDays;
                     const totalDeductions = deductedDays * dayRate;
-                    html += '<td>' + formatNumber(totalDays) + '</td><td>' + formatNumber(totalSalary) + '</td><td>' + formatNumber(totalLoans) + '</td><td>' + formatNumber(deductedDays) + '</td><td>' + formatNumber(totalDeductions) + '</td><td>' + formatNumber(dayRate) + '</td></tr>';
+                    html += '<td>' + formatNumber(attendanceDays) + '</td><td>' + formatNumber(daysSalary) + '</td><td>' + formatNumber(totalLoans) + '</td><td>' + formatNumber(dayRate) + '</td><td>' + formatNumber(netSalary) + '</td><td>' + formatNumber(totalDeductions) + '</td></tr>';
                 });
                 html += '</tbody></table>';
                 html += '<div class="footer"><div class="dev">Developed by Abdelrahman Mohamed</div><div class="dev-version">v5.2</div></div>';
@@ -1406,7 +1490,7 @@
             function exportAdvancesToExcel() {
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file || !file.employees || file.employees.length === 0) {
-                    showToast('لا يوجد موظفين للتصدير', 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'لا يوجد موظفين للتصدير' });
                     return;
                 }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1439,7 +1523,7 @@
             function printAdvances() {
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file || !file.employees || file.employees.length === 0) {
-                    showToast('لا يوجد موظفين للطباعة', 'error');
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'لا يوجد موظفين للطباعة' });
                     return;
                 }
                 const monthKey = getFolderMonthKey(currentRestaurantId);
@@ -1481,7 +1565,7 @@
             function loadAppDataFromServer() {
                 const serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.success && Array.isArray(serverData.files)) {
-                    appData.files = serverData.files || [];
+                    appData.files = (serverData.files || []).filter(file => file.restaurant_id === RESTAURANT_ID);
                     appData.files.forEach(file => {
                         if (file.employees) {
                             file.employees = deduplicateEmployees(file.employees);
@@ -1493,52 +1577,6 @@
                 }
                 renderFoldersList();
                 setViewMode('files');
-            }
-
-            const successModal = document.getElementById('successModal');
-            const successMessageEl = document.getElementById('successMessage');
-            function showSuccess(msg) { successMessageEl.textContent = msg; successModal.classList.add('active'); }
-            function hideSuccess() { successModal.classList.remove('active'); }
-            document.getElementById('closeSuccessModal').addEventListener('click', hideSuccess);
-            document.getElementById('okSuccessBtn').addEventListener('click', hideSuccess);
-            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
-
-            const confirmModal = document.getElementById('confirmModal');
-            const confirmMessageEl = document.getElementById('confirmMessage');
-            function showConfirm(msg, callback) {
-                confirmMessageEl.textContent = msg;
-                confirmCallback = callback;
-                confirmModal.classList.add('active');
-            }
-            function hideConfirm() {
-                confirmModal.classList.remove('active');
-                confirmCallback = null;
-                pendingDeleteEmployee = null;
-                document.getElementById('confirmPasswordWrap').style.display = 'none';
-                document.getElementById('confirmPasswordInput').value = '';
-            }
-            document.getElementById('closeConfirmModal').addEventListener('click', hideConfirm);
-            document.getElementById('confirmNoBtn').addEventListener('click', hideConfirm);
-            document.getElementById('confirmYesBtn').addEventListener('click', async function() {
-                if (confirmCallback) {
-                    const result = await confirmCallback();
-                    if (result === false) {
-                        return;
-                    }
-                    confirmCallback = null;
-                }
-                hideConfirm();
-            });
-            window.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirm(); });
-
-            const toastEl = document.getElementById('toast');
-            let toastTimeout;
-            function showToast(message, type = 'success') {
-                if (!toastEl) return;
-                toastEl.textContent = message;
-                toastEl.className = 'toast ' + type + ' show';
-                clearTimeout(toastTimeout);
-                toastTimeout = setTimeout(() => { toastEl.classList.remove('show'); }, 2000);
             }
 
             document.addEventListener('DOMContentLoaded', function() {
