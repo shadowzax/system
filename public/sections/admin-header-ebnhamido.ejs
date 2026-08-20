@@ -15,20 +15,44 @@
                     </div>
                 </div>
             </div>
-            <nav class="flex-1">
-                <div class="sidebar-section-title">مطاعم السلام</div>
-                <a href="/admin/resturant/1" class="sidebar-item restaurant-item active" data-restaurant-id="id_ibn_hamido">
-                    <img src="https://i.ibb.co/fYds0Vcq/458109350-8047883141947002-8357149268094311983-n-removebg-preview.png" class="restaurant-logo" alt="logo">
-                    <span>ابن حميدو</span>
-                </a>
-                <a href="/admin/reports/1" class="sidebar-item restaurant-item active" data-restaurant-id="id_ibn_hamido">
-                    <img src="https://i.ibb.co/fYds0Vcq/458109350-8047883141947002-8357149268094311983-n-removebg-preview.png" class="restaurant-logo" alt="logo">
-                    <span>تقارير ابن حميدو</span>
-                </a>
-                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                    <a href="" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
-                </div>
-            </nav>
+<nav class="flex-1">
+    <div class="sidebar-section-title">مطاعم السلام</div>
+
+    <a href="/admin/resturant/1"
+       class="sidebar-item restaurant-item active"
+       data-restaurant-id="id_ibn_hamido">
+        <img src="/logos/1.png"
+             class="restaurant-logo"
+             alt="logo">
+        <span>ابن حميدو</span>
+    </a>
+
+    <a href="/admin/reports/1"
+       class="sidebar-item restaurant-item active"
+       data-restaurant-id="id_ibn_hamido">
+        <img src="/logos/1.png"
+             class="restaurant-logo"
+             alt="logo">
+        <span>تقارير ابن حميدو</span>
+    </a>
+
+    <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+        <a id="logoutBtn" class="sidebar-item" style="color: #ef4444;">
+            <i class="las la-sign-out-alt"></i>
+            <span>تسجيل الخروج</span>
+        </a>
+    </div>
+</nav>
+
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        window.location.href = "/login";
+    });
+</script>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
                 <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
                 <div>
@@ -56,7 +80,7 @@
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon">
-                        <img src="https://i.ibb.co/fYds0Vcq/458109350-8047883141947002-8357149268094311983-n-removebg-preview.png" alt="logo" class="restaurant-title-logo" style="width: 150px; height: auto;">
+                        <img src="/logos/1.png" alt="logo" class="restaurant-title-logo" style="width: 150px; height: auto;">
                     </div>
                     <h1>ابن حميدو السلام</h1>
                     <div class="restaurant-meta">
