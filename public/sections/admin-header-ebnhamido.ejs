@@ -19,7 +19,7 @@
     <div class="sidebar-section-title">مطاعم السلام</div>
 
     <a href="/admin/resturant/1"
-       class="sidebar-item restaurant-item active"
+       class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
        data-restaurant-id="id_ibn_hamido">
         <img src="/logos/1.png"
              class="restaurant-logo"
@@ -28,7 +28,7 @@
     </a>
 
     <a href="/admin/reports/1"
-       class="sidebar-item restaurant-item active"
+       class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>"
        data-restaurant-id="id_ibn_hamido">
         <img src="/logos/1.png"
              class="restaurant-logo"
@@ -43,6 +43,7 @@
         </a>
     </div>
 </nav>
+
 
 <script>
     document.getElementById('logoutBtn').addEventListener('click', function (e) {
