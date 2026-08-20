@@ -190,12 +190,10 @@ app.get("/admin/resturant/1", (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect("/login");
     }
-
     res.render("../admin/1-ebnhamido", {
         title: "ابن حميدو السلام",
         description: "",
         activePage: "restaurant",
-
         restaurant: {
             id: 1,
             name: "ابن حميدو السلام",
@@ -204,19 +202,16 @@ app.get("/admin/resturant/1", (req, res) => {
         }
     });
 });
-
 app.get("/admin/reports/1", async (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect("/login");
     }
 
     let reports = [];
-
     try {
         const response = await fetch(
             "https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=1"
         );
-
         if (response.ok) {
             const data = await response.json();
 
@@ -226,7 +221,6 @@ app.get("/admin/reports/1", async (req, res) => {
                 transfers: "تحويلات",
                 fees: "فيز"
             };
-
             reports = Object.entries(sources).flatMap(([key, sourceLabel]) =>
                 (data.reports?.[key] || []).map(report => ({
                     ...report,
@@ -234,7 +228,6 @@ app.get("/admin/reports/1", async (req, res) => {
                     sourceLabel
                 }))
             );
-
             reports.sort((a, b) =>
                 (b.timestamp || "").localeCompare(a.timestamp || "")
             );
@@ -254,6 +247,71 @@ app.get("/admin/reports/1", async (req, res) => {
             name: "ابن حميدو السلام",
             section: "السلام",
             logo: "/logos/1.png"
+        }
+    });
+});
+/*----------------------------------------------*/
+app.get("/admin/resturant/2", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+    res.render("../admin/1-ebnhamido", {
+        title: "مطاعم نعمه",
+        description: "",
+        activePage: "restaurant",
+        restaurant: {
+            id: 1,
+            name: "ابن حميدو السلام",
+            section: "السلام",
+            logo: "/logos/2.png"
+        }
+    });
+});
+app.get("/admin/reports/2", async (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    let reports = [];
+    try {
+        const response = await fetch(
+            "https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=2"
+        );
+        if (response.ok) {
+            const data = await response.json();
+
+            const sources = {
+                advances: "سلف",
+                expenses: "خوارج",
+                transfers: "تحويلات",
+                fees: "فيز"
+            };
+            reports = Object.entries(sources).flatMap(([key, sourceLabel]) =>
+                (data.reports?.[key] || []).map(report => ({
+                    ...report,
+                    source: key,
+                    sourceLabel
+                }))
+            );
+            reports.sort((a, b) =>
+                (b.timestamp || "").localeCompare(a.timestamp || "")
+            );
+        }
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+    }
+
+    res.render("../admin/1-ebnhamido-reports", {
+        title: "تقارير مطاعم نعمه",
+        description: "",
+        reports,
+        activePage: "reports",
+
+        restaurant: {
+            id: 2,
+            name: "مطاعم نعمه",
+            section: "السلام",
+            logo: "/logos/2.png"
         }
     });
 });
