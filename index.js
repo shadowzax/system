@@ -196,6 +196,46 @@ app.get("/admin/resturant/1", (req, res) => {
         description: ""
     });
 });
+app.get("/admin/reports/1", async (req, res) => {
+    let reports = [];
+
+    try {
+        const response = await fetch("https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=1");
+        if (response.ok) {
+            const data = await response.json();
+            const reportsObj = data.reports || {};
+            const sources = [
+                { key: 'advances', label: 'سلف' },
+                { key: 'expenses', label: 'خوارج' },
+                { key: 'transfers', label: 'تحويلات' },
+                { key: 'fees', label: 'فيز' }
+            ];
+
+            sources.forEach(src => {
+                const arr = reportsObj[src.key] || [];
+                if (Array.isArray(arr)) {
+                    arr.forEach(report => {
+                        reports.push({
+                            ...report,
+                            source: src.key,
+                            sourceLabel: src.label
+                        });
+                    });
+                }
+            });
+
+            reports.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+        }
+    } catch (err) {
+        console.error('Error fetching reports:', err);
+    }
+
+    res.render("admin/1-ebnhamido-reports", {
+        title: "",
+        description: "",
+        reports
+    });
+});
 /*-----------------------------------------*/
 app.get("/outgoing", (req, res) => {
     if (!req.isAuthenticated) {
