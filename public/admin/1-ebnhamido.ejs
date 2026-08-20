@@ -141,7 +141,7 @@
                         <div class="mb-4">
                             <div class="relative">
                                 <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-                                <input type="text" id="folderSearchInput" class="input-field pr-10" placeholder="ابحث عن ملف...">
+                                <input type="text" id="folderSearchInput" class="input-field pr-10" placeholder="ابحث عن ملف..." autocomplete="off">
                             </div>
                         </div>
                         <div class="space-y-3" id="foldersList"></div>
@@ -157,7 +157,7 @@
                         <div class="mb-4">
                             <div class="relative">
                                 <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-                                <input type="text" id="employeeSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف...">
+                                <input type="text" id="employeeSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف..." autocomplete="off">
                             </div>
                         </div>
                         <div class="shared-table-wrapper">
@@ -195,7 +195,7 @@
                         <div class="mb-4">
                             <div class="relative">
                                 <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-                                <input type="text" id="advancesSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف...">
+                                <input type="text" id="advancesSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف..." autocomplete="off">
                             </div>
                         </div>
                         <div class="shared-table-wrapper" id="advancesTableWrapper">
@@ -223,7 +223,7 @@
                         <div class="mb-4">
                             <div class="relative">
                                 <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-                                <input type="text" id="salariesSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف...">
+                                <input type="text" id="salariesSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف..." autocomplete="off">
                             </div>
                         </div>
                         <div class="shared-table-wrapper" id="sharedTableWrapper">
@@ -570,10 +570,6 @@
             function renderFoldersList() {
                 const query = folderSearchInput ? folderSearchInput.value.toLowerCase().trim() : '';
                 foldersList.innerHTML = '';
-                if (!query) {
-                    foldersList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]">اكتب للبحث عن ملف...</div>';
-                    return;
-                }
                 const filteredFiles = appData.files.filter(file => file.name && file.name.toLowerCase().includes(query));
                 if (filteredFiles.length === 0) {
                     foldersList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]">لا توجد ملفات</div>';
@@ -1591,6 +1587,7 @@
                 } else {
                     appData.files = [];
                 }
+                if (folderSearchInput) folderSearchInput.value = '';
                 renderFoldersList();
                 setViewMode('files');
             }
