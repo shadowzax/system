@@ -1308,7 +1308,7 @@
                         </table>
                     </div>
                     <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
-                        <div class="flex flex-wrap gap-3 items-center">
+                        <div class="flex flex-wrap gap-3 items-center" id="editableActions">
                             <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
                             <div class="add-rows-section">
                                 <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
@@ -1423,6 +1423,10 @@
             const token = appData.token || "";
             const apiBase = appData.api || "";
             const restaurantId = "1";
+            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
+            const isAdmin = (userRole === 'admin');
+            const isCashier = (userRole === 'cashier');
+            const isViewer = (userRole === 'viewer');
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const PRINT_LOGO = 'https://files.catbox.moe/05wiyk.png';
             let printLogoURL = PRINT_LOGO;
@@ -1439,6 +1443,22 @@
             if (userData.profile_picture) {
                 document.getElementById('userAvatar').src = userData.profile_picture;
                 document.getElementById('headerAvatar').src = userData.profile_picture;
+            }
+
+            const editableActions = document.getElementById('editableActions');
+            const storeBtn = document.getElementById('storeBtn');
+            const addRowBtn = document.getElementById('addRowBtn');
+            const addRowsBatchBtn = document.getElementById('addRowsBatchBtn');
+            const clearRowsBtn = document.getElementById('clearRowsBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+            if (isViewer) {
+                editableActions.style.display = 'none';
+                storeBtn.style.display = 'none';
+                cancelEditBtn.style.display = 'none';
+            } else {
+                editableActions.style.display = 'flex';
+                storeBtn.style.display = 'inline-flex';
             }
 
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
@@ -1488,8 +1508,6 @@
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
-            const storeBtn = document.getElementById('storeBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
 
             function updateTotal() {
                 let total = 0;
@@ -1555,7 +1573,13 @@
                 deleteBtn.tabIndex = -1;
                 deleteBtn.title = 'حذف الصف';
                 deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                if (isViewer) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.4';
+                    deleteBtn.style.cursor = 'not-allowed';
+                }
                 deleteBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     if (tbody.children.length > 1) {
                         tr.remove();
                         updateSerials();
@@ -1581,6 +1605,7 @@
                 });
 
                 amountInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const now = new Date();
@@ -1640,6 +1665,7 @@
                 });
 
                 datetimeInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -1680,6 +1706,7 @@
             }
 
             function addRowAtEnd(amount, isoDatetime) {
+                if (isViewer) return null;
                 const tr = createRowElement(amount || '', isoDatetime || '');
                 tbody.appendChild(tr);
                 updateSerials();
@@ -1688,6 +1715,7 @@
             }
 
             function clearAllRows() {
+                if (isViewer) return;
                 tbody.innerHTML = '';
                 addRowAtEnd('', '');
                 updateSerials();
@@ -1716,6 +1744,7 @@
             }
 
             function saveToSession() {
+                if (isViewer) return;
                 const data = getTableData();
                 const name = restaurantNameInput.value || '';
                 const isAuto = dateToggleBtn.classList.contains('active');
@@ -1906,7 +1935,10 @@
                 const pageReports = allReports.slice(start, end);
                 let html = '';
                 pageReports.forEach((report) => {
-                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيزا') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs edit-report-btn" data-id="' + report.id + '" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
+                    const editDeleteBtns = (isViewer) ? '' :
+                        `<button class="btn-outline btn-xs edit-report-btn" data-id="${report.id}" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button>
+                        <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>`;
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيزا') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
                 });
                 recentReportsList.innerHTML = html;
                 document.querySelectorAll('.view-report-btn').forEach(btn => {
@@ -1943,6 +1975,10 @@
             });
 
             function deleteReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
+                    return;
+                }
                 Swal.fire({
                     title: 'حذف التقرير',
                     text: 'أدخل كلمة المرور للحذف',
@@ -1989,7 +2025,43 @@
                 });
             }
 
+            // دالة التخزين الرئيسية مع طلب باسورد إذا لم يكن أدمن
             function storeCurrentReport() {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
+                    return;
+                }
+
+                // إذا لم يكن أدمن، نطلب باسورد
+                if (!isAdmin) {
+                    Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتخزين التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تخزين',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true,
+                        preConfirm: (password) => {
+                            if (!password) {
+                                Swal.showValidationMessage('يرجى إدخال كلمة المرور');
+                            }
+                            return password;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const password = result.value;
+                            performStore(password);
+                        }
+                    });
+                } else {
+                    // أدمن: بدون باسورد
+                    performStore('');
+                }
+            }
+
+            function performStore(password) {
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -2005,7 +2077,8 @@
                         name: name,
                         date: dateStr,
                         rows: reportRows,
-                        total: total
+                        total: total,
+                        password: password
                     })
                 })
                 .then(res => res.json())
@@ -2030,8 +2103,26 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
-            function updateCurrentReport() {
-                if (!currentEditReportId) return;
+            async function updateCurrentReport() {
+                if (!currentEditReportId || isViewer) return;
+                let password = '';
+                if (!isAdmin) {
+                    const result = await Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتعديل التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true
+                    });
+                    if (result.isConfirmed && result.value) {
+                        password = result.value;
+                    } else {
+                        return;
+                    }
+                }
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -2048,7 +2139,8 @@
                         name: name,
                         date: dateStr,
                         rows: reportRows,
-                        total: total
+                        total: total,
+                        password: password
                     })
                 })
                 .then(res => res.json())
@@ -2092,6 +2184,10 @@
             }
 
             function editReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
+                }
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
@@ -2147,13 +2243,17 @@
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const newTr = addRowAtEnd('', '');
-                const amountInput = newTr.querySelector('.amount-input');
-                if (amountInput) focusInput(amountInput);
+                if (newTr) {
+                    const amountInput = newTr.querySelector('.amount-input');
+                    if (amountInput) focusInput(amountInput);
+                }
                 saveToSession();
             });
 
             document.getElementById('addRowsBatchBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const countInput = document.getElementById('rowsCountInput');
                 let count = parseInt(countInput.value) || 1;
                 if (count < 1) count = 1;
@@ -2166,6 +2266,7 @@
             });
 
             document.getElementById('clearRowsBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 if (tbody.children.length === 0) return;
                 Swal.fire({
                     title: 'مسح الكل',
