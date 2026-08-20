@@ -201,34 +201,33 @@ app.get("/admin/reports/1", async (req, res) => {
     let reports = [];
 
     try {
-        const response = await fetch("https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=1");
+        const response = await fetch(
+            "https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=1"
+        );
 
         if (response.ok) {
             const data = await response.json();
-            const sources = [
-                { key: "advances", label: "سلف" },
-                { key: "expenses", label: "خوارج" },
-                { key: "transfers", label: "تحويلات" },
-                { key: "fees", label: "فيز" }
-            ];
 
-            sources.forEach(({ key, label }) => {
-                (data.reports?.[key] || []).forEach(report => {
-                    reports.push({
-                        ...report,
-                        source: key,
-                        sourceLabel: label
-                    });
-                });
-            });
+            const sources = {
+                advances: "سلف",
+                expenses: "خوارج",
+                transfers: "تحويلات",
+                fees: "فيز"
+            };
+
+            reports = Object.entries(sources).flatMap(([key, sourceLabel]) =>
+                (data.reports?.[key] || []).map(report => ({
+                    ...report,
+                    source: key,
+                    sourceLabel
+                }))
+            );
 
             reports.sort((a, b) =>
                 (b.timestamp || "").localeCompare(a.timestamp || "")
             );
         }
-    } catch (err) {
-        console.error("Error fetching reports:", err);
-    }
+    } catch {}
 
     res.render("../admin/1-ebnhamido-reports", {
         title: "",
