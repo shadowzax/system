@@ -937,7 +937,9 @@
             token: "<%- token %>",
             api: "<%- api %>",
             isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
-            user: <%- JSON.stringify(user || null) %>
+            user: <%- JSON.stringify(user || null) %>,
+            expenses: <%- JSON.stringify(user && user.expenses ? JSON.parse(user.expenses) : []) %>,
+            restaurant_id: 1
         };
     </script>
     <div class="relative min-h-screen">
@@ -952,17 +954,13 @@
                 </div>
             </div>
             <nav class="flex-1">
-                <!-- <div class="sidebar-section-title">الرئيسية</div>
-                <a href="/" class="sidebar-item" data-page="dashboard"><i class="las la-tachometer-alt"></i><span>لوحة
-                        التحكم</span></a> -->
-
                 <div class="sidebar-section-title">الكاش</div>
                 <a href="/outgoing" class="sidebar-item " data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
                 <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
                 <a href="/cash" class="sidebar-item " data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
                 <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
                 <div class="sidebar-section-title">الملف الشخصي</div>
-                <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/settings" class="sidebar-item " data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
                 <a href="/me/reports" class="sidebar-item" data-page="reports"><i class="las la-chart-bar"></i><span>آخر التقارير</span></a>
 
                 <div class="sidebar-section-title">المالية</div>
@@ -1097,7 +1095,7 @@
 
             function getDaysInMonth(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); return new Date(year, month, 0).getDate(); }
 
-            function formatMonthDisplay(monthKey) { const parts = monthKey.split('-'); const year = parseInt(parts[0]); const month = parseInt(parts[1]); const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']; return monthNames[month - 1] + ' ' + year; }
+            function formatMonthDisplay(monthKey) { return monthKey; }
 
             function monthKeyToInput(monthKey) { return monthKey; }
 
@@ -1145,9 +1143,15 @@
 
             const STORAGE_KEY = 'loansAppData_v4';
             const API_BASE = '<%= api %>' + '/api/admin';
+            const RESTAURANT_ID = "1";
+
+            const isAdmin = window.__APP_DATA__.user && window.__APP_DATA__.user.account_type === 'admin';
 
             function getToken() {
-                return localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+                if (window.__APP_DATA__ && window.__APP_DATA__.token) {
+                    return window.__APP_DATA__.token;
+                }
+                return '';
             }
 
             function loadAppData() {
@@ -1173,19 +1177,34 @@
             let currentFileId = null;
             let confirmCallback = null;
 
+            function isSameOrigin(url) {
+                try {
+                    const apiOrigin = new URL(url, window.location.origin).origin;
+                    return apiOrigin === window.location.origin;
+                } catch (e) {
+                    return false;
+                }
+            }
+
             async function sendAdvanceToServer(fileId, employeeId, day, amount) {
                 try {
-                    const token = getToken();
                     const headers = { 'Content-Type': 'application/json' };
-                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const token = getToken();
+                    if (token) {
+                        headers['Authorization'] = 'Bearer ' + token;
+                    }
+                    const sameOrigin = isSameOrigin(API_BASE);
                     const response = await fetch(`${API_BASE}/files/advance`, {
                         method: 'POST',
                         headers,
+                        credentials: sameOrigin ? 'include' : 'omit',
                         body: JSON.stringify({
+                            token,
                             fileId,
                             employeeId,
                             day,
-                            amount
+                            amount,
+                            restaurant_id: RESTAURANT_ID
                         })
                     });
                     const data = await response.json();
@@ -1290,7 +1309,8 @@
             function renderFilesList() {
                 const query = fileSearchInput ? fileSearchInput.value.toLowerCase().trim() : '';
                 filesList.innerHTML = '';
-                const filteredFiles = appData.files.filter(file => file.name && file.name.toLowerCase().includes(query));
+                const allFiles = appData.files.filter(file => file.restaurant_id === RESTAURANT_ID);
+                const filteredFiles = allFiles.filter(file => file.name && file.name.toLowerCase().includes(query));
                 if (filteredFiles.length === 0) {
                     filesList.innerHTML = '<div class="text-center py-8 text-[var(--color-muted)]"><i class="las la-folder-open text-5xl block mb-3 opacity-30"></i><p>لا توجد ملفات</p><p class="text-xs mt-1">لا يمكن إنشاء ملفات جديدة</p></div>';
                     return;
@@ -1421,7 +1441,8 @@
                         if (isZero) cls = ' has-value-zero';
                         else if (hasVal) cls = ' has-value';
                         if (hasVal && numVal !== 0) totalLoans += numVal;
-                        row += '<td><input type="text" class="day-input' + cls + '" id="loan-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + loanVal + '" inputmode="decimal" placeholder="0"></td>';
+                        const disabledAttr = isAdmin ? '' : ' disabled';
+                        row += '<td><input type="text" class="day-input' + cls + '" id="loan-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + loanVal + '" inputmode="decimal" placeholder="0"' + disabledAttr + '></td>';
                     }
                     const netSalary = monthlySalary - totalLoans;
                     row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
@@ -1530,6 +1551,7 @@
             }
 
             function bindTableInputEvents() {
+                if (!isAdmin) return;
                 sharedTableBody.querySelectorAll('.day-input').forEach(input => {
                     input.addEventListener('input', function() {
                         const val = convertArabicNumerals(this.value).replace(/,/g, '');
@@ -1663,11 +1685,11 @@
             function loadInitialData() {
                 const serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.files && Array.isArray(serverData.files)) {
-                    appData.files = convertLegacyData(serverData.files);
+                    appData.files = convertLegacyData(serverData.files).filter(file => file.restaurant_id === RESTAURANT_ID);
                     saveAppData(appData);
                     renderFilesList();
                 } else if (serverData && Array.isArray(serverData)) {
-                    appData.files = convertLegacyData(serverData);
+                    appData.files = convertLegacyData(serverData).filter(file => file.restaurant_id === RESTAURANT_ID);
                     saveAppData(appData);
                     renderFilesList();
                 } else {
