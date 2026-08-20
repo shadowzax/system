@@ -366,7 +366,10 @@
                 const headers = { 'Content-Type': 'application/json' };
                 if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
                 const options = { method, headers };
-                if (body) options.body = JSON.stringify(body);
+                if (body) {
+                    body.token = authToken;
+                    options.body = JSON.stringify(body);
+                }
                 const response = await fetch(API_BASE + path, options);
                 const data = await response.json();
                 if (!response.ok || !data.success) {
