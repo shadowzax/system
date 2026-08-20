@@ -49,82 +49,53 @@
                     </div>
                 </div>
             </div>
-<nav class="flex-1" id="adminSidebarNav">
-    <div class="sidebar-section-title">فرع السلام</div>
+            <nav class="flex-1" id="adminSidebarNav">
+                <div class="sidebar-section-title">فرع السلام</div>
 
-    <a
-        href="/admin/resturant/1"
-        class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
-        data-restaurant-id="1"
-    >
-        <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
-        <span>ابن حميدو</span>
-    </a>
+                <a
+                    href="/admin/resturant/1"
+                    class="sidebar-item restaurant-item <%= activePage === 'restaurant' ? 'active' : '' %>"
+                >
+                    <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
+                    <span>ابن حميدو</span>
+                </a>
 
-    <a
-        href="/admin/reports/1"
-        class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>"
-        data-restaurant-id="reports-1"
-    >
-        <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
-        <span>تقارير ابن حميدو</span>
-    </a>
+                <a
+                    href="/admin/reports/1"
+                    class="sidebar-item restaurant-item <%= activePage === 'reports' ? 'active' : '' %>"
+                >
+                    <img src="/logos/1.png" class="restaurant-logo" alt="شعار ابن حميدو">
+                    <span>تقارير ابن حميدو</span>
+                </a>
 
-    <a
-        href="/admin/resturant/2"
-        class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>"
-        data-restaurant-id="2"
-    >
-        <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
-        <span>مطاعم نعمه</span>
-    </a>
+                <a
+                    href="/admin/resturant/2"
+                    class="sidebar-item restaurant-item <%= activePage === 'neama-restaurant' ? 'active' : '' %>"
+                >
+                    <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
+                    <span>مطاعم نعمه</span>
+                </a>
 
-    <a
-        href="/admin/reports/2"
-        class="sidebar-item restaurant-item <%= activePage === 'neama-reports' ? 'active' : '' %>"
-        data-restaurant-id="reports-2"
-    >
-        <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
-        <span>تقارير مطاعم نعمه</span>
-    </a>
+                <a
+                    href="/admin/reports/2"
+                    class="sidebar-item restaurant-item <%= activePage === 'neama-reports' ? 'active' : '' %>"
+                >
+                    <img src="/logos/2.png" class="restaurant-logo" alt="شعار مطاعم نعمه">
+                    <span>تقارير مطاعم نعمه</span>
+                </a>
 
-    <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-        <a
-            href="/login"
-            id="adminSidebarLogoutBtn"
-            class="sidebar-item"
-            style="color: #ef4444;"
-        >
-            <i class="las la-sign-out-alt"></i>
-            <span>تسجيل الخروج</span>
-        </a>
-    </div>
-</nav>
-
-<script>
-    document.getElementById("adminSidebarLogoutBtn").addEventListener("click", function (e) {
-        e.preventDefault();
-
-        Swal.fire({
-            title: "تسجيل الخروج؟",
-            text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "تسجيل الخروج",
-            cancelButtonText: "إلغاء",
-            confirmButtonColor: "#ef4444"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.cookie =
-                    "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-                window.location.href = "/login";
-            }
-        });
-    });
-</script>
-
-
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a
+                        href="/login"
+                        id="adminSidebarLogoutBtn"
+                        class="sidebar-item"
+                        style="color: #ef4444;"
+                    >
+                        <i class="las la-sign-out-alt"></i>
+                        <span>تسجيل الخروج</span>
+                    </a>
+                </div>
+            </nav>
 
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
                 <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
@@ -149,6 +120,7 @@
                         </div>
                     </button>
                     <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
+                </div>
             </header>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
@@ -386,7 +358,7 @@
             function getCurrentMonthKey() { const now = new Date(); return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'); }
 
             function getFolderMonthKey(fileId) {
-                const file = appData.files.find(f => f.id === fileId);
+                const file = appData.files.find(f => String(f.id) === String(fileId));
                 if (file && file.createdAt) {
                     const d = new Date(file.createdAt);
                     if (!isNaN(d.getTime())) {
@@ -514,7 +486,7 @@
             }
 
             function getFileByRestaurantId(rid) {
-                return appData.files.find(f => f.id === rid);
+                return appData.files.find(f => String(f.id) === String(rid));
             }
 
             function getEmployeeDayData(fileId, employeeId, monthKey, type = 'salary') {
@@ -578,20 +550,6 @@
             if (initialActiveBottom) moveNotch(initialActiveBottom);
             window.addEventListener('resize', () => { const activeItem = document.querySelector('.bottom-nav-item.active'); if (activeItem) moveNotch(activeItem); });
 
-            const sidebarRestaurantItems = document.querySelectorAll('.sidebar-item.restaurant-item');
-            sidebarRestaurantItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    const rid = this.getAttribute('data-restaurant-id');
-                    if (rid === RESTAURANT_ID) {
-                        e.preventDefault();
-                        sidebarRestaurantItems.forEach(i => i.classList.remove('active'));
-                        this.classList.add('active');
-                        selectRestaurant(rid);
-                        if (window.innerWidth < 1025) closeSidebar();
-                    }
-                });
-            });
-
             const filesViewBtn = document.getElementById('filesViewBtn');
             const advancesViewBtn = document.getElementById('advancesViewBtn');
             const salariesViewBtn = document.getElementById('salariesViewBtn');
@@ -640,6 +598,8 @@
                     const dateStr = createdAt.getFullYear() + '-' + String(createdAt.getMonth() + 1).padStart(2, '0') + '-' + String(createdAt.getDate()).padStart(2, '0');
                     const card = document.createElement('div');
                     card.className = 'file-card';
+                    card.setAttribute('data-id', file.id);
+                    card.style.cursor = 'pointer';
                     card.innerHTML = `
                         <div class="file-icon"><i class="las la-folder"></i></div>
                         <div class="flex-1 min-w-0">
@@ -652,10 +612,14 @@
                             <button class="btn-outline btn-xs delete-folder-btn" data-id="${file.id}" style="border-color:#ef4444;color:#ef4444;"><i class="las la-trash"></i> حذف</button>
                         </div>
                     `;
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
+                        openFolder(file.id);
+                    });
                     foldersList.appendChild(card);
                 });
                 document.querySelectorAll('.open-folder-btn').forEach(btn => {
-                    btn.addEventListener('click', function() { openFolder(this.getAttribute('data-id')); });
+                    btn.addEventListener('click', function(e) { e.stopPropagation(); openFolder(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.copy-folder-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) { e.stopPropagation(); copyFolder(this.getAttribute('data-id')); });
@@ -666,7 +630,7 @@
             }
 
             function copyFolder(folderId) {
-                const sourceFile = appData.files.find(f => f.id === folderId);
+                const sourceFile = appData.files.find(f => String(f.id) === String(folderId));
                 if (!sourceFile) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 pendingCopyFolderId = folderId;
                 document.getElementById('copyFolderNameInput').value = sourceFile.name + ' (نسخة)';
@@ -677,7 +641,7 @@
             async function performCopyFolder() {
                 const folderId = pendingCopyFolderId;
                 if (!folderId) return;
-                const sourceFile = appData.files.find(f => f.id === folderId);
+                const sourceFile = appData.files.find(f => String(f.id) === String(folderId));
                 if (!sourceFile) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 const newName = document.getElementById('copyFolderNameInput').value.trim();
                 const password = document.getElementById('copyFolderPasswordInput').value.trim();
@@ -687,7 +651,7 @@
                     const restaurantId = sourceFile.restaurant_id || sourceFile.id;
                     const result = await copyFolderOnServer(folderId, newName, password, restaurantId);
                     if (result.file) {
-                        if (result.file.restaurant_id === RESTAURANT_ID) appData.files.push(result.file);
+                        if (String(result.file.restaurant_id) === RESTAURANT_ID) appData.files.push(result.file);
                     } else {
                         await loadAppDataFromServer();
                     }
@@ -712,7 +676,7 @@
             window.addEventListener('click', (e) => { if (e.target === document.getElementById('copyFolderModal')) hideCopyFolderModal(); });
 
             async function deleteFolder(folderId) {
-                const fileIndex = appData.files.findIndex(f => f.id === folderId);
+                const fileIndex = appData.files.findIndex(f => String(f.id) === String(folderId));
                 if (fileIndex === -1) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 const { value: password } = await Swal.fire({
                     title: 'تأكيد حذف الملف',
@@ -729,7 +693,7 @@
                 try {
                     await deleteFolderOnServer(folderId, password);
                     appData.files.splice(fileIndex, 1);
-                    if (currentRestaurantId === folderId) {
+                    if (String(currentRestaurantId) === String(folderId)) {
                         currentRestaurantId = null;
                         foldersContainer.style.display = 'block';
                         employeesTableContainer.style.display = 'none';
@@ -752,12 +716,8 @@
                 currentFolderName.textContent = '📁 ' + (file.name || 'ملف');
                 foldersContainer.style.display = 'none';
                 employeesTableContainer.style.display = 'block';
-                document.querySelectorAll('.sidebar-item.restaurant-item').forEach(i => {
-                    if (i.getAttribute('data-restaurant-id') === rid) i.classList.add('active');
-                    else i.classList.remove('active');
-                });
                 document.querySelectorAll('.bottom-nav-item').forEach(i => {
-                    if (i.getAttribute('data-restaurant-id') === rid) i.classList.add('active');
+                    if (String(i.getAttribute('data-restaurant-id')) === String(rid)) i.classList.add('active');
                     else i.classList.remove('active');
                 });
                 const activeBottom = document.querySelector('.bottom-nav-item.active');
@@ -1633,7 +1593,7 @@
             function loadAppDataFromServer() {
                 const serverData = window.__SERVER_DATA__;
                 if (serverData && serverData.success && Array.isArray(serverData.files)) {
-                    appData.files = (serverData.files || []).filter(file => file.restaurant_id === RESTAURANT_ID);
+                    appData.files = (serverData.files || []).filter(file => String(file.restaurant_id) === RESTAURANT_ID);
                     appData.files.forEach(file => {
                         if (file.employees) {
                             file.employees = deduplicateEmployees(file.employees);
@@ -1646,6 +1606,24 @@
                 renderFoldersList();
                 setViewMode('files');
             }
+
+            document.getElementById('adminSidebarLogoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: "تسجيل الخروج؟",
+                    text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "تسجيل الخروج",
+                    cancelButtonText: "إلغاء",
+                    confirmButtonColor: "#ef4444"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        window.location.href = "/login";
+                    }
+                });
+            });
 
             document.addEventListener('DOMContentLoaded', function() {
                 const themeToggles = document.querySelectorAll('.theme-toggle');
