@@ -68,33 +68,26 @@
 </nav>
 
 <script>
-    (function () {
-        const logoutButton = document.getElementById("adminSidebarLogoutBtn");
+    document.getElementById("logoutBtn").addEventListener("click", function (e) {
+        e.preventDefault();
 
-        if (!logoutButton) return;
+        Swal.fire({
+            title: "تسجيل الخروج؟",
+            text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "تسجيل الخروج",
+            cancelButtonText: "إلغاء",
+            confirmButtonColor: "#ef4444"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.cookie =
+                    "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-        logoutButton.addEventListener("click", function (e) {
-            e.preventDefault();
-
-            Swal.fire({
-                title: "تسجيل الخروج؟",
-                text: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "تسجيل الخروج",
-                cancelButtonText: "إلغاء",
-                confirmButtonColor: "#ef4444",
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.cookie =
-                        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-                    window.location.href = "/login";
-                }
-            });
+                window.location.href = "/login";
+            }
         });
-    })();
+    });
 </script>
 
 
