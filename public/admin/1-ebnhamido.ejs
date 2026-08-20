@@ -441,8 +441,7 @@
             window.addEventListener('resize', function() { if (window.innerWidth >= 1025) { sidebar.classList.remove('mobile-open', 'mobile-closed'); } else { if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed'); } });
             if (headerAvatar) { headerAvatar.addEventListener('click', function(e) { e.stopPropagation(); if (window.innerWidth < 1025) { if (sidebar.classList.contains('mobile-open')) closeSidebar(); else openSidebar(); } }); }
             document.addEventListener('click', function(e) { if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) { if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) { closeSidebar(); } } });
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) { logoutBtn.addEventListener('click', (e) => { e.preventDefault(); Swal.fire({ title: 'تأكيد', text: 'هل أنت متأكد من تسجيل الخروج؟', icon: 'question', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'لا', confirmButtonColor: '#ef4444' }).then((res) => { if (res.isConfirmed) window.location.href = '/'; }); }); }
+
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
             const navNotch = document.getElementById('navNotch');
 
