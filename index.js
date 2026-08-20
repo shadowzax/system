@@ -194,10 +194,22 @@ app.get("/admin/resturant/1", (req, res) => {
     res.render("../admin/1-ebnhamido", {
         title: "ابن حميدو السلام",
         description: "",
-        activePage: "restaurant"
+        activePage: "restaurant",
+
+        restaurant: {
+            id: 1,
+            name: "ابن حميدو السلام",
+            section: "السلام",
+            logo: "/logos/1.png"
+        }
     });
 });
+
 app.get("/admin/reports/1", async (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
     let reports = [];
 
     try {
@@ -227,13 +239,22 @@ app.get("/admin/reports/1", async (req, res) => {
                 (b.timestamp || "").localeCompare(a.timestamp || "")
             );
         }
-    } catch {}
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+    }
 
     res.render("../admin/1-ebnhamido-reports", {
-        title: "",
+        title: "تقارير ابن حميدو السلام",
         description: "",
         reports,
-        activePage: "reports"
+        activePage: "reports",
+
+        restaurant: {
+            id: 1,
+            name: "ابن حميدو السلام",
+            section: "السلام",
+            logo: "/logos/1.png"
+        }
     });
 });
 /*-----------------------------------------*/
