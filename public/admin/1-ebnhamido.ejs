@@ -105,6 +105,7 @@
                     <div id="foldersContainer" class="info-card">
                         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                             <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-folder-open text-primary"></i> الملفات</h3>
+                            <button class="btn-primary btn-sm" id="createFolderBtn"><i class="las la-plus"></i> إضافة ملف</button>
                         </div>
                         <div class="mb-4">
                             <div class="relative">
@@ -214,6 +215,19 @@
             <img src="<%= restaurant.logo %>" class="restaurant-logo" alt="logo">
             <span><%= restaurant.name %></span>
         </a>
+    </div>
+    <div class="modal-overlay" id="createFolderModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCreateFolderModal"><i class="las la-times"></i></button>
+            <i class="las la-folder-plus text-4xl text-primary mb-3"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">إنشاء ملف جديد</h3>
+            <p class="text-sm text-[var(--color-muted)] mb-4">أدخل اسم الملف الجديد</p>
+            <input type="text" id="createFolderNameInput" class="input-field mb-4" placeholder="اسم الملف">
+            <div class="flex gap-3 justify-end">
+                <button class="btn-outline btn-sm" id="cancelCreateFolderBtn">إلغاء</button>
+                <button class="btn-primary btn-sm" id="confirmCreateFolderBtn">إنشاء</button>
+            </div>
+        </div>
     </div>
     <div class="modal-overlay" id="copyFolderModal">
         <div class="modal-content">
@@ -445,6 +459,10 @@
                 return await apiRequest('/files/add-employee', 'POST', { fileId, name, phone, profession, monthlySalary });
             }
 
+            async function createFolderOnServer(name, restaurantId) {
+                return await apiRequest('/files/create', 'POST', { name, restaurant_id: restaurantId, employees: [] });
+            }
+
             async function copyFolderOnServer(fileId, newName, password, restaurantId) {
                 return await apiRequest('/files/copy', 'POST', { fileId, name: newName, password, restaurant_id: restaurantId });
             }
@@ -551,6 +569,12 @@
             const addEmpPhoneInput = document.getElementById('addEmpPhoneInput');
             const addEmpProfessionInput = document.getElementById('addEmpProfessionInput');
             const addEmpMonthlySalaryInput = document.getElementById('addEmpMonthlySalaryInput');
+            const createFolderBtn = document.getElementById('createFolderBtn');
+            const createFolderModal = document.getElementById('createFolderModal');
+            const closeCreateFolderModalBtn = document.getElementById('closeCreateFolderModal');
+            const cancelCreateFolderBtn = document.getElementById('cancelCreateFolderBtn');
+            const confirmCreateFolderBtn = document.getElementById('confirmCreateFolderBtn');
+            const createFolderNameInput = document.getElementById('createFolderNameInput');
 
             function renderFoldersList() {
                 const query = folderSearchInput ? folderSearchInput.value.toLowerCase().trim() : '';
@@ -596,6 +620,43 @@
                     btn.addEventListener('click', function(e) { e.stopPropagation(); deleteFolder(this.getAttribute('data-id')); });
                 });
             }
+
+            function openCreateFolderModal() {
+                createFolderNameInput.value = '';
+                createFolderModal.classList.add('active');
+            }
+
+            function closeCreateFolderModal() {
+                createFolderModal.classList.remove('active');
+            }
+
+            async function performCreateFolder() {
+                const name = createFolderNameInput.value.trim();
+                if (!name) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: 'يرجى إدخال اسم الملف' });
+                    return;
+                }
+                try {
+                    const result = await createFolderOnServer(name, RESTAURANT_ID);
+                    if (result.file) {
+                        appData.files.push(result.file);
+                    } else {
+                        await loadAppDataFromServer();
+                    }
+                    closeCreateFolderModal();
+                    renderFoldersList();
+                    Swal.fire({ icon: 'success', title: 'تم', text: 'تم إنشاء الملف بنجاح' });
+                } catch (error) {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: error.message });
+                    closeCreateFolderModal();
+                }
+            }
+
+            createFolderBtn.addEventListener('click', openCreateFolderModal);
+            closeCreateFolderModalBtn.addEventListener('click', closeCreateFolderModal);
+            cancelCreateFolderBtn.addEventListener('click', closeCreateFolderModal);
+            confirmCreateFolderBtn.addEventListener('click', performCreateFolder);
+            window.addEventListener('click', (e) => { if (e.target === createFolderModal) closeCreateFolderModal(); });
 
             function copyFolder(folderId) {
                 const sourceFile = appData.files.find(f => String(f.id) === String(folderId));
