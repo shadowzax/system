@@ -1186,11 +1186,28 @@
                     if (window.innerWidth < 1025) closeSidebar();
                 });
             });
-            const logoutBtn = document.getElementById('logoutBtn');
-            logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                Swal.fire({ title: 'تسجيل الخروج', text: 'هل أنت متأكد؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'إلغاء' }).then((result) => { if (result.isConfirmed) window.location.href = '/'; });
-            });
+
+const logoutBtn = document.getElementById('logoutBtn');
+
+logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'تسجيل الخروج',
+        text: 'هل أنت متأكد؟',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'نعم',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+            window.location.href = '/';
+        }
+    });
+});
+
 
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
             const navNotch = document.getElementById('navNotch');
