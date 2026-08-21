@@ -247,7 +247,18 @@ app.get("/settings", (req, res) => {
         description: ""
     });
 });
+/*------------------------------------------*/
+app.get("/neama/login", (req, res) => {
+    if (req.isAuthenticated) {
+        return res.redirect("/");
+    }
 
+    res.render("../neama/auth/login", {
+        title: "تسجيل الدخول",
+        description: "قم بتسجيل الدخول إلى حسابك"
+    });
+});
+/*------------------------------------------*/
 // - Admin - //
 /*------------------------------------------*/
 app.get("/admin/resturant/1", (req, res) => {
