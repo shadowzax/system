@@ -175,16 +175,7 @@ app.get("/admin/acount", (req, res) => {
         description: ""
     });
 });
-app.get("/me/reports", (req, res) => {
-    if (!req.isAuthenticated) {
-    return res.redirect("/login");
-     }
-    res.render("../uploads/test", {
-  //  res.render("profile/myreports", {
-        title: "",
-        activePage: "reports",
-    });
-});
+
 /*--------------------------------------------*/
 app.get("/outgoing", (req, res) => {
     if (!req.isAuthenticated) {
@@ -237,6 +228,7 @@ app.get("/advances", (req, res) => {
         activePage: "advances",
     });
 });
+/*---------------------------------------*/
 app.get("/settings", (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect("/login");
@@ -245,6 +237,16 @@ app.get("/settings", (req, res) => {
     res.render("settings/settings", {
         title: "الاعدادات",
         activePage: "settings",
+    });
+});
+app.get("/me/reports", (req, res) => {
+    if (!req.isAuthenticated) {
+    return res.redirect("/login");
+     }
+ //   res.render("../uploads/test", {
+     res.render("profile/myreports", {
+        title: "",
+        activePage: "reports",
     });
 });
 /*------------------------------------------*/
