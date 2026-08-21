@@ -250,7 +250,7 @@ app.get("/settings", (req, res) => {
 /*------------------------------------------*/
 app.get("/neama/login", (req, res) => {
     if (req.isAuthenticated) {
-        return res.redirect("/");
+        return res.redirect("/neama/outgoing");
     }
 
     res.render("../neama/auth/login", {
