@@ -132,7 +132,7 @@
                         </table>
                     </div>
                     <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
-                        <div class="flex flex-wrap gap-3 items-center">
+                        <div class="flex flex-wrap gap-3 items-center" id="editableActions">
                             <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
                             <div class="add-rows-section">
                                 <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
@@ -244,6 +244,10 @@
             const token = appData.token || "";
             const apiBase = appData.api || "";
             const restaurantId = "1";
+            const userRole = userData.account_type || 'viewer';
+            const isAdmin = (userRole === 'admin');
+            const isCashier = (userRole === 'cashier');
+            const isViewer = (userRole === 'viewer');
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const PRINT_LOGO = 'https://files.catbox.moe/05wiyk.png';
             let printLogoURL = PRINT_LOGO;
@@ -262,6 +266,18 @@
                 document.getElementById('headerAvatar').src = userData.profile_picture;
             }
 
+            const editableActions = document.getElementById('editableActions');
+            const storeBtn = document.getElementById('storeBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            if (isViewer) {
+                editableActions.style.display = 'none';
+                storeBtn.style.display = 'none';
+                cancelEditBtn.style.display = 'none';
+            } else {
+                editableActions.style.display = 'flex';
+                storeBtn.style.display = 'inline-flex';
+            }
+
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
             function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
             function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
@@ -273,8 +289,6 @@
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
-            const storeBtn = document.getElementById('storeBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
 
             function updateTotal() {
                 let total = 0;
@@ -333,6 +347,7 @@
                         const isLastRow = rowIndex === rows.length - 1;
                         const isAmountCell = cellIndex === 1;
                         if (isLastRow && isAmountCell) {
+                            if (isViewer) return;
                             const newTr = addRowAtEnd('', '');
                             const { descInput } = getInputsInRow(newTr);
                             if (descInput) focusInput(descInput);
@@ -365,6 +380,7 @@
                             else if (cellIndex === 1) {
                                 if (rowIndex < rows.length - 1) navigateCell(this, 1, 0);
                                 else {
+                                    if (isViewer) return;
                                     const newTr = addRowAtEnd('', '');
                                     const { descInput } = getInputsInRow(newTr);
                                     if (descInput) focusInput(descInput);
@@ -425,7 +441,13 @@
                 upBtn.tabIndex = -1;
                 upBtn.title = 'إضافة صف للأعلى';
                 upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
+                if (isViewer) {
+                    upBtn.disabled = true;
+                    upBtn.style.opacity = '0.4';
+                    upBtn.style.cursor = 'not-allowed';
+                }
                 upBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     const newTr = createRowElement('', '');
                     tbody.insertBefore(newTr, tr);
                     updateTotal();
@@ -439,7 +461,13 @@
                 downBtn.tabIndex = -1;
                 downBtn.title = 'إضافة صف للأسفل';
                 downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
+                if (isViewer) {
+                    downBtn.disabled = true;
+                    downBtn.style.opacity = '0.4';
+                    downBtn.style.cursor = 'not-allowed';
+                }
                 downBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     const newTr = createRowElement('', '');
                     if (tr.nextSibling) tbody.insertBefore(newTr, tr.nextSibling);
                     else tbody.appendChild(newTr);
@@ -454,7 +482,13 @@
                 signBtn.tabIndex = -1;
                 signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
                 signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
+                if (isViewer) {
+                    signBtn.disabled = true;
+                    signBtn.style.opacity = '0.4';
+                    signBtn.style.cursor = 'not-allowed';
+                }
                 signBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     const currentVal = parseNumber(amountInput.value);
                     if (currentVal === 0) {
                         amountInput.value = '';
@@ -475,7 +509,13 @@
                 deleteBtn.tabIndex = -1;
                 deleteBtn.title = 'حذف الصف';
                 deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                if (isViewer) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.4';
+                    deleteBtn.style.cursor = 'not-allowed';
+                }
                 deleteBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     if (tbody.children.length > 1) {
                         tr.remove();
                         updateTotal();
@@ -514,6 +554,7 @@
             }
 
             function addRowAtEnd(description, amount) {
+                if (isViewer) return null;
                 const tr = createRowElement(description, amount);
                 tbody.appendChild(tr);
                 updateTotal();
@@ -521,6 +562,7 @@
             }
 
             function clearAllRows() {
+                if (isViewer) return;
                 tbody.innerHTML = '';
                 addRowAtEnd('', '');
                 updateTotal();
@@ -545,6 +587,7 @@
             }
 
             function saveToSession() {
+                if (isViewer) return;
                 const data = getTableData();
                 const name = restaurantNameInput.value || '';
                 const isAuto = dateToggleBtn.classList.contains('active');
@@ -727,7 +770,10 @@
                 const pageReports = allReports.slice(start, end);
                 let html = '';
                 pageReports.forEach((report) => {
-                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs edit-report-btn" data-id="' + report.id + '" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
+                    const editDeleteBtns = (isViewer) ? '' :
+                        `<button class="btn-outline btn-xs edit-report-btn" data-id="${report.id}" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button>
+                        <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>`;
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
                 });
                 recentReportsList.innerHTML = html;
                 document.querySelectorAll('.view-report-btn').forEach(btn => {
@@ -764,6 +810,10 @@
             });
 
             function deleteReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
+                    return;
+                }
                 Swal.fire({
                     title: 'حذف التقرير',
                     text: 'أدخل كلمة المرور للحذف',
@@ -806,6 +856,38 @@
             }
 
             function storeCurrentReport() {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
+                    return;
+                }
+                if (!isAdmin) {
+                    Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتخزين التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تخزين',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true,
+                        preConfirm: (password) => {
+                            if (!password) {
+                                Swal.showValidationMessage('يرجى إدخال كلمة المرور');
+                            }
+                            return password;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const password = result.value;
+                            performStore(password);
+                        }
+                    });
+                } else {
+                    performStore('');
+                }
+            }
+
+            function performStore(password) {
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -813,7 +895,7 @@
                 fetch(apiBase + '/api/expenses/advances-store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, restaurant_id: restaurantId, code: '', name, date: dateStr, rows, total })
+                    body: JSON.stringify({ token, restaurant_id: restaurantId, code: '', name, date: dateStr, rows, total, password })
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -848,8 +930,26 @@
                 }
             }
 
-            function updateCurrentReport() {
-                if (!currentEditReportId) return;
+            async function updateCurrentReport() {
+                if (!currentEditReportId || isViewer) return;
+                let password = '';
+                if (!isAdmin) {
+                    const result = await Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتعديل التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true
+                    });
+                    if (result.isConfirmed && result.value) {
+                        password = result.value;
+                    } else {
+                        return;
+                    }
+                }
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -857,7 +957,7 @@
                 fetch(apiBase + '/api/expenses/advances-update', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, restaurant_id: restaurantId, reportId: currentEditReportId, code: '', name, date: dateStr, rows, total })
+                    body: JSON.stringify({ token, restaurant_id: restaurantId, reportId: currentEditReportId, code: '', name, date: dateStr, rows, total, password })
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -886,6 +986,10 @@
             }
 
             function editReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
+                }
                 let report = null;
                 if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(reportId));
                 if (!report) {
@@ -944,12 +1048,16 @@
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const newTr = addRowAtEnd('', '');
-                const { descInput } = getInputsInRow(newTr);
-                if (descInput) focusInput(descInput);
+                if (newTr) {
+                    const { descInput } = getInputsInRow(newTr);
+                    if (descInput) focusInput(descInput);
+                }
                 saveToSession();
             });
             document.getElementById('addRowsBatchBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const countInput = document.getElementById('rowsCountInput');
                 let count = parseInt(countInput.value) || 1;
                 if (count < 1) count = 1;
@@ -960,6 +1068,7 @@
                 Swal.fire('تم', 'تم إضافة ' + count + ' صفوف جديدة.', 'success');
             });
             document.getElementById('clearRowsBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 if (tbody.children.length === 0) return;
                 Swal.fire({
                     title: 'مسح الكل',
