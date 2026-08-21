@@ -296,245 +296,258 @@
                     <h1 class="text-2xl font-bold text-[var(--color-white)] mb-2">تسجيل الدخول</h1>
                     <p class="text-sm text-[var(--color-muted)]">أدخل بياناتك للوصول إلى لوحة التحكم</p>
                 </div>
-<form id="loginForm" autocomplete="off" novalidate>
-    <div class="mb-4">
-        <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium" for="loginEmail">
-            البريد الإلكتروني
-        </label>
+                <form id="loginForm" autocomplete="off" novalidate>
+                    <div class="mb-4">
+                        <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium" for="loginIdentifier">
+                            البريد الإلكتروني أو رقم الهاتف
+                        </label>
 
-        <input type="email" class="input-field" id="loginEmail" placeholder="example@domain.com" dir="ltr"
-            autocomplete="email">
+                        <input type="text" class="input-field" id="loginIdentifier"
+                            placeholder="example@domain.com أو 01012345678" dir="ltr" autocomplete="username">
 
-        <span class="validation-msg" id="loginEmailMsg"></span>
-    </div>
+                        <span class="validation-msg" id="loginIdentifierMsg"></span>
+                    </div>
 
-    <div class="mb-4">
-        <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium" for="loginPassword">
-            كلمة المرور
-        </label>
+                    <div class="mb-4">
+                        <label class="text-sm text-[var(--color-muted)] block mb-1 font-medium" for="loginPassword">
+                            كلمة المرور
+                        </label>
 
-        <div class="relative">
-            <input type="password" class="input-field" id="loginPassword" placeholder="أدخل كلمة المرور"
-                style="padding-left:44px;" autocomplete="current-password">
+                        <div class="relative">
+                            <input type="password" class="input-field" id="loginPassword" placeholder="أدخل كلمة المرور"
+                                style="padding-left:44px;" autocomplete="current-password">
 
-            <button type="button" id="toggleLoginPassBtn"
-                class="absolute left-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-[var(--color-muted)] cursor-pointer p-2 rounded-lg hover:text-[var(--color-primary)] transition-colors"
-                title="إظهار كلمة المرور">
-                <i class="las la-eye"></i>
-            </button>
-        </div>
+                            <button type="button" id="toggleLoginPassBtn"
+                                class="absolute left-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-[var(--color-muted)] cursor-pointer p-2 rounded-lg hover:text-[var(--color-primary)] transition-colors"
+                                title="إظهار كلمة المرور">
+                                <i class="las la-eye"></i>
+                            </button>
+                        </div>
 
-        <span class="validation-msg" id="loginPassMsg"></span>
-    </div>
+                        <span class="validation-msg" id="loginPassMsg"></span>
+                    </div>
 
-    <button type="submit" class="btn-primary w-full justify-center mt-2" id="loginSubmitBtn">
-        <i class="las la-sign-in-alt"></i>
-        تسجيل الدخول
-    </button>
-</form>
+                    <button type="submit" class="btn-primary w-full justify-center mt-2" id="loginSubmitBtn">
+                        <i class="las la-sign-in-alt"></i>
+                        تسجيل الدخول
+                    </button>
+                </form>
 
 
-<script>
-(function () {
-    'use strict';
+                <script>
+                    (function () {
+                        'use strict';
 
-    var LOGIN_URL = "<%= api %>" + '/api/auth/login';
+                        var LOGIN_URL = "<%= api %>" + '/api/auth/login';
 
-    var loginForm = document.getElementById('loginForm');
-    var loginEmail = document.getElementById('loginEmail');
-    var loginPassword = document.getElementById('loginPassword');
-    var loginSubmitBtn = document.getElementById('loginSubmitBtn');
+                        var loginForm = document.getElementById('loginForm');
+                        var loginIdentifier = document.getElementById('loginIdentifier');
+                        var loginPassword = document.getElementById('loginPassword');
+                        var loginSubmitBtn = document.getElementById('loginSubmitBtn');
 
-    var loginEmailMsg = document.getElementById('loginEmailMsg');
-    var loginPassMsg = document.getElementById('loginPassMsg');
+                        var loginIdentifierMsg = document.getElementById('loginIdentifierMsg');
+                        var loginPassMsg = document.getElementById('loginPassMsg');
 
-    function clearValidation() {
-        loginEmailMsg.textContent = '';
-        loginEmailMsg.className = 'validation-msg';
+                        function clearValidation() {
+                            loginIdentifierMsg.textContent = '';
+                            loginIdentifierMsg.className = 'validation-msg';
 
-        loginPassMsg.textContent = '';
-        loginPassMsg.className = 'validation-msg';
+                            loginPassMsg.textContent = '';
+                            loginPassMsg.className = 'validation-msg';
 
-        loginEmail.classList.remove('error');
-        loginPassword.classList.remove('error');
-    }
-
-    function validateForm() {
-        clearValidation();
-
-        var valid = true;
-        var emailValue = loginEmail.value.trim();
-        var passwordValue = loginPassword.value;
-
-        if (!emailValue) {
-            loginEmailMsg.textContent = 'البريد الإلكتروني مطلوب';
-            loginEmailMsg.className = 'validation-msg error';
-            loginEmail.classList.add('error');
-            valid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-            loginEmailMsg.textContent = 'صيغة البريد الإلكتروني غير صالحة';
-            loginEmailMsg.className = 'validation-msg error';
-            loginEmail.classList.add('error');
-            valid = false;
-        }
-
-        if (!passwordValue) {
-            loginPassMsg.textContent = 'كلمة المرور مطلوبة';
-            loginPassMsg.className = 'validation-msg error';
-            loginPassword.classList.add('error');
-            valid = false;
-        }
-
-        return valid;
-    }
-
-    function setLoadingState(isLoading) {
-        loginSubmitBtn.disabled = isLoading;
-
-        if (isLoading) {
-            loginSubmitBtn.innerHTML =
-                '<i class="las la-spinner la-spin"></i> جاري تسجيل الدخول...';
-        } else {
-            loginSubmitBtn.innerHTML =
-                '<i class="las la-sign-in-alt"></i> تسجيل الدخول';
-        }
-    }
-
-    function showError(title, message) {
-        Swal.fire({
-            icon: 'error',
-            title: title,
-            text: message,
-            confirmButtonText: 'موافق',
-            showConfirmButton: true,
-            allowOutsideClick: false
-        });
-    }
-
-    loginForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
-
-        setLoadingState(true);
-
-        fetch(LOGIN_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: loginEmail.value.trim().toLowerCase(),
-                password: loginPassword.value
-            })
-        })
-            .then(function (response) {
-                return response.json()
-                    .then(function (data) {
-                        return {
-                            ok: response.ok,
-                            status: response.status,
-                            data: data
-                        };
-                    })
-                    .catch(function () {
-                        return {
-                            ok: response.ok,
-                            status: response.status,
-                            data: null
-                        };
-                    });
-            })
-            .then(function (result) {
-                setLoadingState(false);
-
-                if (
-                    result.ok &&
-                    result.data &&
-                    result.data.success &&
-                    result.data.user
-                ) {
-                    var user = result.data.user;
-
-                    if (result.data.token) {
-                        document.cookie =
-                            'token=' +
-                            encodeURIComponent(result.data.token) +
-                            '; path=/; max-age=604800; SameSite=Lax';
-                    }
-
-                    localStorage.setItem(
-                        'userProfileData',
-                        JSON.stringify({
-                            id: user.id || '',
-                            fullName: user.name || user.fullName || '',
-                            email: user.email || '',
-                            phoneNumber: user.phone_number || '',
-                            role: user.account_type || user.role || '',
-                            accountStatus: user.account_status || '',
-                            avatar: user.profile_picture || ''
-                        })
-                    );
-
-                    localStorage.setItem('isLoggedIn', 'true');
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تم تسجيل الدخول بنجاح',
-                        text: 'تم تسجيل الدخول إلى حسابك بنجاح.',
-                        confirmButtonText: 'موافق',
-                        showConfirmButton: true,
-                        allowOutsideClick: false
-                    }).then(function (swalResult) {
-                        if (swalResult.isConfirmed) {
-                            window.location.href = '/outgoing';
+                            loginIdentifier.classList.remove('error');
+                            loginPassword.classList.remove('error');
                         }
-                    });
 
-                    return;
-                }
+                        function isValidEmail(value) {
+                            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+                        }
 
-                var message =
-                    result.data && result.data.message
-                        ? result.data.message
-                        : 'فشل تسجيل الدخول، تحقق من بياناتك.';
+                        function isValidPhone(value) {
+                            return /^\+?[0-9]{9,15}$/.test(value);
+                        }
 
-                showError('فشل تسجيل الدخول', message);
-            })
-            .catch(function (error) {
-                setLoadingState(false);
+                        function validateForm() {
+                            clearValidation();
 
-                showError(
-                    'فشل الاتصال',
-                    'تعذر الاتصال بالخادم: ' + error.message
-                );
-            });
-    });
-})();
-</script>
-<script>
-(function () {
-    var loginPassword = document.getElementById('loginPassword');
-    var toggleLoginPassBtn = document.getElementById('toggleLoginPassBtn');
+                            var valid = true;
+                            var identifierValue = loginIdentifier.value.trim();
+                            var passwordValue = loginPassword.value;
 
-    toggleLoginPassBtn.addEventListener('click', function () {
-        var isPassword = loginPassword.type === 'password';
+                            if (!identifierValue) {
+                                loginIdentifierMsg.textContent = 'البريد الإلكتروني أو رقم الهاتف مطلوب';
+                                loginIdentifierMsg.className = 'validation-msg error';
+                                loginIdentifier.classList.add('error');
+                                valid = false;
+                            } else if (!isValidEmail(identifierValue) && !isValidPhone(identifierValue)) {
+                                loginIdentifierMsg.textContent = 'أدخل بريدًا إلكترونيًا أو رقم هاتف صالحًا';
+                                loginIdentifierMsg.className = 'validation-msg error';
+                                loginIdentifier.classList.add('error');
+                                valid = false;
+                            }
 
-        loginPassword.type = isPassword ? 'text' : 'password';
+                            if (!passwordValue) {
+                                loginPassMsg.textContent = 'كلمة المرور مطلوبة';
+                                loginPassMsg.className = 'validation-msg error';
+                                loginPassword.classList.add('error');
+                                valid = false;
+                            }
 
-        var icon = toggleLoginPassBtn.querySelector('i');
+                            return valid;
+                        }
 
-        icon.classList.toggle('la-eye', !isPassword);
-        icon.classList.toggle('la-eye-slash', isPassword);
+                        function setLoadingState(isLoading) {
+                            loginSubmitBtn.disabled = isLoading;
 
-        toggleLoginPassBtn.title = isPassword
-            ? 'إخفاء كلمة المرور'
-            : 'إظهار كلمة المرور';
-    });
-})();
-</script>
+                            if (isLoading) {
+                                loginSubmitBtn.innerHTML =
+                                    '<i class="las la-spinner la-spin"></i> جاري تسجيل الدخول...';
+                            } else {
+                                loginSubmitBtn.innerHTML =
+                                    '<i class="las la-sign-in-alt"></i> تسجيل الدخول';
+                            }
+                        }
+
+                        function showError(title, message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: title,
+                                text: message,
+                                confirmButtonText: 'موافق',
+                                showConfirmButton: true,
+                                allowOutsideClick: false
+                            });
+                        }
+
+                        loginForm.addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            if (!validateForm()) {
+                                return;
+                            }
+
+                            setLoadingState(true);
+
+                            var identifierValue = loginIdentifier.value.trim();
+                            if (identifierValue.indexOf('@') !== -1) {
+                                identifierValue = identifierValue.toLowerCase();
+                            }
+
+                            fetch(LOGIN_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    identifier: identifierValue,
+                                    password: loginPassword.value
+                                })
+                            })
+                                .then(function (response) {
+                                    return response.json()
+                                        .then(function (data) {
+                                            return {
+                                                ok: response.ok,
+                                                status: response.status,
+                                                data: data
+                                            };
+                                        })
+                                        .catch(function () {
+                                            return {
+                                                ok: response.ok,
+                                                status: response.status,
+                                                data: null
+                                            };
+                                        });
+                                })
+                                .then(function (result) {
+                                    setLoadingState(false);
+
+                                    if (
+                                        result.ok &&
+                                        result.data &&
+                                        result.data.success &&
+                                        result.data.user
+                                    ) {
+                                        var user = result.data.user;
+
+                                        if (result.data.token) {
+                                            document.cookie =
+                                                'token=' +
+                                                encodeURIComponent(result.data.token) +
+                                                '; path=/; max-age=604800; SameSite=Lax';
+                                        }
+
+                                        localStorage.setItem(
+                                            'userProfileData',
+                                            JSON.stringify({
+                                                id: user.id || '',
+                                                fullName: user.name || user.fullName || '',
+                                                email: user.email || '',
+                                                phoneNumber: user.phone_number || '',
+                                                role: user.account_type || user.role || '',
+                                                accountStatus: user.account_status || '',
+                                                avatar: user.profile_picture || ''
+                                            })
+                                        );
+
+                                        localStorage.setItem('isLoggedIn', 'true');
+
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'تم تسجيل الدخول بنجاح',
+                                            text: 'تم تسجيل الدخول إلى حسابك بنجاح.',
+                                            confirmButtonText: 'موافق',
+                                            showConfirmButton: true,
+                                            allowOutsideClick: false
+                                        }).then(function (swalResult) {
+                                            if (swalResult.isConfirmed) {
+                                                window.location.href = '/outgoing';
+                                            }
+                                        });
+
+                                        return;
+                                    }
+
+                                    var message =
+                                        result.data && result.data.message
+                                            ? result.data.message
+                                            : 'فشل تسجيل الدخول، تحقق من بياناتك.';
+
+                                    showError('فشل تسجيل الدخول', message);
+                                })
+                                .catch(function (error) {
+                                    setLoadingState(false);
+
+                                    showError(
+                                        'فشل الاتصال',
+                                        'تعذر الاتصال بالخادم: ' + error.message
+                                    );
+                                });
+                        });
+                    })();
+                </script>
+                <script>
+                    (function () {
+                        var loginPassword = document.getElementById('loginPassword');
+                        var toggleLoginPassBtn = document.getElementById('toggleLoginPassBtn');
+
+                        toggleLoginPassBtn.addEventListener('click', function () {
+                            var isPassword = loginPassword.type === 'password';
+
+                            loginPassword.type = isPassword ? 'text' : 'password';
+
+                            var icon = toggleLoginPassBtn.querySelector('i');
+
+                            icon.classList.toggle('la-eye', !isPassword);
+                            icon.classList.toggle('la-eye-slash', isPassword);
+
+                            toggleLoginPassBtn.title = isPassword
+                                ? 'إخفاء كلمة المرور'
+                                : 'إظهار كلمة المرور';
+                        });
+                    })();
+                </script>
 
 
                 <div class="text-center mt-6 pt-4 border-t border-[var(--border-color)]">
@@ -552,34 +565,34 @@
     </main>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    (function () {
-        var themeToggles = document.querySelectorAll('.theme-toggle');
-        var body = document.body;
-        var savedTheme = localStorage.getItem('theme') || 'dark';
+    <script>
+        (function () {
+            var themeToggles = document.querySelectorAll('.theme-toggle');
+            var body = document.body;
+            var savedTheme = localStorage.getItem('theme') || 'dark';
 
-        function applyTheme(theme) {
-            var isDark = theme === 'dark';
+            function applyTheme(theme) {
+                var isDark = theme === 'dark';
 
-            body.classList.toggle('light', !isDark);
+                body.classList.toggle('light', !isDark);
+
+                themeToggles.forEach(function (toggle) {
+                    toggle.classList.toggle('dark', isDark);
+                });
+
+                localStorage.setItem('theme', theme);
+            }
+
+            applyTheme(savedTheme);
 
             themeToggles.forEach(function (toggle) {
-                toggle.classList.toggle('dark', isDark);
+                toggle.addEventListener('click', function () {
+                    var isDark = !body.classList.contains('light');
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
             });
-
-            localStorage.setItem('theme', theme);
-        }
-
-        applyTheme(savedTheme);
-
-        themeToggles.forEach(function (toggle) {
-            toggle.addEventListener('click', function () {
-                var isDark = !body.classList.contains('light');
-                applyTheme(isDark ? 'light' : 'dark');
-            });
-        });
-    })();
-</script>
+        })();
+    </script>
 
 
 </body>
