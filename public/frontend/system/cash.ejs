@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -14,14 +13,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="/css/cash.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -51,22 +47,15 @@
         };
     </script>
 </head>
-
 <body>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
             <div class="mb-6 px-2 mt-4">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>"
-                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
-                        style="border-color:#f59e0b;">
+                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
                     <div>
-                        <p class="font-bold text-[var(--color-white)]" id="userFullName">
-                            <%= user?.name || "مستخدم" %>
-                        </p>
-                        <p class="text-xs text-[var(--color-muted)]" id="role">
-                            <%= user?.job_title || user?.account_type || "مستخدم" %>
-                        </p>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user?.name || "مستخدم" %></p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user?.job_title || user?.account_type || "مستخدم" %></p>
                     </div>
                 </div>
             </div>
@@ -89,20 +78,14 @@
             </nav>
             <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
                 <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
-                <div>
-                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer"
-                        class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
-                </div>
+                <div><a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a></div>
                 <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
             </div>
         </aside>
         <main class="lg:mr-[280px] transition-all">
             <header id="mainHeader">
                 <div class="flex items-center gap-6 mr-4">
-                    <a class="flex w-fit select-none items-center" href="/">
-                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo"
-                            class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
-                    </a>
+                    <a class="flex w-fit select-none items-center" href="/"><img src="https://files.catbox.moe/kdxauw.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain"></a>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <button class="theme-toggle" id="themetoggle">
@@ -124,16 +107,13 @@
                     <div class="restaurant-header">
                         <i class="las la-money-bill-wave"></i>
                         <h3>الكاش</h3>
-                        <input type="text" class="restaurant-name-input" id="restaurantNameInput"
-                            placeholder="اسم المعاملة">
+                        <input type="text" class="restaurant-name-input" id="restaurantNameInput" placeholder="اسم المعاملة">
                         <div class="mr-auto flex items-center gap-2">
-                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active"
-                                title="تبديل بين التاريخ التلقائي واليدوي">
+                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active" title="تبديل بين التاريخ التلقائي واليدوي">
                                 <i class="las la-calendar-check"></i>
                                 <span id="dateToggleText">تلقائي</span>
                             </button>
-                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2"
-                                style="width:140px;" disabled>
+                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2" style="width:140px;" disabled>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -158,7 +138,7 @@
                         </table>
                     </div>
                     <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
-                        <div class="flex flex-wrap gap-3 items-center">
+                        <div class="flex flex-wrap gap-3 items-center" id="editableActions">
                             <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
                             <div class="add-rows-section">
                                 <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
@@ -273,6 +253,10 @@
             const token = appData.token || "";
             const apiBase = appData.api || "";
             const restaurantId = "1";
+            const userRole = userData.account_type || 'viewer';
+            const isAdmin = (userRole === 'admin');
+            const isCashier = (userRole === 'cashier');
+            const isViewer = (userRole === 'viewer');
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const PRINT_LOGO = 'https://files.catbox.moe/05wiyk.png';
             let printLogoURL = PRINT_LOGO;
@@ -291,12 +275,21 @@
                 document.getElementById('headerAvatar').src = userData.profile_picture;
             }
 
+            const editableActions = document.getElementById('editableActions');
+            const storeBtn = document.getElementById('storeBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            if (isViewer) {
+                editableActions.style.display = 'none';
+                storeBtn.style.display = 'none';
+                cancelEditBtn.style.display = 'none';
+            } else {
+                editableActions.style.display = 'flex';
+                storeBtn.style.display = 'inline-flex';
+            }
+
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
-
             function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
-
             function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
-
             function formatDateTime(isoString) {
                 if (!isoString) return '';
                 const d = new Date(isoString);
@@ -311,7 +304,6 @@
                 hours = String(hours).padStart(2, '0');
                 return day + '-' + month + ' ' + hours + ':' + minutes + ' ' + ampm;
             }
-
             function parseDateTime(str) {
                 const regex = /^(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
                 const match = str.trim().match(regex);
@@ -329,7 +321,6 @@
                 if (isNaN(result.getTime())) return null;
                 return result;
             }
-
             function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
 
             const tbody = document.getElementById('restaurantTbody');
@@ -338,8 +329,6 @@
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
-            const storeBtn = document.getElementById('storeBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
 
             function updateTotal() {
                 let total = 0;
@@ -405,7 +394,13 @@
                 deleteBtn.tabIndex = -1;
                 deleteBtn.title = 'حذف الصف';
                 deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                if (isViewer) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.4';
+                    deleteBtn.style.cursor = 'not-allowed';
+                }
                 deleteBtn.addEventListener('click', function() {
+                    if (isViewer) return;
                     if (tbody.children.length > 1) {
                         tr.remove();
                         updateSerials();
@@ -431,6 +426,7 @@
                 });
 
                 amountInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const now = new Date();
@@ -490,6 +486,7 @@
                 });
 
                 datetimeInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -530,6 +527,7 @@
             }
 
             function addRowAtEnd(amount, isoDatetime) {
+                if (isViewer) return null;
                 const tr = createRowElement(amount || '', isoDatetime || '');
                 tbody.appendChild(tr);
                 updateSerials();
@@ -538,6 +536,7 @@
             }
 
             function clearAllRows() {
+                if (isViewer) return;
                 tbody.innerHTML = '';
                 addRowAtEnd('', '');
                 updateSerials();
@@ -566,6 +565,7 @@
             }
 
             function saveToSession() {
+                if (isViewer) return;
                 const data = getTableData();
                 const name = restaurantNameInput.value || '';
                 const isAuto = dateToggleBtn.classList.contains('active');
@@ -756,7 +756,10 @@
                 const pageReports = allReports.slice(start, end);
                 let html = '';
                 pageReports.forEach((report) => {
-                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير كاش') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button><button class="btn-outline btn-xs edit-report-btn" data-id="' + report.id + '" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button><button class="btn-outline btn-xs delete-report-btn" data-id="' + report.id + '" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button></div></div>';
+                    const editDeleteBtns = (isViewer) ? '' :
+                        `<button class="btn-outline btn-xs edit-report-btn" data-id="${report.id}" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button>
+                        <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>`;
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير كاش') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
                 });
                 recentReportsList.innerHTML = html;
                 document.querySelectorAll('.view-report-btn').forEach(btn => {
@@ -793,6 +796,10 @@
             });
 
             function deleteReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
+                    return;
+                }
                 Swal.fire({
                     title: 'حذف التقرير',
                     text: 'أدخل كلمة المرور للحذف',
@@ -840,6 +847,38 @@
             }
 
             function storeCurrentReport() {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
+                    return;
+                }
+                if (!isAdmin) {
+                    Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتخزين التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تخزين',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true,
+                        preConfirm: (password) => {
+                            if (!password) {
+                                Swal.showValidationMessage('يرجى إدخال كلمة المرور');
+                            }
+                            return password;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const password = result.value;
+                            performStore(password);
+                        }
+                    });
+                } else {
+                    performStore('');
+                }
+            }
+
+            function performStore(password) {
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -855,7 +894,8 @@
                         name: name,
                         date: dateStr,
                         rows: reportRows,
-                        total: total
+                        total: total,
+                        password: password
                     })
                 })
                 .then(res => res.json())
@@ -880,8 +920,26 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
-            function updateCurrentReport() {
-                if (!currentEditReportId) return;
+            async function updateCurrentReport() {
+                if (!currentEditReportId || isViewer) return;
+                let password = '';
+                if (!isAdmin) {
+                    const result = await Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتعديل التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true
+                    });
+                    if (result.isConfirmed && result.value) {
+                        password = result.value;
+                    } else {
+                        return;
+                    }
+                }
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -898,7 +956,8 @@
                         name: name,
                         date: dateStr,
                         rows: reportRows,
-                        total: total
+                        total: total,
+                        password: password
                     })
                 })
                 .then(res => res.json())
@@ -939,6 +998,10 @@
             }
 
             function editReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
+                }
                 let report = null;
                 if (serverTransfers) report = serverTransfers.find(r => String(r.id) === String(reportId));
                 if (!report) {
@@ -1004,13 +1067,17 @@
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const newTr = addRowAtEnd('', '');
-                const amountInput = newTr.querySelector('.amount-input');
-                if (amountInput) focusInput(amountInput);
+                if (newTr) {
+                    const amountInput = newTr.querySelector('.amount-input');
+                    if (amountInput) focusInput(amountInput);
+                }
                 saveToSession();
             });
 
             document.getElementById('addRowsBatchBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 const countInput = document.getElementById('rowsCountInput');
                 let count = parseInt(countInput.value) || 1;
                 if (count < 1) count = 1;
@@ -1023,6 +1090,7 @@
             });
 
             document.getElementById('clearRowsBtn').addEventListener('click', function() {
+                if (isViewer) return;
                 if (tbody.children.length === 0) return;
                 Swal.fire({
                     title: 'مسح الكل',
@@ -1207,5 +1275,4 @@
         })();
     </script>
 </body>
-
 </html>
