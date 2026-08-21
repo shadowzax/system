@@ -860,34 +860,6 @@
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
                     return;
                 }
-                if (!isAdmin) {
-                    Swal.fire({
-                        title: 'كلمة المرور مطلوبة',
-                        text: 'أدخل كلمة المرور لتخزين التقرير',
-                        input: 'password',
-                        inputPlaceholder: 'كلمة المرور',
-                        showCancelButton: true,
-                        confirmButtonText: 'تخزين',
-                        cancelButtonText: 'إلغاء',
-                        reverseButtons: true,
-                        preConfirm: (password) => {
-                            if (!password) {
-                                Swal.showValidationMessage('يرجى إدخال كلمة المرور');
-                            }
-                            return password;
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const password = result.value;
-                            performStore(password);
-                        }
-                    });
-                } else {
-                    performStore('');
-                }
-            }
-
-            function performStore(password) {
                 const name = restaurantNameInput.value || '';
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
@@ -895,7 +867,7 @@
                 fetch(apiBase + '/api/expenses/advances-store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, restaurant_id: restaurantId, code: '', name, date: dateStr, rows, total, password })
+                    body: JSON.stringify({ token, restaurant_id: restaurantId, code: '', name, date: dateStr, rows, total })
                 })
                 .then(res => res.json())
                 .then(data => {
