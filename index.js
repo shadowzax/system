@@ -224,7 +224,7 @@ app.get("/cash", (req, res) => {
 
     res.render("system/cash", {
         title: "تحويلات كاش",
-        activePage: "reports",
+        activePage: "transfers",
     });
 });
 app.get("/advances", (req, res) => {
