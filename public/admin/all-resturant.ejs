@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>إدارة المطاعم</title>
+    <meta name="description" content="إدارة بيانات المطاعم">
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="apple-touch-icon" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+            --header-height: 70px;
+            --sidebar-width: 280px;
+            --bottom-nav-height: 68px;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
+        }
+
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Alexandria', system-ui, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-background);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0563a7;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d99ff;
+        }
+
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border-color);
+            position: fixed;
+            right: 0;
+            top: var(--header-height);
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease, z-index 0.3s;
+            z-index: 30;
+            padding: 24px 16px;
+            transform: translateX(0);
+        }
+
+        .dashboard-sidebar.mobile-closed {
+            transform: translateX(100%);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-sidebar.mobile-open {
+                z-index: 105;
+            }
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--color-muted);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-item i {
+            font-size: 22px;
+            width: 28px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(13, 153, 255, 0.08);
+            color: var(--color-primary);
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(13, 153, 255, 0.15), rgba(124, 58, 237, 0.1));
+            color: var(--color-primary);
+            border-right: 3px solid var(--color-primary);
+            font-weight: 600;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-muted);
+            padding: 16px 16px 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-sidebar {
+                transform: translateX(100%);
+                width: 260px;
+                z-index: 45;
+            }
+
+            .dashboard-sidebar.mobile-open {
+                transform: translateX(0);
+                z-index: 105;
+            }
+
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(100%);
+                z-index: 45;
+            }
+
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .dashboard-sidebar {
+                transform: translateX(0) !important;
+                z-index: 30;
+            }
+
+            .dashboard-sidebar.mobile-open,
+            .dashboard-sidebar.mobile-closed {
+                transform: translateX(0) !important;
+            }
+
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #10b981;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ef4444;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--color-background);
+            z-index: 110;
+            transition: background-color 0.3s;
+        }
+
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .header-avatar:hover {
+            transform: scale(1.05);
+            border-color: #f59e0b;
+        }
+
+        main {
+            padding-top: var(--header-height);
+        }
+
+        .bottom-mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        @media (max-width: 1024px) {
+            .bottom-mobile-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                gap: 4px;
+            }
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            padding: 6px 4px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--color-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .bottom-nav-item span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            font-size: 0.68rem;
+        }
+
+        .bottom-nav-item:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.06);
+        }
+
+        .bottom-nav-item:active {
+            transform: scale(0.94);
+            background: rgba(13, 153, 255, 0.12);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .bottom-nav-item.active i {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 102;
+            font-size: 1.4rem;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            color: var(--color-primary);
+        }
+
+        .bottom-nav-item.active span {
+            margin-top: 18px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--color-white);
+            font-family: inherit;
+            transition: border-color 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.1);
+        }
+
+        select.input-field {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 36px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .input-field {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .info-card {
+                padding: 18px;
+            }
+
+            .btn-sm {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+
+            .add-rows-section input {
+                width: 80px;
+            }
+
+            .restaurant-card .flex-wrap.justify-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .restaurant-card .flex-wrap.gap-3 {
+                flex-direction: column;
+            }
+
+            .restaurant-table th,
+            .restaurant-table td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+
+            .restaurant-logo {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            background: #0b85e0;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--color-white);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.05);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+        }
+
+        .btn-xs {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content.wide {
+            max-width: 900px;
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 24px 20px;
+                border-radius: 18px;
+                max-width: 95vw;
+            }
+
+            .modal-content.wide {
+                max-width: 95vw;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: var(--color-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            z-index: 5;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .title-cell {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 32px;
+            text-align: center;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 28px;
+        }
+
+        .title-cell h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+
+        .title-cell p {
+            color: var(--color-muted);
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+
+        .title-cell .title-icon {
+            font-size: 2.4rem;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .title-cell {
+                padding: 20px 16px;
+            }
+
+            .title-cell h1 {
+                font-size: 1.5rem;
+            }
+
+            .title-cell p {
+                font-size: 0.85rem;
+            }
+        }
+
+        .restaurant-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Alexandria', sans-serif;
+            min-width: 700px;
+        }
+
+        .restaurant-table th,
+        .restaurant-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .restaurant-table th {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .restaurant-table td .input-field {
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            font-size: 0.95rem;
+            color: var(--color-white);
+            width: 100%;
+        }
+
+        .restaurant-table td .input-field:focus {
+            border-bottom: 1px solid var(--color-primary);
+            box-shadow: none;
+        }
+
+        .restaurant-table .total-row td {
+            border-top: 2px solid var(--color-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-primary);
+        }
+
+        .restaurant-table .total-row td:last-child {
+            color: var(--color-primary);
+        }
+
+        .view-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Alexandria', sans-serif;
+            margin-top: 16px;
+        }
+
+        .view-table th,
+        .view-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+            color: var(--color-white);
+        }
+
+        .view-table th {
+            background: var(--darker-bg);
+            color: var(--color-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .restaurant-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-glow);
+            margin-top: 28px;
+        }
+
+        .restaurant-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .restaurant-header i {
+            font-size: 2rem;
+            color: var(--color-primary);
+        }
+
+        .restaurant-header h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+
+        .restaurant-header .restaurant-name-input {
+            flex: 1;
+            min-width: 150px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 14px;
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .restaurant-header .restaurant-name-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .row-action-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            padding: 3px 5px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row-action-btn:hover {
+            color: var(--color-primary);
+            background: rgba(13, 153, 255, 0.1);
+        }
+
+        .row-action-btn.delete-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all .4s ease;
+        }
+
+        .theme-toggle .toggle-circle {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
+            transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
+        }
+
+        .theme-toggle .icon {
+            position: absolute;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .4s ease;
+        }
+
+        .theme-toggle .sun-icon {
+            color: #ff6b35;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .theme-toggle .moon-icon {
+            color: #a78bfa;
+            opacity: 0;
+            transform: rotate(180deg) scale(.5);
+        }
+
+        .theme-toggle.dark {
+            background: linear-gradient(45deg, #475569, #1e293b);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+
+        .theme-toggle.dark .toggle-circle {
+            right: calc(100% - 31px);
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+
+        .theme-toggle.dark .sun-icon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(.5);
+        }
+
+        .theme-toggle.dark .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .add-rows-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .add-rows-section input {
+            width: 100px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 12px;
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .add-rows-section input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .report-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-list-item .report-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .report-list-item .report-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .restaurant-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--color-white);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--color-primary);
+        }
+
+        .clear-logo-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .clear-logo-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg"
+                        class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar"
+                        style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName">Mohamed Ibrahim</p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role">مدير الحسابات</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1">
+                <div class="sidebar-section-title">الكاش</div>
+                <a href="/outgoing" class="sidebar-item" data-page="outgoing-invoices"><i class="las la-file-invoice-dollar"></i><span>خوارج</span></a>
+                <a href="/visa" class="sidebar-item" data-page="visa"><i class="las la-credit-card"></i><span>فيز</span></a>
+                <a href="/cash" class="sidebar-item" data-page="transfers"><i class="las la-exchange-alt"></i><span>تحويلات</span></a>
+                <a href="/advances" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <div class="sidebar-section-title">الملف الشخصي</div>
+                <a href="/settings" class="sidebar-item" data-page="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+                <a href="/me/reports" class="sidebar-item" data-page="reports"><i class="las la-chart-bar"></i><span>آخر التقارير</span></a>
+                <div class="sidebar-section-title">المالية</div>
+                <a href="/employee-files" class="sidebar-item" data-page="files"><i class="las la-folder"></i><span>الملفات والموظفين</span></a>
+                <a href="/employee-advance" class="sidebar-item" data-page="advances"><i class="las la-hand-holding-usd"></i><span>السلف</span></a>
+                <a href="/employee-salary" class="sidebar-item" data-page="daily-salary"><i class="las la-money-bill-wave"></i><span>الرواتب اليومية</span></a>
+                <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+                    <a href="" id="logoutBtn" class="sidebar-item" style="color: #ef4444;"><i class="las la-sign-out-alt"></i><span>تسجيل الخروج</span></a>
+                </div>
+            </nav>
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer"
+                        class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a>
+                </div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
+            </div>
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/">
+                        <img src="https://files.catbox.moe/kdxauw.png" alt="logo"
+                            class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="https://i.ibb.co/yjsL7YQ/photo-2026-08-11-02-55-41.jpg" class="header-avatar" alt="avatar">
+                </div>
+            </header>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="title-cell">
+                    <div class="title-icon"><i class="las la-utensils"></i></div>
+                    <h1>إدارة المطاعم</h1>
+                    <p>إدارة بيانات المطاعم (المعرف والاسم والشعار والوصف والهاتف والبريد وساعات العمل والعنوان والحالة)</p>
+                </div>
+                <div class="restaurant-card">
+                    <div class="restaurant-header">
+                        <i class="las la-store"></i>
+                        <h3>إدارة المطاعم</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="restaurant-table" id="restaurantTable">
+                            <thead>
+                                <tr>
+                                    <th>المعرف</th>
+                                    <th>الاسم</th>
+                                    <th>الشعار</th>
+                                    <th>الحالة</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="restaurantTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
+            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
+            <p id="successMessage" class="text-[var(--color-muted)]"></p>
+            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeViewModal"><i class="las la-times"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-[var(--color-white)]">تفاصيل المطعم</h3>
+            <div class="space-y-4" id="viewRestaurantDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const restaurantTbody = document.getElementById('restaurantTbody');
+        let restaurants = [];
+
+        const defaultRestaurants = [
+            {
+                id: "1",
+                name: "ابن حميدو السلام",
+                logo: "https://sys.shadowza.space/logos/1.png",
+                description: "Sea Food",
+                phone: "-",
+                email: "-",
+                working_hours: "11:00 - 03:00",
+                address: "شرم الشيخ",
+                is_active: 1,
+                created_at: "-",
+                updated_at: "-",
+                main_link: "/",
+                admin_link: "/admin/resturant/1"
+            },
+            {
+                id: "2",
+                name: "مطاعم نعمه",
+                logo: "https://sys.shadowza.space/logos/2.png",
+                description: "اكل شعبي",
+                phone: "-",
+                email: "-",
+                working_hours: "24 Hours",
+                address: "شرم الشيخ",
+                is_active: 0,
+                created_at: "-",
+                updated_at: "-",
+                main_link: "",
+                admin_link: ""
+            }
+        ];
+
+        function getCurrentTimestamp() {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+
+        function loadRestaurants() {
+            try {
+                const stored = localStorage.getItem('restaurantManagementData');
+                if (stored) {
+                    restaurants = JSON.parse(stored);
+                } else {
+                    restaurants = defaultRestaurants;
+                    saveRestaurants();
+                }
+            } catch (e) {
+                restaurants = defaultRestaurants;
+            }
+            renderRestaurantTable();
+        }
+
+        function saveRestaurants() {
+            try {
+                localStorage.setItem('restaurantManagementData', JSON.stringify(restaurants));
+            } catch (e) {
+                console.warn('فشل حفظ البيانات محلياً');
+            }
+        }
+
+        function renderRestaurantTable() {
+            restaurantTbody.innerHTML = '';
+            if (restaurants.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="5" class="text-center py-12">
+                        <div class="flex flex-col items-center justify-center gap-3">
+                            <i class="las la-store-alt text-6xl text-[var(--color-muted)] opacity-40"></i>
+                            <p class="text-lg font-semibold text-[var(--color-muted)]">لا توجد مطاعم حالياً</p>
+                            <p class="text-sm text-[var(--color-muted)] opacity-70">ابدأ بإضافة مطعم جديد من النموذج أعلاه</p>
+                        </div>
+                    </td>
+                `;
+                restaurantTbody.appendChild(tr);
+                return;
+            }
+            restaurants.forEach((rest, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${rest.id || ''}</td>
+                    <td>${rest.name || ''}</td>
+                    <td>${rest.logo ? `<img src="${rest.logo}" alt="شعار" class="restaurant-logo" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%239ca3af%22%3E%3Cpath d=%22M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-1.99.9-1.99 2L2 20c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 0h-4V4h4v2z%22/%3E%3C/svg%3E'"` : '<span class="text-[var(--color-muted)]">—</span>'}</td>
+                    <td>${rest.is_active ? '<span class="badge-success"><i class="las la-check-circle"></i> نشط</span>' : '<span class="badge-danger"><i class="las la-times-circle"></i> غير نشط</span>'}</td>
+                    <td>
+                        <div class="flex gap-2">
+                            <button class="row-action-btn view-btn" data-index="${index}" title="عرض"><i class="las la-eye"></i></button>
+                            <a href="${rest.main_link || '#'}" class="btn-outline btn-sm main-link" data-index="${index}">توجه للرابط الأساسي</a>
+                            <a href="${rest.admin_link || '#'}" class="btn-outline btn-sm admin-link" data-index="${index}">إدارة المطعم</a>
+                        </div>
+                    </td>
+                `;
+                restaurantTbody.appendChild(tr);
+            });
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    openViewModal(index);
+                });
+            });
+
+            document.querySelectorAll('.main-link, .admin-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const rest = restaurants[index];
+                    if (rest && !rest.is_active) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'تنبيه',
+                            text: 'هذا المطعم غير نشط حالياً',
+                            confirmButtonText: 'حسناً',
+                            confirmButtonColor: '#0d99ff'
+                        });
+                    }
+                });
+            });
+        }
+
+        function openViewModal(index) {
+            const rest = restaurants[index];
+            if (!rest) return;
+            const container = document.getElementById('viewRestaurantDetails');
+            container.innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    ${rest.logo ? `<img src="${rest.logo}" alt="شعار" class="restaurant-logo" style="width:60px;height:60px;" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%239ca3af%22%3E%3Cpath d=%22M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-1.99.9-1.99 2L2 20c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 0h-4V4h4v2z%22/%3E%3C/svg%3E'">` : '<div class="restaurant-logo flex items-center justify-center" style="width:60px;height:60px;"><i class="las la-store-alt text-2xl text-[var(--color-muted)]"></i></div>'}
+                    <div>
+                        <h4 class="text-xl font-bold">${rest.name}</h4>
+                        <p class="text-sm text-[var(--color-muted)]">${rest.description || 'بدون وصف'}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">المعرف</span>
+                        <p class="font-medium">${rest.id}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">الحالة</span>
+                        <p>${rest.is_active ? 'نشط' : 'غير نشط'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">الهاتف</span>
+                        <p>${rest.phone || '—'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">البريد الإلكتروني</span>
+                        <p>${rest.email || '—'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">ساعات العمل</span>
+                        <p>${rest.working_hours || '—'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">العنوان</span>
+                        <p>${rest.address || '—'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">تاريخ الإنشاء</span>
+                        <p>${rest.created_at || '—'}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-[var(--color-muted)]">آخر تحديث</span>
+                        <p>${rest.updated_at || '—'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        const themeToggleBtn = document.getElementById('themetoggle');
+        const body = document.body;
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            body.classList.toggle('light', !isDark);
+            themeToggleBtn.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = !body.classList.contains('light');
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        const sidebar = document.getElementById('dashboardSidebar');
+        const headerAvatar = document.getElementById('headerAvatar');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-open');
+            sidebar.classList.remove('mobile-closed');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            sidebar.classList.add('mobile-closed');
+        }
+
+        if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1025) {
+                sidebar.classList.remove('mobile-open', 'mobile-closed');
+            } else {
+                if (!sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.add('mobile-closed');
+                }
+            }
+        });
+
+        headerAvatar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (window.innerWidth < 1025) {
+                if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                else openSidebar();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
+                if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) {
+                    closeSidebar();
+                }
+            }
+        });
+
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.id === 'logoutBtn') return;
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                if (window.innerWidth < 1025) closeSidebar();
+            });
+        });
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                window.location.href = '/';
+            }
+        });
+
+        const successModal = document.getElementById('successModal');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
+        const okSuccessBtn = document.getElementById('okSuccessBtn');
+        const successMessageEl = document.getElementById('successMessage');
+
+        function showSuccess(msg) {
+            successMessageEl.textContent = msg;
+            successModal.classList.add('active');
+        }
+
+        function hideSuccess() {
+            successModal.classList.remove('active');
+        }
+
+        closeSuccessModal.addEventListener('click', hideSuccess);
+        okSuccessBtn.addEventListener('click', hideSuccess);
+        window.addEventListener('click', (e) => {
+            if (e.target === successModal) hideSuccess();
+        });
+
+        const viewModal = document.getElementById('viewModal');
+        const closeViewModal = document.getElementById('closeViewModal');
+
+        closeViewModal.addEventListener('click', function() {
+            viewModal.classList.remove('active');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === viewModal) {
+                viewModal.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRestaurants();
+        });
+    </script>
+</body>
+
+</html>
