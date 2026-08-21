@@ -198,11 +198,19 @@
             return null;
         }
 
-        function isCashReport(report) {
+        function processReport(report) {
+            if (!excludeCashReports) return report;
             const cashKeywords = ['كاش', 'نقدي'];
-            if (report.name && cashKeywords.some(k => report.name.includes(k))) return true;
-            if (report.rows && report.rows.some(row => row.desc && cashKeywords.some(k => row.desc.includes(k)))) return true;
-            return false;
+            const rows = Array.isArray(report.rows) ? report.rows.filter(row => !(row.desc && cashKeywords.some(k => row.desc.includes(k)))) : [];
+            if (rows.length === 0) return null;
+            const total = rows.reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
+            return Object.assign({}, report, { rows: rows, total: total.toString() });
+        }
+
+        function getProcessedReports() {
+            const reports = Array.isArray(window.expensesReports) ? window.expensesReports : [];
+            if (!excludeCashReports) return reports;
+            return reports.map(processReport).filter(r => r !== null);
         }
 
         function hideReportView() {
@@ -212,7 +220,7 @@
         }
 
         function viewReportById(reportId) {
-            const reports = Array.isArray(window.expensesReports) ? window.expensesReports : [];
+            const reports = getProcessedReports();
             const report = reports.find(r => r.id === reportId);
             if (!report) {
                 showSuccess('التقرير غير موجود.');
@@ -318,7 +326,7 @@
         }
 
         function loadRecentReports() {
-            const reports = Array.isArray(window.expensesReports) ? window.expensesReports : [];
+            const reports = getProcessedReports();
             const searchQuery = reportSearchInput.value.toLowerCase().trim();
             let filteredReports = reports;
 
@@ -334,10 +342,6 @@
 
             if (selectedDateFilter) {
                 filteredReports = filteredReports.filter(report => getReportDateKey(report) === selectedDateFilter);
-            }
-
-            if (excludeCashReports) {
-                filteredReports = filteredReports.filter(report => !isCashReport(report));
             }
 
             if (selectedDateFilter) {
@@ -568,7 +572,7 @@
         document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
         document.getElementById('printDetailReportBtn').addEventListener('click', function() {
             if (!currentViewReportId) return;
-            const reports = Array.isArray(window.expensesReports) ? window.expensesReports : [];
+            const reports = getProcessedReports();
             const report = reports.find(r => r.id === currentViewReportId);
             if (!report) return;
             const printArea = document.getElementById('printArea');
