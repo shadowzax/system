@@ -394,7 +394,22 @@ app.get("/admin/reports/2", async (req, res) => {
     });
 });
 /*-----------------------------------------*/
-
+app.get("/admin/resturant", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+    res.render("../admin/all-resturant", {
+        title: "",
+        description: "",
+        activePage: "all-resturant",
+        restaurant: {
+            id: 2,
+            name: "مطاعم نعمه",
+            section: "السلام",
+            logo: "/logos/2.png"
+        }
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running at http://${HOST}:${PORT}`);
