@@ -224,7 +224,7 @@ app.get("/cash", (req, res) => {
 
     res.render("system/cash", {
         title: "تحويلات كاش",
-        description: ""
+        activePage: "reports",
     });
 });
 app.get("/advances", (req, res) => {
@@ -255,7 +255,8 @@ app.get("/neama/login", (req, res) => {
 
     res.render("../neama/auth/login", {
         title: "تسجيل الدخول",
-        description: "قم بتسجيل الدخول إلى حسابك"
+        description: "قم بتسجيل الدخول إلى حسابك",
+    
     });
 });
 /*------------------------------------------*/
