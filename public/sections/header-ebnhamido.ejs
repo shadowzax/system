@@ -1,147 +1,115 @@
-<div class="relative min-h-screen">
-    <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
-        <div class="mb-6 px-2 mt-4">
-            <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
-                <img id="userAvatar"
-                     src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>"
-                     class="w-12 h-12 rounded-full border-2 shadow object-cover"
-                     alt="avatar"
-                     style="border-color:#f59e0b;">
-
-                <div>
-                    <p class="font-bold text-[var(--color-white)]" id="userFullName">
-                        <%= user?.name || "مستخدم" %>
-                    </p>
-
-                    <p class="text-xs text-[var(--color-muted)]" id="role">
-                        <%= user?.job_title || user?.account_type || "مستخدم" %>
-                    </p>
+    <div class="relative min-h-screen">
+        <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
+            <div class="mb-6 px-2 mt-4">
+                <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
+                    <img id="userAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="w-12 h-12 rounded-full border-2 shadow object-cover" alt="avatar" style="border-color:#f59e0b;">
+                    <div>
+                        <p class="font-bold text-[var(--color-white)]" id="userFullName"><%= user?.name || "مستخدم" %></p>
+                        <p class="text-xs text-[var(--color-muted)]" id="role"><%= user?.job_title || user?.account_type || "مستخدم" %></p>
+                    </div>
                 </div>
             </div>
-        </div>
+<!----------------------------------->
+<nav class="flex-1">
+    <div class="sidebar-section-title">الكاش</div>
 
-        <!----------------------------------->
-        <nav class="flex-1">
+    <a href="/outgoing"
+       class="sidebar-item <%= activePage === 'outgoing-invoices' ? 'active' : '' %>"
+       data-page="outgoing-invoices">
+        <i class="las la-file-invoice-dollar"></i>
+        <span>خوارج</span>
+    </a>
 
-            <div class="sidebar-section-title">الكاش</div>
+    <a href="/visa"
+       class="sidebar-item <%= activePage === 'visa' ? 'active' : '' %>"
+       data-page="visa">
+        <i class="las la-credit-card"></i>
+        <span>فيز</span>
+    </a>
 
-            <a href="/outgoing"
-               class="sidebar-item <%= activePage === 'outgoing-invoices' ? 'active' : '' %>"
-               data-page="outgoing-invoices">
-                <i class="las la-file-invoice-dollar"></i>
-                <span>خوارج</span>
-            </a>
+    <a href="/cash"
+       class="sidebar-item <%= activePage === 'transfers' ? 'active' : '' %>"
+       data-page="transfers">
+        <i class="las la-exchange-alt"></i>
+        <span>تحويلات</span>
+    </a>
 
-            <a href="/visa"
-               class="sidebar-item <%= activePage === 'visa' ? 'active' : '' %>"
-               data-page="visa">
-                <i class="las la-credit-card"></i>
-                <span>فيز</span>
-            </a>
+    <a href="/advances"
+       class="sidebar-item <%= activePage === 'advances' ? 'active' : '' %>"
+       data-page="advances">
+        <i class="las la-hand-holding-usd"></i>
+        <span>السلف</span>
+    </a>
 
-            <a href="/cash"
-               class="sidebar-item <%= activePage === 'transfers' ? 'active' : '' %>"
-               data-page="transfers">
-                <i class="las la-exchange-alt"></i>
-                <span>تحويلات</span>
-            </a>
+    <div class="sidebar-section-title">الملف الشخصي</div>
 
-            <a href="/advances"
-               class="sidebar-item <%= activePage === 'advances' ? 'active' : '' %>"
-               data-page="advances">
-                <i class="las la-hand-holding-usd"></i>
-                <span>السلف</span>
-            </a>
+    <a href="/settings"
+       class="sidebar-item <%= activePage === 'settings' ? 'active' : '' %>"
+       data-page="settings">
+        <i class="las la-cog"></i>
+        <span>الإعدادات</span>
+    </a>
 
+    <a href="/me/reports"
+       class="sidebar-item <%= activePage === 'reports' ? 'active' : '' %>"
+       data-page="reports">
+        <i class="las la-chart-bar"></i>
+        <span>آخر التقارير</span>
+    </a>
 
-            <div class="sidebar-section-title">الملف الشخصي</div>
+    <% if (user && user.account_type === 'admin') { %>
+    <div class="sidebar-section-title">المالية</div>
 
-            <a href="/settings"
-               class="sidebar-item <%= activePage === 'settings' ? 'active' : '' %>"
-               data-page="settings">
-                <i class="las la-cog"></i>
-                <span>الإعدادات</span>
-            </a>
+    <a href="/employee-files"
+       class="sidebar-item <%= activePage === 'files' ? 'active' : '' %>"
+       data-page="files">
+        <i class="las la-folder"></i>
+        <span>الملفات والموظفين</span>
+    </a>
 
-            <a href="/me/reports"
-               class="sidebar-item <%= activePage === 'reports' ? 'active' : '' %>"
-               data-page="reports">
-                <i class="las la-chart-bar"></i>
-                <span>آخر التقارير</span>
-            </a>
+    <a href="/employee-advance"
+       class="sidebar-item <%= activePage === 'employee-advance' ? 'active' : '' %>"
+       data-page="employee-advance">
+        <i class="las la-hand-holding-usd"></i>
+        <span>السلف</span>
+    </a>
 
+    <a href="/employee-salary"
+       class="sidebar-item <%= activePage === 'daily-salary' ? 'active' : '' %>"
+       data-page="daily-salary">
+        <i class="las la-money-bill-wave"></i>
+        <span>الرواتب اليومية</span>
+    </a>
+    <% } %>
 
-            <% if (user?.account_type === 'admin') { %>
-
-                <div class="sidebar-section-title">المالية</div>
-
-                <a href="/employee-files"
-                   class="sidebar-item <%= activePage === 'files' ? 'active' : '' %>"
-                   data-page="files">
-                    <i class="las la-folder"></i>
-                    <span>الملفات والموظفين</span>
-                </a>
-
-                <a href="/employee-advance"
-                   class="sidebar-item <%= activePage === 'employee-advance' ? 'active' : '' %>"
-                   data-page="employee-advance">
-                    <i class="las la-hand-holding-usd"></i>
-                    <span>السلف</span>
-                </a>
-
-                <a href="/employee-salary"
-                   class="sidebar-item <%= activePage === 'daily-salary' ? 'active' : '' %>"
-                   data-page="daily-salary">
-                    <i class="las la-money-bill-wave"></i>
-                    <span>الرواتب اليومية</span>
-                </a>
-
-            <% } %>
-
-
-            <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
-                <a id="logoutBtn"
-                   class="sidebar-item"
-                   style="color: #ef4444;">
-                    <i class="las la-sign-out-alt"></i>
-                    <span>تسجيل الخروج</span>
-                </a>
+    <div class="mt-8 pt-4 border-t border-[var(--border-color)]">
+        <a id="logoutBtn"
+           class="sidebar-item"
+           style="color: #ef4444;">
+            <i class="las la-sign-out-alt"></i>
+            <span>تسجيل الخروج</span>
+        </a>
+    </div>
+</nav>
+<!----------------------------------->
+            <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
+                <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">Developed by</span>
+                <div><a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">Abdelrahman Mohamed</a></div>
+                <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">v3.2</div>
             </div>
-
-        </nav>
-        <!----------------------------------->
-
-        <div class="mt-5 pt-4 border-t border-black/10 dark:border-white/10 text-center leading-tight">
-            <span class="text-[9px] uppercase tracking-[0.15em] text-[var(--color-muted)] opacity-70">
-                Developed by
-            </span>
-
-            <div>
-                <a href="https://www.facebook.com/Abdelrahman.Elshamhuot"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="text-[11px] font-medium text-[var(--color-muted)] hover:underline">
-                    Abdelrahman Mohamed
-                </a>
-            </div>
-
-            <div class="mt-1 text-[9px] text-[var(--color-muted)] opacity-50">
-                v3.2
-            </div>
-        </div>
-    </aside>
-
-
-    <main class="lg:mr-[280px] transition-all">
-
-        <header id="mainHeader">
-
-            <div class="flex items-center gap-6 mr-4">
-                <a class="flex w-fit select-none items-center" href="/">
-                    <img src="/logos/1.png"
-                         alt="logo"
-                         class="h-[52px] sm:h-[60px] md:h-[68px] object-contain">
-                </a>
-            </div>
-
-            <div class="flex items-center gap-3 sm:gap-
+        </aside>
+        <main class="lg:mr-[280px] transition-all">
+            <header id="mainHeader">
+                <div class="flex items-center gap-6 mr-4">
+                    <a class="flex w-fit select-none items-center" href="/"><img src="/logos/1.png" alt="logo" class="h-[52px] sm:h-[60px] md:h-[68px] object-contain"></a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="theme-toggle" id="themetoggle">
+                        <div class="toggle-circle">
+                            <i class="fas fa-sun icon sun-icon"></i>
+                            <i class="fas fa-moon icon moon-icon"></i>
+                        </div>
+                    </button>
+                    <img id="headerAvatar" src="<%= user?.profile_picture || 'https://files.catbox.moe/4lsmka.jpg' %>" class="header-avatar" alt="avatar">
+                </div>
+            </header>
