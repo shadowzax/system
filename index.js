@@ -234,7 +234,7 @@ app.get("/settings", (req, res) => {
         return res.redirect("/login");
     }
 
-    res.render("settings/settings", {
+    res.render("profile/settings", {
         title: "الاعدادات",
         activePage: "settings",
     });
