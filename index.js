@@ -137,19 +137,19 @@ app.get("/", (req, res) => {
 app.get("/employee-files", (req, res) => {
     res.render("finance/files", {
         title: "",
-        description: ""
+        activePage: "files",
     });
 });
 app.get("/employee-advance", (req, res) => {
     res.render("finance/advance", {
         title: "",
-        description: ""
+        activePage: "employee-advance",
     });
 });
 app.get("/employee-salary", (req, res) => {
     res.render("finance/salary", {
         title: "",
-        description: ""
+        activePage: "daily-salary",
     });
 });
 
@@ -182,7 +182,7 @@ app.get("/me/reports", (req, res) => {
     res.render("../uploads/test", {
   //  res.render("profile/myreports", {
         title: "",
-        description: ""
+        activePage: "reports",
     });
 });
 /*--------------------------------------------*/
@@ -193,7 +193,7 @@ app.get("/outgoing", (req, res) => {
 
     res.render("system/outgoing", {
         title: "خوارج",
-        description: ""
+        activePage: "outgoing-invoices",
     });
 });
 app.get("/", (req, res) => {
@@ -203,7 +203,7 @@ app.get("/", (req, res) => {
 
     res.render("system/outgoing", {
         title: "خوارج",
-        description: ""
+        activePage: "outgoing-invoices",
     });
 });
 app.get("/visa", (req, res) => {
@@ -213,7 +213,7 @@ app.get("/visa", (req, res) => {
 
     res.render("system/visa", {
         title: "فيز",
-        description: ""
+        activePage: "visa",
     });
 });
 
@@ -223,7 +223,7 @@ app.get("/cash", (req, res) => {
     }
 
     res.render("system/cash", {
-        title: "تحويلات كاش",
+        title: "التحويلات",
         activePage: "transfers",
     });
 });
@@ -233,8 +233,8 @@ app.get("/advances", (req, res) => {
     }
 
     res.render("system/salary-advance", {
-        title: "تحويلات كاش",
-        description: ""
+        title: "اداره السلف",
+        activePage: "advances",
     });
 });
 app.get("/settings", (req, res) => {
@@ -243,8 +243,8 @@ app.get("/settings", (req, res) => {
     }
 
     res.render("settings/settings", {
-        title: "تحويلات كاش",
-        description: ""
+        title: "الاعدادات",
+        activePage: "settings",
     });
 });
 /*------------------------------------------*/
