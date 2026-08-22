@@ -552,7 +552,7 @@
         });
 
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
-            const LOGO_URL = '/logos/2.png';
+            const LOGO_URL = `<%= restaurant.logo %>`;
             let html = '';
             html += '<div style="text-align:center; margin-bottom:2mm;">';
             html += '<img src="' + LOGO_URL + '" style="width:20mm; height:auto; margin:0 auto; display:block;" alt="Logo" />';
