@@ -264,21 +264,21 @@ app.get("/neama/login", (req, res) => {
     });
 });
 app.get("/neama/employee-files", (req, res) => {
-    res.render(path.join(__dirname, "public", "neama", "finance", "files"), {
+    res.render("../neama/finance/files", {
         title: "",
         activePage: "files"
     });
 });
 
 app.get("/neama/employee-advance", (req, res) => {
-    res.render(path.join(__dirname, "public", "neama", "finance", "advance"), {
+    res.render("../neama/finance/advance", {
         title: "",
         activePage: "employee-advance"
     });
 });
 
 app.get("/neama/employee-salary", (req, res) => {
-    res.render(path.join(__dirname, "public", "neama", "finance", "salary"), {
+    res.render("../neama/finance/salary", {
         title: "",
         activePage: "daily-salary"
     });
