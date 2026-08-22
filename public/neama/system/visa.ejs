@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>تقرير فيزا</title>
+    <meta name="description" content="تقرير معاملات الفيزا">
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="apple-touch-icon" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/visa.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.__APP_DATA__ = {
+            token: "<%- token %>",
+            api: "<%- api %>",
+            isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
+            user: <%- JSON.stringify(user || null) %>,
+            fees: <%- JSON.stringify(user && user.fees ? JSON.parse(user.fees) : []) %>,
+            restaurant_id: 1
+        };
+    </script>
+</head>
+
+<body>
+    <%- include('../../sections/header-ebnhamido.ejs') %>
+            <div class="container mx-auto px-4 py-6 max-w-7xl">
+                <div class="title-cell">
+                    <div class="title-icon"><i class="las la-credit-card"></i></div>
+                    <h1>فيزا</h1>
+                    <p>تسجيل معاملات الفيزا</p>
+                </div>
+                <div class="restaurant-card">
+                    <div class="restaurant-header">
+                        <i class="las la-credit-card"></i>
+                        <h3>فيزا</h3>
+                        <input type="text" class="restaurant-name-input" id="restaurantNameInput"
+                            placeholder="اسم المعاملة (فيزا)">
+                        <div class="mr-auto flex items-center gap-2">
+                            <button type="button" id="dateToggleBtn" class="date-toggle-btn active"
+                                title="تبديل بين التاريخ التلقائي واليدوي">
+                                <i class="las la-calendar-check"></i>
+                                <span id="dateToggleText">تلقائي</span>
+                            </button>
+                            <input type="date" id="reportDateInput" class="input-field text-xs py-1 px-2"
+                                style="width:140px;" disabled>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="restaurant-table" id="restaurantTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:8%;text-align:center;">#</th>
+                                    <th style="width:35%;">المبلغ (ج.م)</th>
+                                    <th style="width:37%;text-align:center;">التاريخ والوقت</th>
+                                    <th style="width:20%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="restaurantTbody"></tbody>
+                            <tfoot>
+                                <tr class="total-row" id="totalRow">
+                                    <td style="text-align:center;">-</td>
+                                    <td id="totalAmount">0</td>
+                                    <td style="text-align:center;">الإجمالي</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mt-4 justify-between items-center">
+                        <div class="flex flex-wrap gap-3 items-center" id="editableActions">
+                            <button class="btn-outline btn-sm" id="addRowBtn"><i class="las la-plus"></i> إضافة صف</button>
+                            <div class="add-rows-section">
+                                <span class="text-xs text-[var(--color-muted)]">عدد الصفوف:</span>
+                                <input type="number" id="rowsCountInput" value="3" min="1" max="50">
+                                <button class="btn-outline btn-sm" id="addRowsBatchBtn"><i class="las la-plus-circle"></i> إضافة</button>
+                            </div>
+                            <button class="btn-outline btn-sm" id="clearRowsBtn"><i class="las la-trash-alt"></i> مسح الكل</button>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn-primary btn-sm" id="storeBtn"><i class="las la-save"></i> تخزين</button>
+                            <button class="btn-outline btn-sm hidden" id="cancelEditBtn"><i class="las la-times"></i> إلغاء التعديل</button>
+                            <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة (82.5mm)</button>
+                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> CSV</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-card mt-6" id="reportViewCard" style="display:none;">
+                    <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
+                        <div class="w-full md:w-auto md:flex-1"></div>
+                        <div class="w-full md:w-auto md:flex-1 text-center">
+                            <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
+                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير فيزا</h3>
+                            <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
+                        </div>
+                        <div class="w-full md:w-auto md:flex-1 flex justify-center md:justify-end">
+                            <div class="flex gap-3 flex-wrap justify-center">
+                                <button class="btn-outline btn-sm" id="printDetailReportBtn"><i class="las la-print"></i> طباعة هذا التقرير</button>
+                                <button class="btn-outline btn-sm" id="closeDetailReportBtn"><i class="las la-times"></i> إغلاق</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="view-table" id="viewReportTable2">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%;text-align:center;">#</th>
+                                    <th style="width:45%;">المبلغ (ج.م)</th>
+                                    <th style="width:45%;text-align:center;">التاريخ والوقت</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewReportTbody2"></tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td style="text-align:center;">-</td>
+                                    <td id="viewReportTotal2">0</td>
+                                    <td style="text-align:center;">الإجمالي</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="mt-6 info-card" id="recentReportsCard">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-history text-primary"></i> آخر التقارير المنشأة</h3>
+                            <p class="text-sm text-[var(--color-muted)]">عرض آخر التقارير التي تم تخزينها</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-[var(--color-muted)]">ترتيب:</label>
+                            <select id="sortOrderSelect" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                <option value="newest">الأحدث</option>
+                                <option value="oldest">الأقدم</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3" id="recentReportsList"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                            <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
+                            <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
+                            <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="printArea" style="display:none;"></div>
+    <div class="bottom-mobile-nav" id="bottomMobileNav">
+        <div class="nav-notch" id="navNotch"></div>
+        <a href="#" class="bottom-nav-item" data-tab="dashboard"><i class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
+        <a href="#" class="bottom-nav-item active" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="tickets"><i class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
+        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
+    </div>
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content text-center">
+            <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
+            <i class="las la-check-circle text-5xl text-primary mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
+            <p id="successMessage" class="text-[var(--color-muted)]"></p>
+            <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const appData = window.__APP_DATA__ || {};
+            const userData = appData.user || {};
+            const serverFees = Array.isArray(appData.fees) ? appData.fees : null;
+            const token = appData.token || "";
+            const apiBase = appData.api || "";
+            const restaurantId = "1";
+            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
+            const isAdmin = (userRole === 'admin');
+            const isCashier = (userRole === 'cashier');
+            const isViewer = (userRole === 'viewer');
+            const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
+            const PRINT_LOGO = 'https://files.catbox.moe/05wiyk.png';
+            let printLogoURL = PRINT_LOGO;
+
+            let allReports = [];
+            let currentReportsPage = 1;
+            let reportsPageSize = 5;
+            let currentEditReportId = null;
+            let sortOrder = 'newest';
+            let preEditSnapshot = null;
+
+            document.getElementById('userFullName').textContent = userData.name || 'مستخدم';
+            document.getElementById('role').textContent = userData.job_title || userData.account_type || 'مستخدم';
+            if (userData.profile_picture) {
+                document.getElementById('userAvatar').src = userData.profile_picture;
+                document.getElementById('headerAvatar').src = userData.profile_picture;
+            }
+
+            const editableActions = document.getElementById('editableActions');
+            const storeBtn = document.getElementById('storeBtn');
+            const addRowBtn = document.getElementById('addRowBtn');
+            const addRowsBatchBtn = document.getElementById('addRowsBatchBtn');
+            const clearRowsBtn = document.getElementById('clearRowsBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+            if (isViewer) {
+                editableActions.style.display = 'none';
+                storeBtn.style.display = 'none';
+                cancelEditBtn.style.display = 'none';
+            } else {
+                editableActions.style.display = 'flex';
+                storeBtn.style.display = 'inline-flex';
+            }
+
+            function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
+
+            function parseNumber(val) { const converted = convertArabicNumerals(String(val)); const cleaned = converted.replace(/,/g, '').trim(); const num = parseFloat(cleaned); return isNaN(num) ? 0 : num; }
+
+            function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
+
+            function formatDateTime(isoString) {
+                if (!isoString) return '';
+                const d = new Date(isoString);
+                if (isNaN(d.getTime())) return '';
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                let hours = d.getHours();
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                if (hours === 0) hours = 12;
+                hours = String(hours).padStart(2, '0');
+                return day + '-' + month + ' ' + hours + ':' + minutes + ' ' + ampm;
+            }
+
+            function parseDateTime(str) {
+                const regex = /^(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+                const match = str.trim().match(regex);
+                if (!match) return null;
+                let day = parseInt(match[1]);
+                let month = parseInt(match[2]);
+                let hours = parseInt(match[3]);
+                const minutes = parseInt(match[4]);
+                const ampm = match[5].toUpperCase();
+                if (month < 1 || month > 12 || day < 1 || day > 31 || hours < 1 || hours > 12 || minutes < 0 || minutes > 59) return null;
+                if (ampm === 'PM' && hours !== 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                const now = new Date();
+                const result = new Date(now.getFullYear(), month - 1, day, hours, minutes, 0, 0);
+                if (isNaN(result.getTime())) return null;
+                return result;
+            }
+
+            function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
+
+            const tbody = document.getElementById('restaurantTbody');
+            const totalAmountEl = document.getElementById('totalAmount');
+            const restaurantNameInput = document.getElementById('restaurantNameInput');
+            const dateToggleBtn = document.getElementById('dateToggleBtn');
+            const dateToggleText = document.getElementById('dateToggleText');
+            const reportDateInput = document.getElementById('reportDateInput');
+
+            function updateTotal() {
+                let total = 0;
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const input = row.querySelector('.amount-input');
+                    if (input) total += parseNumber(input.value);
+                });
+                totalAmountEl.textContent = formatNumber(total);
+            }
+
+            function focusInput(input) {
+                if (input) {
+                    input.focus();
+                    if (input.type === 'text' && input.value) input.setSelectionRange(input.value.length, input.value.length);
+                }
+            }
+
+            function updateSerials() {
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    const serialCell = row.querySelector('.serial-cell');
+                    if (serialCell) serialCell.textContent = index + 1;
+                });
+            }
+
+            function createRowElement(amount, isoDatetime) {
+                const tr = document.createElement('tr');
+
+                const serialTd = document.createElement('td');
+                serialTd.className = 'serial-cell';
+                serialTd.textContent = '0';
+                tr.appendChild(serialTd);
+
+                const amountTd = document.createElement('td');
+                const amountInput = document.createElement('input');
+                amountInput.type = 'text';
+                amountInput.className = 'input-field amount-input';
+                amountInput.placeholder = 'أدخل المبلغ';
+                amountInput.setAttribute('inputmode', 'decimal');
+                amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
+                amountTd.appendChild(amountInput);
+                tr.appendChild(amountTd);
+
+                const datetimeTd = document.createElement('td');
+                datetimeTd.style.textAlign = 'center';
+                const datetimeInput = document.createElement('input');
+                datetimeInput.type = 'text';
+                datetimeInput.className = 'datetime-input';
+                datetimeInput.placeholder = 'DD-MM HH:MM AM/PM';
+                datetimeInput.dir = 'ltr';
+                datetimeInput.setAttribute('data-iso', isoDatetime || '');
+                datetimeInput.value = isoDatetime ? formatDateTime(isoDatetime) : '';
+                datetimeTd.appendChild(datetimeInput);
+                tr.appendChild(datetimeTd);
+
+                const actionTd = document.createElement('td');
+                actionTd.style.whiteSpace = 'nowrap';
+                actionTd.style.textAlign = 'right';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'row-action-btn delete-btn';
+                deleteBtn.tabIndex = -1;
+                deleteBtn.title = 'حذف الصف';
+                deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                if (isViewer) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.4';
+                    deleteBtn.style.cursor = 'not-allowed';
+                }
+                deleteBtn.addEventListener('click', function() {
+                    if (isViewer) return;
+                    if (tbody.children.length > 1) {
+                        tr.remove();
+                        updateSerials();
+                        updateTotal();
+                        saveToSession();
+                    } else {
+                        Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
+                    }
+                });
+                actionTd.appendChild(deleteBtn);
+                tr.appendChild(actionTd);
+
+                amountInput.addEventListener('input', function() {
+                    updateTotal();
+                });
+                amountInput.addEventListener('blur', function() {
+                    let val = convertArabicNumerals(this.value).replace(/,/g, '');
+                    const num = parseFloat(val);
+                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
+                    else this.value = '';
+                    updateTotal();
+                    saveToSession();
+                });
+
+                amountInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const now = new Date();
+                        datetimeInput.setAttribute('data-iso', now.toISOString());
+                        datetimeInput.value = formatDateTime(now.toISOString());
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex === rows.length - 1) {
+                            const newTr = addRowAtEnd('', '');
+                            updateSerials();
+                            const newAmountInput = newTr.querySelector('.amount-input');
+                            if (newAmountInput) focusInput(newAmountInput);
+                        } else {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
+                        }
+                        updateTotal();
+                        saveToSession();
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex > 0) {
+                            const prevRow = rows[currentIndex - 1];
+                            const prevAmountInput = prevRow.querySelector('.amount-input');
+                            if (prevAmountInput) focusInput(prevAmountInput);
+                        }
+                    }
+                });
+
+                datetimeInput.addEventListener('blur', function() {
+                    const userValue = this.value.trim();
+                    if (userValue === '') {
+                        this.setAttribute('data-iso', '');
+                        saveToSession();
+                        return;
+                    }
+                    const parsed = parseDateTime(userValue);
+                    if (parsed) {
+                        this.setAttribute('data-iso', parsed.toISOString());
+                        this.value = formatDateTime(parsed.toISOString());
+                    } else {
+                        const iso = this.getAttribute('data-iso');
+                        this.value = iso ? formatDateTime(iso) : '';
+                    }
+                    saveToSession();
+                });
+
+                datetimeInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
+                        } else {
+                            const newTr = addRowAtEnd('', '');
+                            updateSerials();
+                            const newAmountInput = newTr.querySelector('.amount-input');
+                            if (newAmountInput) focusInput(newAmountInput);
+                        }
+                        saveToSession();
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextDtInput = nextRow.querySelector('.datetime-input');
+                            if (nextDtInput) focusInput(nextDtInput);
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex > 0) {
+                            const prevRow = rows[currentIndex - 1];
+                            const prevDtInput = prevRow.querySelector('.datetime-input');
+                            if (prevDtInput) focusInput(prevDtInput);
+                        }
+                    }
+                });
+
+                return tr;
+            }
+
+            function addRowAtEnd(amount, isoDatetime) {
+                if (isViewer) return null;
+                const tr = createRowElement(amount || '', isoDatetime || '');
+                tbody.appendChild(tr);
+                updateSerials();
+                updateTotal();
+                return tr;
+            }
+
+            function clearAllRows() {
+                if (isViewer) return;
+                tbody.innerHTML = '';
+                addRowAtEnd('', '');
+                updateSerials();
+                updateTotal();
+            }
+
+            function getTableData() {
+                const rows = tbody.querySelectorAll('tr');
+                const data = [];
+                rows.forEach(row => {
+                    const amountInput = row.querySelector('.amount-input');
+                    const datetimeInput = row.querySelector('.datetime-input');
+                    if (amountInput && datetimeInput) {
+                        data.push({ amount: amountInput.value || '0', datetime: datetimeInput.getAttribute('data-iso') || '' });
+                    }
+                });
+                return data;
+            }
+
+            function loadTableData(data) {
+                tbody.innerHTML = '';
+                if (data.length === 0) addRowAtEnd('', '');
+                else data.forEach(item => addRowAtEnd(item.amount || '', item.datetime || ''));
+                updateSerials();
+                updateTotal();
+            }
+
+            function saveToSession() {
+                if (isViewer) return;
+                const data = getTableData();
+                const name = restaurantNameInput.value || '';
+                const isAuto = dateToggleBtn.classList.contains('active');
+                const customDate = reportDateInput.value;
+                const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
+                try { localStorage.setItem('visaReportData', JSON.stringify(payload)); } catch (e) {}
+            }
+
+            function updateDateToggleUI(isAuto) {
+                const icon = dateToggleBtn.querySelector('i');
+                const span = dateToggleBtn.querySelector('span');
+                if (isAuto) {
+                    dateToggleBtn.classList.add('active');
+                    dateToggleBtn.classList.remove('inactive');
+                    if (icon) icon.className = 'las la-calendar-check';
+                    if (span) span.textContent = 'تلقائي';
+                    reportDateInput.disabled = true;
+                } else {
+                    dateToggleBtn.classList.remove('active');
+                    dateToggleBtn.classList.add('inactive');
+                    if (icon) icon.className = 'las la-calendar-alt';
+                    if (span) span.textContent = 'يدوي';
+                    reportDateInput.disabled = false;
+                }
+            }
+
+            function loadFromSession() {
+                try {
+                    const stored = localStorage.getItem('visaReportData');
+                    if (stored) {
+                        const payload = JSON.parse(stored);
+                        restaurantNameInput.value = payload.name || '';
+                        const isAuto = payload.isAuto !== undefined ? payload.isAuto : true;
+                        updateDateToggleUI(isAuto);
+                        if (payload.customDate) reportDateInput.value = payload.customDate;
+                        else reportDateInput.value = formatDateForInput(new Date());
+                        loadTableData(payload.rows || []);
+                        return true;
+                    }
+                } catch (e) {}
+                return false;
+            }
+
+            function getReportDateString() {
+                const now = new Date();
+                const isAuto = dateToggleBtn.classList.contains('active');
+                const customDate = reportDateInput.value;
+                let dateObj;
+                if (now.getHours() < 8) {
+                    dateObj = new Date(now);
+                    dateObj.setDate(dateObj.getDate() - 1);
+                } else {
+                    if (isAuto || !customDate) dateObj = new Date(now);
+                    else dateObj = new Date(customDate + 'T00:00:00');
+                }
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                return day + '/' + month + '/' + year;
+            }
+
+            function buildPrintHTML(name, dateStr, rowsData, totalText) {
+                const LOGO_URL = printLogoURL;
+                let html = '';
+                html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
+                html += '<tr>';
+                html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<div class="restaurant-name">' + (name || 'تقرير فيزا') + '</div>';
+                html += '<div class="print-date">' + (dateStr || '') + '</div>';
+                html += '</td>';
+                html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
+                html += '<img src="' + LOGO_URL + '" style="max-width:27mm; height:auto; display:block;" alt="Logo" />';
+                html += '</td>';
+                html += '</tr></table>';
+                html += '<div class="header-separator"></div>';
+                html += '<table>';
+                html += '<thead><tr><th style="width:10%;text-align:center;">#</th><th style="width:50%;">المبلغ (ج.م)</th><th style="width:40%;text-align:center;">التاريخ والوقت</th></tr></thead><tbody>';
+                if (rowsData && rowsData.length) {
+                    rowsData.forEach((row, idx) => {
+                        const amount = row.amount || '0';
+                        const dt = row.desc || (row.datetime ? formatDateTime(row.datetime) : '');
+                        html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + amount + '</td><td style="text-align:center;">' + dt + '</td></tr>';
+                    });
+                }
+                html += '<tr class="total-row"><td style="text-align:center;">-</td><td><strong>' + (totalText || '0') + '</strong></td><td style="text-align:center;"><strong>الإجمالي</strong></td></tr>';
+                html += '</tbody></table>';
+                html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+                return html;
+            }
+
+            const reportViewCard = document.getElementById('reportViewCard');
+            const viewReportTitle2 = document.getElementById('viewReportTitle2');
+            const viewReportDate2 = document.getElementById('viewReportDate2');
+            const viewReportTbody2 = document.getElementById('viewReportTbody2');
+            const viewReportTotal2 = document.getElementById('viewReportTotal2');
+            const recentReportsCard = document.getElementById('recentReportsCard');
+            const recentReportsList = document.getElementById('recentReportsList');
+            let currentViewReportId = null;
+
+            function hideReportView() {
+                reportViewCard.style.display = 'none';
+                recentReportsCard.style.display = 'block';
+                currentViewReportId = null;
+            }
+
+            function viewReportById(reportId) {
+                let report = null;
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
+                if (!report) {
+                    const stored = localStorage.getItem('visaStoredReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored);
+                        report = reports.find(r => String(r.id) === String(reportId));
+                    }
+                }
+                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
+                currentViewReportId = reportId;
+                viewReportTitle2.textContent = report.name || 'تقرير فيزا';
+                viewReportDate2.textContent = report.date || '';
+                viewReportTbody2.innerHTML = '';
+                if (report.rows && report.rows.length) {
+                    report.rows.forEach((row, idx) => {
+                        const tr = document.createElement('tr');
+                        const tdSerial = document.createElement('td');
+                        tdSerial.textContent = idx + 1;
+                        tdSerial.style.textAlign = 'center';
+                        const tdAmount = document.createElement('td');
+                        tdAmount.textContent = row.amount || '0';
+                        const tdDatetime = document.createElement('td');
+                        const dt = row.desc || (row.datetime ? formatDateTime(row.datetime) : '');
+                        tdDatetime.textContent = dt;
+                        tdDatetime.style.textAlign = 'center';
+                        tr.appendChild(tdSerial);
+                        tr.appendChild(tdAmount);
+                        tr.appendChild(tdDatetime);
+                        viewReportTbody2.appendChild(tr);
+                    });
+                }
+                viewReportTotal2.textContent = report.total || '0';
+                reportViewCard.style.display = 'block';
+                recentReportsCard.style.display = 'none';
+            }
+
+            function loadRecentReports() {
+                let reports = serverFees || [];
+                if (!Array.isArray(reports) || reports.length === 0) {
+                    try {
+                        const stored = localStorage.getItem('visaStoredReports');
+                        if (stored) reports = JSON.parse(stored);
+                    } catch (e) { reports = []; }
+                }
+                allReports = Array.isArray(reports) ? reports : [];
+                if (allReports.length === 0) {
+                    recentReportsList.innerHTML = '<div class="text-center py-6 text-[var(--color-muted)] text-sm">لا توجد تقارير سابقة</div>';
+                    document.getElementById('prevReportsPageBtn').disabled = true;
+                    document.getElementById('nextReportsPageBtn').disabled = true;
+                    document.getElementById('reportsPageIndicator').textContent = '0 / 0';
+                    return;
+                }
+                currentReportsPage = 1;
+                renderRecentReportsPage();
+                document.getElementById('reportsPageSize').value = reportsPageSize;
+            }
+
+            function getSortTime(report) {
+                if (report.timestamp) return new Date(report.timestamp).getTime();
+                const id = String(report.id || '');
+                const match = id.match(/^rep_(\d+)_/);
+                if (match) return parseInt(match[1]);
+                return 0;
+            }
+
+            function sortReports() {
+                if (sortOrder === 'oldest') {
+                    allReports.sort((a, b) => getSortTime(a) - getSortTime(b));
+                } else {
+                    allReports.sort((a, b) => getSortTime(b) - getSortTime(a));
+                }
+            }
+
+            function renderRecentReportsPage() {
+                sortReports();
+                const totalPages = Math.ceil(allReports.length / reportsPageSize);
+                if (currentReportsPage < 1) currentReportsPage = 1;
+                if (currentReportsPage > totalPages) currentReportsPage = totalPages;
+                const start = (currentReportsPage - 1) * reportsPageSize;
+                const end = start + reportsPageSize;
+                const pageReports = allReports.slice(start, end);
+                let html = '';
+                pageReports.forEach((report) => {
+                    const editDeleteBtns = (isViewer) ? '' :
+                        `<button class="btn-outline btn-xs edit-report-btn" data-id="${report.id}" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button>
+                        <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>`;
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيزا') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
+                });
+                recentReportsList.innerHTML = html;
+                document.querySelectorAll('.view-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('.edit-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { editReportById(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('.delete-report-btn').forEach(btn => {
+                    btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); });
+                });
+                document.getElementById('reportsPageIndicator').textContent = currentReportsPage + ' / ' + totalPages;
+                document.getElementById('prevReportsPageBtn').disabled = currentReportsPage <= 1;
+                document.getElementById('nextReportsPageBtn').disabled = currentReportsPage >= totalPages;
+            }
+
+            document.getElementById('sortOrderSelect').addEventListener('change', function() {
+                sortOrder = this.value;
+                currentReportsPage = 1;
+                renderRecentReportsPage();
+            });
+
+            document.getElementById('reportsPageSize').addEventListener('change', function() {
+                reportsPageSize = parseInt(this.value);
+                currentReportsPage = 1;
+                renderRecentReportsPage();
+            });
+            document.getElementById('prevReportsPageBtn').addEventListener('click', function() {
+                if (currentReportsPage > 1) { currentReportsPage--; renderRecentReportsPage(); }
+            });
+            document.getElementById('nextReportsPageBtn').addEventListener('click', function() {
+                const totalPages = Math.ceil(allReports.length / reportsPageSize);
+                if (currentReportsPage < totalPages) { currentReportsPage++; renderRecentReportsPage(); }
+            });
+
+            function deleteReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
+                    return;
+                }
+                Swal.fire({
+                    title: 'حذف التقرير',
+                    text: 'أدخل كلمة المرور للحذف',
+                    input: 'password',
+                    inputPlaceholder: 'كلمة المرور',
+                    showCancelButton: true,
+                    confirmButtonText: 'حذف',
+                    cancelButtonText: 'إلغاء',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        const password = result.value;
+                        fetch(apiBase + '/api/expenses/fees-delete', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: token,
+                                restaurant_id: restaurantId,
+                                reportId: reportId,
+                                password: password
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (serverFees) {
+                                    const index = serverFees.findIndex(r => String(r.id) === String(reportId));
+                                    if (index !== -1) serverFees.splice(index, 1);
+                                }
+                                allReports = allReports.filter(r => String(r.id) !== String(reportId));
+                                if (allReports.length === 0) loadRecentReports();
+                                else {
+                                    const totalPages = Math.ceil(allReports.length / reportsPageSize);
+                                    if (currentReportsPage > totalPages) currentReportsPage = totalPages;
+                                    renderRecentReportsPage();
+                                }
+                                Swal.fire('تم الحذف', data.message, 'success');
+                            } else {
+                                Swal.fire('خطأ', data.message, 'error');
+                            }
+                        })
+                        .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
+                    }
+                });
+            }
+
+            // دالة التخزين الرئيسية مع طلب باسورد إذا لم يكن أدمن
+            function storeCurrentReport() {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
+                    return;
+                }
+
+                // إذا لم يكن أدمن، نطلب باسورد
+                if (!isAdmin) {
+                    Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتخزين التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تخزين',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true,
+                        preConfirm: (password) => {
+                            if (!password) {
+                                Swal.showValidationMessage('يرجى إدخال كلمة المرور');
+                            }
+                            return password;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const password = result.value;
+                            performStore(password);
+                        }
+                    });
+                } else {
+                    // أدمن: بدون باسورد
+                    performStore('');
+                }
+            }
+
+            function performStore(password) {
+                const name = restaurantNameInput.value || '';
+                const rows = getTableData();
+                const total = totalAmountEl.textContent;
+                const dateStr = getReportDateString();
+                const reportRows = rows.map(r => ({ desc: r.datetime ? formatDateTime(r.datetime) : '', amount: r.amount }));
+                fetch(apiBase + '/api/expenses/fees-store', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        restaurant_id: restaurantId,
+                        code: '',
+                        name: name,
+                        date: dateStr,
+                        rows: reportRows,
+                        total: total,
+                        password: password
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (serverFees) {
+                            const idx = serverFees.findIndex(r => String(r.restaurant_id) === restaurantId && String(r.date) === dateStr);
+                            if (idx !== -1) serverFees.splice(idx, 1);
+                            serverFees.unshift(data.report);
+                            if (serverFees.length > 20) serverFees.length = 20;
+                        }
+                        allReports = allReports.filter(r => !(String(r.restaurant_id) === restaurantId && String(r.date) === dateStr));
+                        allReports.unshift(data.report);
+                        if (allReports.length > 20) allReports.length = 20;
+                        currentReportsPage = 1;
+                        renderRecentReportsPage();
+                        Swal.fire('تم التخزين', data.message, 'success');
+                    } else {
+                        Swal.fire('خطأ', data.message, 'error');
+                    }
+                })
+                .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
+            }
+
+            async function updateCurrentReport() {
+                if (!currentEditReportId || isViewer) return;
+                let password = '';
+                if (!isAdmin) {
+                    const result = await Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتعديل التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true
+                    });
+                    if (result.isConfirmed && result.value) {
+                        password = result.value;
+                    } else {
+                        return;
+                    }
+                }
+                const name = restaurantNameInput.value || '';
+                const rows = getTableData();
+                const total = totalAmountEl.textContent;
+                const dateStr = getReportDateString();
+                const reportRows = rows.map(r => ({ desc: r.datetime ? formatDateTime(r.datetime) : '', amount: r.amount }));
+                fetch(apiBase + '/api/expenses/fees-update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        restaurant_id: restaurantId,
+                        reportId: currentEditReportId,
+                        code: '',
+                        name: name,
+                        date: dateStr,
+                        rows: reportRows,
+                        total: total,
+                        password: password
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (serverFees) {
+                            const idx = serverFees.findIndex(r => String(r.id) === String(currentEditReportId));
+                            if (idx !== -1) serverFees[idx] = data.report;
+                        }
+                        const idxAll = allReports.findIndex(r => String(r.id) === String(currentEditReportId));
+                        if (idxAll !== -1) allReports[idxAll] = data.report;
+                        renderRecentReportsPage();
+                        restorePreEditSnapshot();
+                        cancelEditMode();
+                        Swal.fire('تم التعديل', data.message, 'success');
+                    } else {
+                        Swal.fire('خطأ', data.message, 'error');
+                    }
+                })
+                .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
+            }
+
+            function captureFormState() {
+                return {
+                    name: restaurantNameInput.value || '',
+                    rows: getTableData(),
+                    isAuto: dateToggleBtn.classList.contains('active'),
+                    customDate: reportDateInput.value
+                };
+            }
+
+            function restorePreEditSnapshot() {
+                if (!preEditSnapshot) return;
+                restaurantNameInput.value = preEditSnapshot.name || '';
+                updateDateToggleUI(preEditSnapshot.isAuto);
+                if (preEditSnapshot.customDate) reportDateInput.value = preEditSnapshot.customDate;
+                else reportDateInput.value = formatDateForInput(new Date());
+                loadTableData(preEditSnapshot.rows || []);
+                saveToSession();
+                preEditSnapshot = null;
+            }
+
+            function editReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
+                }
+                let report = null;
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
+                if (!report) {
+                    const stored = localStorage.getItem('visaStoredReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored);
+                        report = reports.find(r => String(r.id) === String(reportId));
+                    }
+                }
+                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
+                preEditSnapshot = captureFormState();
+                currentEditReportId = reportId;
+                restaurantNameInput.value = report.name || '';
+                if (report.date) {
+                    const parts = report.date.split('/');
+                    if (parts.length === 3) {
+                        reportDateInput.value = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+                    }
+                }
+                updateDateToggleUI(false);
+                tbody.innerHTML = '';
+                if (report.rows && report.rows.length) {
+                    report.rows.forEach(row => {
+                        const iso = row.desc ? (parseDateTime(row.desc) ? parseDateTime(row.desc).toISOString() : '') : '';
+                        addRowAtEnd(row.amount || '', iso);
+                    });
+                } else {
+                    addRowAtEnd('', '');
+                }
+                updateSerials();
+                updateTotal();
+                storeBtn.innerHTML = '<i class="las la-edit"></i> تحديث التقرير';
+                cancelEditBtn.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function cancelEditMode() {
+                currentEditReportId = null;
+                storeBtn.innerHTML = '<i class="las la-save"></i> تخزين';
+                cancelEditBtn.classList.add('hidden');
+            }
+
+            cancelEditBtn.addEventListener('click', function() {
+                restorePreEditSnapshot();
+                cancelEditMode();
+                Swal.fire('تم', 'تم إلغاء التعديل.', 'info');
+            });
+
+            storeBtn.addEventListener('click', function() {
+                saveToSession();
+                if (currentEditReportId) updateCurrentReport();
+                else storeCurrentReport();
+            });
+
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                if (isViewer) return;
+                const newTr = addRowAtEnd('', '');
+                if (newTr) {
+                    const amountInput = newTr.querySelector('.amount-input');
+                    if (amountInput) focusInput(amountInput);
+                }
+                saveToSession();
+            });
+
+            document.getElementById('addRowsBatchBtn').addEventListener('click', function() {
+                if (isViewer) return;
+                const countInput = document.getElementById('rowsCountInput');
+                let count = parseInt(countInput.value) || 1;
+                if (count < 1) count = 1;
+                if (count > 50) count = 50;
+                countInput.value = count;
+                for (let i = 0; i < count; i++) addRowAtEnd('', '');
+                updateSerials();
+                saveToSession();
+                Swal.fire('تم', 'تم إضافة ' + count + ' صفوف جديدة.', 'success');
+            });
+
+            document.getElementById('clearRowsBtn').addEventListener('click', function() {
+                if (isViewer) return;
+                if (tbody.children.length === 0) return;
+                Swal.fire({
+                    title: 'مسح الكل',
+                    text: 'هل أنت متأكد من مسح جميع الصفوف؟',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'نعم، امسح',
+                    cancelButtonText: 'إلغاء',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        clearAllRows();
+                        saveToSession();
+                        Swal.fire('تم', 'تم مسح جميع الصفوف.', 'success');
+                    }
+                });
+            });
+
+            document.getElementById('printInvoiceBtn').addEventListener('click', function() {
+                saveToSession();
+                const printArea = document.getElementById('printArea');
+                const name = restaurantNameInput.value || '';
+                const dateStr = getReportDateString();
+                const rowsData = getTableData();
+                printArea.innerHTML = buildPrintHTML(name, dateStr, rowsData, totalAmountEl.textContent);
+                printArea.style.display = 'block';
+                setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300);
+            });
+
+            document.getElementById('exportRestaurantBtn').addEventListener('click', function() {
+                saveToSession();
+                const name = restaurantNameInput.value || '';
+                let csv = '#,المبلغ (ج.م),التاريخ والوقت\n';
+                const rows = getTableData();
+                rows.forEach((row, idx) => {
+                    csv += (idx + 1) + ',' + (row.amount || '0') + ',' + (row.datetime ? formatDateTime(row.datetime) : '') + '\n';
+                });
+                csv += '-,الإجمالي,' + totalAmountEl.textContent + '\n';
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = name + '_تقرير_فيزا.csv';
+                link.click();
+                Swal.fire('تم', 'تم تصدير التقرير بصيغة CSV بنجاح.', 'success');
+            });
+
+            document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
+            document.getElementById('printDetailReportBtn').addEventListener('click', function() {
+                if (!currentViewReportId) return;
+                let report = null;
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(currentViewReportId));
+                if (!report) {
+                    const stored = localStorage.getItem('visaStoredReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored);
+                        report = reports.find(r => String(r.id) === String(currentViewReportId));
+                    }
+                }
+                if (!report) return;
+                const printArea = document.getElementById('printArea');
+                const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ amount: r.amount || '0', desc: r.desc || '', datetime: r.datetime || '' })) : [];
+                printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
+                printArea.style.display = 'block';
+                setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300);
+            });
+
+            const sidebar = document.getElementById('dashboardSidebar');
+            const headerAvatar = document.getElementById('headerAvatar');
+            function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
+            function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
+            if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1025) sidebar.classList.remove('mobile-open', 'mobile-closed');
+                else if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
+            });
+            headerAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (window.innerWidth < 1025) {
+                    if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                    else openSidebar();
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1025 && sidebar.classList.contains('mobile-open')) {
+                    if (!sidebar.contains(e.target) && e.target !== headerAvatar && !headerAvatar.contains(e.target)) closeSidebar();
+                }
+            });
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.id === 'logoutBtn') return;
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    if (window.innerWidth < 1025) closeSidebar();
+                });
+            });
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                Swal.fire({ title: 'تسجيل الخروج', text: 'هل أنت متأكد؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'إلغاء' }).then((result) => { if (result.isConfirmed) window.location.href = '/'; });
+            });
+
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+            const navNotch = document.getElementById('navNotch');
+            function moveNotch(activeItem) {
+                if (!navNotch || !activeItem) return;
+                const rect = activeItem.getBoundingClientRect();
+                const navRect = document.getElementById('bottomMobileNav').getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2 - navRect.left;
+                navNotch.style.left = centerX + 'px';
+            }
+            function setBottomNavActive() {
+                let activeItem = null;
+                bottomNavItems.forEach(item => {
+                    item.classList.remove('active');
+                    const tab = item.getAttribute('data-tab');
+                    if (tab === 'reports') {
+                        item.classList.add('active');
+                        activeItem = item;
+                    }
+                });
+                if (activeItem) moveNotch(activeItem);
+                else if (bottomNavItems.length > 0) {
+                    bottomNavItems[0].classList.add('active');
+                    moveNotch(bottomNavItems[0]);
+                }
+            }
+            setBottomNavActive();
+            window.addEventListener('resize', () => { const activeItem = document.querySelector('.bottom-nav-item.active'); if (activeItem) moveNotch(activeItem); });
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    bottomNavItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    moveNotch(this);
+                });
+            });
+
+            const successModal = document.getElementById('successModal');
+            const closeSuccessModal = document.getElementById('closeSuccessModal');
+            const okSuccessBtn = document.getElementById('okSuccessBtn');
+            const successMessageEl = document.getElementById('successMessage');
+            function showSuccess(msg) { successMessageEl.textContent = msg; successModal.classList.add('active'); }
+            function hideSuccess() { successModal.classList.remove('active'); }
+            closeSuccessModal.addEventListener('click', hideSuccess);
+            okSuccessBtn.addEventListener('click', hideSuccess);
+            window.addEventListener('click', (e) => { if (e.target === successModal) hideSuccess(); });
+
+            dateToggleBtn.addEventListener('click', function() {
+                const isAuto = dateToggleBtn.classList.contains('active');
+                updateDateToggleUI(!isAuto);
+                saveToSession();
+            });
+            reportDateInput.addEventListener('input', function() { saveToSession(); });
+            restaurantNameInput.addEventListener('input', function() { saveToSession(); });
+
+            const themeToggleBtn = document.getElementById('themetoggle');
+            const body = document.body;
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                body.classList.toggle('light', !isDark);
+                themeToggleBtn.classList.toggle('dark', isDark);
+                localStorage.setItem('theme', theme);
+            }
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = body.classList.contains('light') === false;
+                applyTheme(isDark ? 'light' : 'dark');
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!loadFromSession()) {
+                    tbody.innerHTML = '';
+                    addRowAtEnd('', '');
+                    updateSerials();
+                    updateTotal();
+                    reportDateInput.value = formatDateForInput(new Date());
+                }
+                loadRecentReports();
+            });
+        })();
+    </script>
+</body>
+
+</html>
