@@ -19,6 +19,7 @@ app.use(express.json());
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "public", "frontend"));
+app.set("views", path.join(__dirname, "public"));
 
 
 const API_BASE_URL = "https://xsysx.shadowza.space";
@@ -263,23 +264,26 @@ app.get("/neama/login", (req, res) => {
     });
 });
 app.get("/neama/employee-files", (req, res) => {
-    res.render("../neama/finance/files", {
+    res.render(path.join(__dirname, "public", "neama", "finance", "files"), {
         title: "",
-        activePage: "files",
+        activePage: "files"
     });
 });
+
 app.get("/neama/employee-advance", (req, res) => {
-    res.render("../neama/finance/advance", {
+    res.render(path.join(__dirname, "public", "neama", "finance", "advance"), {
         title: "",
-        activePage: "employee-advance",
+        activePage: "employee-advance"
     });
 });
+
 app.get("/neama/employee-salary", (req, res) => {
-    res.render("../neama/finance/salary", {
+    res.render(path.join(__dirname, "public", "neama", "finance", "salary"), {
         title: "",
-        activePage: "daily-salary",
+        activePage: "daily-salary"
     });
 });
+
 
 /*------------------------------------------*/
 // - Admin - //
