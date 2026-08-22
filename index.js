@@ -19,7 +19,6 @@ app.use(express.json());
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "public", "frontend"));
-app.set("views", path.join(__dirname, "public"));
 
 
 const API_BASE_URL = "https://xsysx.shadowza.space";
