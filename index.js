@@ -261,6 +261,25 @@ app.get("/neama/login", (req, res) => {
     
     });
 });
+app.get("/neama/employee-files", (req, res) => {
+    res.render("../neama/finance/files", {
+        title: "",
+        activePage: "files",
+    });
+});
+app.get("/neama/employee-advance", (req, res) => {
+    res.render("../neama/finance/advance", {
+        title: "",
+        activePage: "employee-advance",
+    });
+});
+app.get("/neama/employee-salary", (req, res) => {
+    res.render("../neama/finance/salary", {
+        title: "",
+        activePage: "daily-salary",
+    });
+});
+
 /*------------------------------------------*/
 // - Admin - //
 /*------------------------------------------*/
@@ -410,6 +429,7 @@ app.get("/admin/resturant", (req, res) => {
         }
     });
 });
+/*------------------------------------------*/
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running at http://${HOST}:${PORT}`);
