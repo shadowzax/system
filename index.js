@@ -266,6 +266,50 @@ app.get("/neama/login", (req, res) => {
     
     });
 });
+
+app.get("/neama/outgoing", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../neama/system/outgoing", {
+        title: "خوارج",
+        activePage: "outgoing-invoices",
+    });
+});
+
+app.get("/neama/visa", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../neama/system/visa", {
+        title: "فيز",
+        activePage: "visa",
+    });
+});
+
+app.get("/neama/cash", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../neama/system/cash", {
+        title: "التحويلات",
+        activePage: "transfers",
+    });
+});
+app.get("/neama/advances", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../neama/system/salary-advance", {
+        title: "اداره السلف",
+        activePage: "advances",
+    });
+});
+
 app.get("/neama/employee-files", (req, res) => {
     res.render("../neama/finance/files", {
         title: "",
