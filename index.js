@@ -309,6 +309,25 @@ app.get("/neama/advances", (req, res) => {
         activePage: "advances",
     });
 });
+app.get("/neama/settings", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../neama/profile/settings", {
+        title: "الاعدادات",
+        activePage: "settings",
+    });
+});
+app.get("/neama/me/reports", (req, res) => {
+    if (!req.isAuthenticated) {
+    return res.redirect("/login");
+     }
+     res.render("../neama/profile/myreports", {
+        title: "",
+        activePage: "reports",
+    });
+}); 
 
 app.get("/neama/employee-files", (req, res) => {
     res.render("../neama/finance/files", {
