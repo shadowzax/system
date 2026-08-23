@@ -179,14 +179,7 @@
         </main>
     </div>
     <div id="printArea" style="display:none;"></div>
-    <div class="bottom-mobile-nav" id="bottomMobileNav">
-        <div class="nav-notch" id="navNotch"></div>
-        <a href="#" class="bottom-nav-item" data-tab="dashboard"><i class="las la-tachometer-alt"></i><span>الرئيسية</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="courses"><i class="las la-book-open"></i><span>الكورسات</span></a>
-        <a href="#" class="bottom-nav-item active" data-tab="reports"><i class="las la-file-alt"></i><span>التقارير</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="tickets"><i class="las la-ticket-alt"></i><span>الاستفسارات</span></a>
-        <a href="#" class="bottom-nav-item" data-tab="settings"><i class="las la-cog"></i><span>الإعدادات</span></a>
-    </div>
+
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
             <button class="modal-close" id="closeSuccessModal"><i class="las la-times"></i></button>
@@ -212,7 +205,7 @@
             const isViewer = (userRole === 'viewer');
             // ===================================
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
-            const PRINT_LOGO = 'https://files.catbox.moe/05wiyk.png';
+            const PRINT_LOGO = '/logos/2.png';
             let printLogoURL = PRINT_LOGO;
 
             let allReports = [];
