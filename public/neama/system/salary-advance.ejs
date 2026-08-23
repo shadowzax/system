@@ -186,10 +186,12 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverAdvances = Array.isArray(appData.advances) ? appData.advances : null;
+            const restaurantId = "2";
+            const serverAdvances = Array.isArray(appData.advances)
+                ? appData.advances.filter(f => String(f.restaurant_id) === restaurantId)
+                : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const restaurantId = "2";
             const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
@@ -539,7 +541,7 @@
                 const isAuto = dateToggleBtn.classList.contains('active');
                 const customDate = reportDateInput.value;
                 const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
-                try { localStorage.setItem('advanceReportData', JSON.stringify(payload)); } catch (e) {}
+                try { localStorage.setItem('neama-advanceReportData', JSON.stringify(payload)); } catch (e) {}
             }
 
             function updateDateToggleUI(isAuto) {
@@ -562,7 +564,7 @@
 
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('advanceReportData');
+                    const stored = localStorage.getItem('neama-advanceReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -641,9 +643,9 @@
                 let report = null;
                 if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('advanceStoredReports');
+                    const stored = localStorage.getItem('neama-advanceStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -673,8 +675,8 @@
                 let reports = serverAdvances || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('advanceStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        const stored = localStorage.getItem('neama-advanceStoredReports');
+                        if (stored) reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -939,9 +941,9 @@
                 let report = null;
                 if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('advanceStoredReports');
+                    const stored = localStorage.getItem('neama-advanceStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1065,9 +1067,9 @@
                 let report = null;
                 if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('advanceStoredReports');
+                    const stored = localStorage.getItem('neama-advanceStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
