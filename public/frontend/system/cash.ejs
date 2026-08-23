@@ -194,10 +194,12 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverTransfers = Array.isArray(appData.transfers) ? appData.transfers : null;
+            const restaurantId = "1";
+            const serverTransfers = Array.isArray(appData.transfers)
+                ? appData.transfers.filter(f => String(f.restaurant_id) === restaurantId)
+                : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const restaurantId = "1";
             const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
@@ -622,7 +624,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -659,7 +661,7 @@
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
                         const stored = localStorage.getItem('cashStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        if (stored) reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -952,7 +954,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1090,7 +1092,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
