@@ -209,10 +209,13 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverFees = Array.isArray(appData.fees) ? appData.fees : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
             const restaurantId = "2";
+            // ✅ فلترة الرسوم لتشمل فقط مطعم رقم 2
+            const serverFees = Array.isArray(appData.fees) 
+                ? appData.fees.filter(f => String(f.restaurant_id) === restaurantId) 
+                : null;
             const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
@@ -533,6 +536,7 @@
                 updateTotal();
             }
 
+            // ✅ تم تغيير مفتاح التخزين المحلي
             function saveToSession() {
                 if (isViewer) return;
                 const data = getTableData();
@@ -540,7 +544,7 @@
                 const isAuto = dateToggleBtn.classList.contains('active');
                 const customDate = reportDateInput.value;
                 const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
-                try { localStorage.setItem('visaReportData', JSON.stringify(payload)); } catch (e) {}
+                try { localStorage.setItem('neama-visaReportData', JSON.stringify(payload)); } catch (e) {}
             }
 
             function updateDateToggleUI(isAuto) {
@@ -561,9 +565,10 @@
                 }
             }
 
+            // ✅ تم تغيير مفتاح التخزين المحلي
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('visaReportData');
+                    const stored = localStorage.getItem('neama-visaReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -644,9 +649,10 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('visaStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي
+                    const stored = localStorage.getItem('neama-visaStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -682,8 +688,11 @@
                 let reports = serverFees || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('visaStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                        const stored = localStorage.getItem('neama-visaStoredReports');
+                        if (stored) {
+                            reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        }
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -815,14 +824,12 @@
                 });
             }
 
-            // دالة التخزين الرئيسية مع طلب باسورد إذا لم يكن أدمن
             function storeCurrentReport() {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
                     return;
                 }
 
-                // إذا لم يكن أدمن، نطلب باسورد
                 if (!isAdmin) {
                     Swal.fire({
                         title: 'كلمة المرور مطلوبة',
@@ -846,7 +853,6 @@
                         }
                     });
                 } else {
-                    // أدمن: بدون باسورد
                     performStore('');
                 }
             }
@@ -981,9 +987,10 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('visaStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                    const stored = localStorage.getItem('neama-visaStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1109,9 +1116,10 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('visaStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                    const stored = localStorage.getItem('neama-visaStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
