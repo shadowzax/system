@@ -194,16 +194,18 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverExpenses = Array.isArray(appData.expenses) ? appData.expenses : null;
+            const restaurantId = "2";
+            const serverExpenses = Array.isArray(appData.expenses)
+                ? appData.expenses.filter(f => String(f.restaurant_id) === restaurantId)
+                : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const restaurantId = "2";
-            // ====== إضافة تحديد الصلاحيات ======
-            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
+
+            const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
             const isViewer = (userRole === 'viewer');
-            // ===================================
+
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const PRINT_LOGO = '/logos/2.png';
             let printLogoURL = PRINT_LOGO;
@@ -222,7 +224,6 @@
                 document.getElementById('headerAvatar').src = userData.profile_picture;
             }
 
-            // ====== إخفاء/إظهار العناصر حسب الصلاحيات ======
             const editableActions = document.getElementById('editableActions');
             const storeBtn = document.getElementById('storeBtn');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -234,7 +235,6 @@
                 editableActions.style.display = 'flex';
                 storeBtn.style.display = 'inline-flex';
             }
-            // ============================================
 
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
 
@@ -563,7 +563,7 @@
                     timestamp: new Date().toISOString()
                 };
                 try {
-                    localStorage.setItem('restaurantReportData', JSON.stringify(payload));
+                    localStorage.setItem('neama-restaurantReportData', JSON.stringify(payload));
                 } catch (e) {}
             }
 
@@ -587,7 +587,7 @@
 
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('restaurantReportData');
+                    const stored = localStorage.getItem('neama-restaurantReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -669,9 +669,9 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
+                    const stored = localStorage.getItem('neama-restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -701,8 +701,10 @@
                 let reports = serverExpenses || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('restaurantStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        const stored = localStorage.getItem('neama-restaurantStoredReports');
+                        if (stored) {
+                            reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        }
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -783,7 +785,6 @@
                 if (currentReportsPage < totalPages) { currentReportsPage++; renderRecentReportsPage(); }
             });
 
-            // ====== تعديل دالة الحذف لتطلب كلمة مرور دائماً ======
             function deleteReportById(reportId) {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
@@ -835,7 +836,6 @@
                 });
             }
 
-            // ====== تعديل دالة التخزين لتطلب كلمة مرور للكاشير ======
             function storeCurrentReport() {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
@@ -911,7 +911,6 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
-            // ====== تعديل دالة التحديث لتطلب كلمة مرور للكاشير ======
             async function updateCurrentReport() {
                 if (!currentEditReportId || isViewer) return;
                 let password = '';
@@ -1000,9 +999,9 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
+                    const stored = localStorage.getItem('neama-restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1135,9 +1134,9 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
+                    const stored = localStorage.getItem('neama-restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
@@ -1180,26 +1179,26 @@
                 });
             });
 
-const logoutBtn = document.getElementById('logoutBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
 
-logoutBtn.addEventListener('click', (e) => {
-    e.preventDefault();
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
 
-    Swal.fire({
-        title: 'تسجيل الخروج',
-        text: 'هل أنت متأكد؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'نعم',
-        cancelButtonText: 'إلغاء'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                Swal.fire({
+                    title: 'تسجيل الخروج',
+                    text: 'هل أنت متأكد؟',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'نعم',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
-            window.location.href = '/';
-        }
-    });
-});
+                        window.location.href = '/';
+                    }
+                });
+            });
 
 
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
