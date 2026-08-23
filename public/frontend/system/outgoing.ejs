@@ -194,16 +194,16 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverExpenses = Array.isArray(appData.expenses) ? appData.expenses : null;
+            const restaurantId = "1";
+            const serverExpenses = Array.isArray(appData.expenses)
+                ? appData.expenses.filter(f => String(f.restaurant_id) === restaurantId)
+                : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const restaurantId = "1";
-            // ====== إضافة تحديد الصلاحيات ======
-            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
+            const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
             const isViewer = (userRole === 'viewer');
-            // ===================================
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const PRINT_LOGO = '/logos/1.png';
             let printLogoURL = PRINT_LOGO;
@@ -222,7 +222,6 @@
                 document.getElementById('headerAvatar').src = userData.profile_picture;
             }
 
-            // ====== إخفاء/إظهار العناصر حسب الصلاحيات ======
             const editableActions = document.getElementById('editableActions');
             const storeBtn = document.getElementById('storeBtn');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -234,7 +233,6 @@
                 editableActions.style.display = 'flex';
                 storeBtn.style.display = 'inline-flex';
             }
-            // ============================================
 
             function convertArabicNumerals(str) { return String(str).replace(/[٠-٩]/g, function(match) { return arabicToEnglishMap[match] || match; }); }
 
@@ -671,7 +669,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -702,7 +700,7 @@
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
                         const stored = localStorage.getItem('restaurantStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        if (stored) reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -783,7 +781,6 @@
                 if (currentReportsPage < totalPages) { currentReportsPage++; renderRecentReportsPage(); }
             });
 
-            // ====== تعديل دالة الحذف لتطلب كلمة مرور دائماً ======
             function deleteReportById(reportId) {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية حذف التقارير.', 'error');
@@ -835,7 +832,6 @@
                 });
             }
 
-            // ====== تعديل دالة التخزين لتطلب كلمة مرور للكاشير ======
             function storeCurrentReport() {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
@@ -911,7 +907,6 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
-            // ====== تعديل دالة التحديث لتطلب كلمة مرور للكاشير ======
             async function updateCurrentReport() {
                 if (!currentEditReportId || isViewer) return;
                 let password = '';
@@ -1002,7 +997,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1137,7 +1132,7 @@
                 if (!report) {
                     const stored = localStorage.getItem('restaurantStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
