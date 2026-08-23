@@ -201,10 +201,13 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const serverTransfers = Array.isArray(appData.transfers) ? appData.transfers : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
             const restaurantId = "2";
+            // ✅ فلترة التحويلات لتشمل فقط مطعم رقم 2
+            const serverTransfers = Array.isArray(appData.transfers) 
+                ? appData.transfers.filter(f => String(f.restaurant_id) === restaurantId) 
+                : null;
             const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
@@ -516,6 +519,7 @@
                 updateTotal();
             }
 
+            // ✅ تم تغيير مفتاح التخزين المحلي
             function saveToSession() {
                 if (isViewer) return;
                 const data = getTableData();
@@ -523,7 +527,7 @@
                 const isAuto = dateToggleBtn.classList.contains('active');
                 const customDate = reportDateInput.value;
                 const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
-                try { localStorage.setItem('cashReportData', JSON.stringify(payload)); } catch (e) {}
+                try { localStorage.setItem('neama-cashReportData', JSON.stringify(payload)); } catch (e) {}
             }
 
             function updateDateToggleUI(isAuto) {
@@ -544,9 +548,10 @@
                 }
             }
 
+            // ✅ تم تغيير مفتاح التخزين المحلي
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('cashReportData');
+                    const stored = localStorage.getItem('neama-cashReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -627,9 +632,10 @@
                 let report = null;
                 if (serverTransfers) report = serverTransfers.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('cashStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                    const stored = localStorage.getItem('neama-cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -665,8 +671,11 @@
                 let reports = serverTransfers || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('cashStoredReports');
-                        if (stored) reports = JSON.parse(stored);
+                        // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                        const stored = localStorage.getItem('neama-cashStoredReports');
+                        if (stored) {
+                            reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        }
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -957,9 +966,10 @@
                 let report = null;
                 if (serverTransfers) report = serverTransfers.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('cashStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                    const stored = localStorage.getItem('neama-cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
@@ -1095,9 +1105,10 @@
                 let report = null;
                 if (serverTransfers) report = serverTransfers.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('cashStoredReports');
+                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
+                    const stored = localStorage.getItem('neama-cashStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored);
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
