@@ -501,7 +501,71 @@ app.get("/admin/resturant", (req, res) => {
     });
 });
 /*------------------------------------------*/
+app.get("/admin/resturant/3", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+    res.render("../admin/1-ebnhamido", {
+        title: "تشكن كينج",
+        description: "",
+        activePage: "chicken-restaurant",
+        restaurant: {
+            id: 3,
+            name: "تشكن كينج",
+            section: "السلام",
+            logo: "/logos/3.png"
+        }
+    });
+});
+app.get("/admin/reports/3", async (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
 
+    let reports = [];
+    try {
+        const response = await fetch(
+            "https://xsysx.shadowza.space/api/admin/create/reports?restaurant_id=3"
+        );
+        if (response.ok) {
+            const data = await response.json();
+
+            const sources = {
+                advances: "سلف",
+                expenses: "خوارج",
+                transfers: "تحويلات",
+                fees: "فيز"
+            };
+            reports = Object.entries(sources).flatMap(([key, sourceLabel]) =>
+                (data.reports?.[key] || []).map(report => ({
+                    ...report,
+                    source: key,
+                    sourceLabel
+                }))
+            );
+            reports.sort((a, b) =>
+                (b.timestamp || "").localeCompare(a.timestamp || "")
+            );
+        }
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+    }
+
+    res.render("../admin/1-ebnhamido-reports", {
+        title: "تقارير تشكن كينج",
+        description: "",
+        reports,
+        activePage: "chicken-reports",
+
+        restaurant: {
+            id: 3,
+            name: "تشكن كينج",
+            section: "السلام",
+            logo: "/logos/3.png"
+        }
+    });
+});
+/*----------------------------------------------------*/
 app.listen(PORT, () => {
     console.log(`🚀 Server is running at http://${HOST}:${PORT}`);
 });
