@@ -983,44 +983,7 @@
 </head>
 
 <body>
-    <header id="mainHeader">
-        <div class="flex items-center gap-3">
-            <img src="https://files.catbox.moe/kdxauw.png" alt="شعار" class="header-avatar" id="headerAvatar">
-            <h1 class="text-xl font-bold hidden sm:block">لوحة التحكم</h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <button id="themetoggle" class="theme-toggle" aria-label="تبديل الوضع الليلي">
-                <span class="icon sun-icon"><i class="las la-sun"></i></span>
-                <span class="icon moon-icon"><i class="las la-moon"></i></span>
-                <span class="toggle-circle"></span>
-            </button>
-        </div>
-    </header>
-
-    <aside class="dashboard-sidebar" id="dashboardSidebar">
-        <div class="sidebar-section-title">القائمة الرئيسية</div>
-        <a href="/" class="sidebar-item">
-            <i class="las la-home"></i>
-            <span>الرئيسية</span>
-        </a>
-        <a href="/restaurants" class="sidebar-item active">
-            <i class="las la-utensils"></i>
-            <span>إدارة المطاعم</span>
-        </a>
-        <a href="/reports" class="sidebar-item">
-            <i class="las la-chart-bar"></i>
-            <span>التقارير</span>
-        </a>
-        <a href="/settings" class="sidebar-item">
-            <i class="las la-cog"></i>
-            <span>الإعدادات</span>
-        </a>
-        <div class="sidebar-section-title">الحساب</div>
-        <a href="#" class="sidebar-item" id="logoutBtn">
-            <i class="las la-sign-out-alt"></i>
-            <span>تسجيل الخروج</span>
-        </a>
-    </aside>
+    <%- include('../../sections/header-ebnhamido.ejs') %>
 
     <main class="pr-0 lg:pr-[280px] transition-all duration-300">
         <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -1053,24 +1016,6 @@
         </div>
     </main>
 
-    <nav class="bottom-mobile-nav" id="bottomMobileNav">
-        <a href="/" class="bottom-nav-item">
-            <i class="las la-home"></i>
-            <span>الرئيسية</span>
-        </a>
-        <a href="/restaurants" class="bottom-nav-item active">
-            <i class="las la-utensils"></i>
-            <span>المطاعم</span>
-        </a>
-        <a href="/reports" class="bottom-nav-item">
-            <i class="las la-chart-bar"></i>
-            <span>التقارير</span>
-        </a>
-        <a href="/settings" class="bottom-nav-item">
-            <i class="las la-cog"></i>
-            <span>الإعدادات</span>
-        </a>
-    </nav>
 
     <div class="modal-overlay" id="successModal">
         <div class="modal-content text-center">
