@@ -1088,29 +1088,6 @@
             return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
         }
 
-        function loadRestaurants() {
-            try {
-                const stored = localStorage.getItem('restaurantManagementData');
-                if (stored) {
-                    restaurants = JSON.parse(stored);
-                } else {
-                    restaurants = defaultRestaurants;
-                    saveRestaurants();
-                }
-            } catch (e) {
-                restaurants = defaultRestaurants;
-            }
-            renderRestaurantTable();
-        }
-
-        function saveRestaurants() {
-            try {
-                localStorage.setItem('restaurantManagementData', JSON.stringify(restaurants));
-            } catch (e) {
-                console.warn('فشل حفظ البيانات محلياً');
-            }
-        }
-
         function renderRestaurantTable() {
             restaurantTbody.innerHTML = '';
             if (restaurants.length === 0) {
@@ -1329,9 +1306,8 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadRestaurants();
-        });
+        restaurants = defaultRestaurants;
+        renderRestaurantTable();
     </script>
 </body>
 
