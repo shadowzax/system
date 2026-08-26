@@ -350,6 +350,101 @@ app.get("/neama/employee-salary", (req, res) => {
     });
 });
 
+/*------------------------------------------*/
+app.get("/chicken/login", (req, res) => {
+    if (req.isAuthenticated) {
+        return res.redirect("/chicken/outgoing");
+    }
+
+    res.render("../chicken/auth/login", {
+        title: "تسجيل الدخول",
+        description: "قم بتسجيل الدخول إلى حسابك",
+    
+    });
+});
+
+app.get("/chicken/outgoing", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/chicken/login");
+    }
+
+    res.render("../chicken/system/outgoing", {
+        title: "خوارج",
+        activePage: "outgoing-invoices",
+    });
+});
+
+app.get("/chicken/visa", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/chicken/login");
+    }
+
+    res.render("../chicken/system/visa", {
+        title: "فيز",
+        activePage: "visa",
+    });
+});
+
+app.get("/chicken/cash", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../chicken/system/cash", {
+        title: "التحويلات",
+        activePage: "transfers",
+    });
+});
+app.get("/chicken/advances", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../chicken/system/salary-advance", {
+        title: "اداره السلف",
+        activePage: "advances",
+    });
+});
+app.get("/chicken/settings", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("../chicken/profile/settings", {
+        title: "الاعدادات",
+        activePage: "settings",
+    });
+});
+app.get("/chicken/me/reports", (req, res) => {
+    if (!req.isAuthenticated) {
+    return res.redirect("/login");
+     }
+     res.render("../chicken/profile/myreports", {
+        title: "",
+        activePage: "reports",
+    });
+}); 
+
+app.get("/chicken/employee-files", (req, res) => {
+    res.render("../chicken/finance/files", {
+        title: "",
+        activePage: "files"
+    });
+});
+
+app.get("/chicken/employee-advance", (req, res) => {
+    res.render("../chicken/finance/advance", {
+        title: "",
+        activePage: "employee-advance"
+    });
+});
+
+app.get("/chicken/employee-salary", (req, res) => {
+    res.render("../chicken/finance/salary", {
+        title: "",
+        activePage: "daily-salary"
+    });
+});
 
 /*------------------------------------------*/
 // - Admin - //
