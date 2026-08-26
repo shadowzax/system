@@ -194,7 +194,7 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const restaurantId = "2";
+            const restaurantId = "3";
             const serverExpenses = Array.isArray(appData.expenses)
                 ? appData.expenses.filter(f => String(f.restaurant_id) === restaurantId)
                 : null;
@@ -207,7 +207,7 @@
             const isViewer = (userRole === 'viewer');
 
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
-            const PRINT_LOGO = '/logos/2.png';
+            const PRINT_LOGO = '/logos/3.png';
             let printLogoURL = PRINT_LOGO;
 
             let allReports = [];
@@ -563,7 +563,7 @@
                     timestamp: new Date().toISOString()
                 };
                 try {
-                    localStorage.setItem('neama-restaurantReportData', JSON.stringify(payload));
+                    localStorage.setItem('chicken-restaurantReportData', JSON.stringify(payload));
                 } catch (e) {}
             }
 
@@ -587,7 +587,7 @@
 
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('neama-restaurantReportData');
+                    const stored = localStorage.getItem('chicken-restaurantReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -669,7 +669,7 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('neama-restaurantStoredReports');
+                    const stored = localStorage.getItem('chicken-restaurantStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
@@ -701,7 +701,7 @@
                 let reports = serverExpenses || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('neama-restaurantStoredReports');
+                        const stored = localStorage.getItem('chicken-restaurantStoredReports');
                         if (stored) {
                             reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         }
@@ -999,7 +999,7 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('neama-restaurantStoredReports');
+                    const stored = localStorage.getItem('chicken-restaurantStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
@@ -1134,7 +1134,7 @@
                 let report = null;
                 if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('neama-restaurantStoredReports');
+                    const stored = localStorage.getItem('chicken-restaurantStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
