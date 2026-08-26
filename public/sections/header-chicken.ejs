@@ -13,28 +13,28 @@
 <nav class="flex-1">
     <div class="sidebar-section-title">الكاش</div>
 
-    <a href="/neama/outgoing"
+    <a href="/chicken/outgoing"
        class="sidebar-item <%= activePage === 'outgoing-invoices' ? 'active' : '' %>"
        data-page="outgoing-invoices">
         <i class="las la-file-invoice-dollar"></i>
         <span>خوارج</span>
     </a>
 
-    <a href="/neama/visa"
+    <a href="/chicken/visa"
        class="sidebar-item <%= activePage === 'visa' ? 'active' : '' %>"
        data-page="visa">
         <i class="las la-credit-card"></i>
         <span>فيز</span>
     </a>
 
-    <a href="/neama/cash"
+    <a href="/chicken/cash"
        class="sidebar-item <%= activePage === 'transfers' ? 'active' : '' %>"
        data-page="transfers">
         <i class="las la-exchange-alt"></i>
         <span>تحويلات</span>
     </a>
 
-    <a href="/neama/advances"
+    <a href="/chicken/advances"
        class="sidebar-item <%= activePage === 'advances' ? 'active' : '' %>"
        data-page="advances">
         <i class="las la-hand-holding-usd"></i>
@@ -43,14 +43,14 @@
 
     <div class="sidebar-section-title">الملف الشخصي</div>
 
-    <a href="/neama/settings"
+    <a href="/chicken/settings"
        class="sidebar-item <%= activePage === 'settings' ? 'active' : '' %>"
        data-page="settings">
         <i class="las la-cog"></i>
         <span>الإعدادات</span>
     </a>
 
-    <a href="/neama/me/reports"
+    <a href="/chicken/me/reports"
        class="sidebar-item <%= activePage === 'reports' ? 'active' : '' %>"
        data-page="reports">
         <i class="las la-chart-bar"></i>
@@ -60,21 +60,21 @@
     <% if (user && user.account_type === 'admin') { %>
     <div class="sidebar-section-title">المالية</div>
 
-    <a href="/neama/employee-files"
+    <a href="/chicken/employee-files"
        class="sidebar-item <%= activePage === 'files' ? 'active' : '' %>"
        data-page="files">
         <i class="las la-folder"></i>
         <span>الملفات والموظفين</span>
     </a>
 
-    <a href="/neama/employee-advance"
+    <a href="/chicken/employee-advance"
        class="sidebar-item <%= activePage === 'employee-advance' ? 'active' : '' %>"
        data-page="employee-advance">
         <i class="las la-hand-holding-usd"></i>
         <span>السلف</span>
     </a>
 
-    <a href="/neama/employee-salary"
+    <a href="/chicken/employee-salary"
        class="sidebar-item <%= activePage === 'daily-salary' ? 'active' : '' %>"
        data-page="daily-salary">
         <i class="las la-money-bill-wave"></i>
