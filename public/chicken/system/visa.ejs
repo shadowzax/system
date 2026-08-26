@@ -211,17 +211,16 @@
             const userData = appData.user || {};
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const restaurantId = "2";
-            // ✅ فلترة الرسوم لتشمل فقط مطعم رقم 2
+            const restaurantId = "3";
             const serverFees = Array.isArray(appData.fees) 
                 ? appData.fees.filter(f => String(f.restaurant_id) === restaurantId) 
                 : null;
-            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
+            const userRole = userData.account_type || 'viewer';
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
             const isViewer = (userRole === 'viewer');
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
-            const PRINT_LOGO = '/logos/2.png';
+            const PRINT_LOGO = '/logos/3.png';
             let printLogoURL = PRINT_LOGO;
 
             let allReports = [];
@@ -536,7 +535,6 @@
                 updateTotal();
             }
 
-            // ✅ تم تغيير مفتاح التخزين المحلي
             function saveToSession() {
                 if (isViewer) return;
                 const data = getTableData();
@@ -544,7 +542,7 @@
                 const isAuto = dateToggleBtn.classList.contains('active');
                 const customDate = reportDateInput.value;
                 const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
-                try { localStorage.setItem('neama-visaReportData', JSON.stringify(payload)); } catch (e) {}
+                try { localStorage.setItem('chicken-visaReportData', JSON.stringify(payload)); } catch (e) {}
             }
 
             function updateDateToggleUI(isAuto) {
@@ -565,10 +563,9 @@
                 }
             }
 
-            // ✅ تم تغيير مفتاح التخزين المحلي
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('neama-visaReportData');
+                    const stored = localStorage.getItem('chicken-visaReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
@@ -649,8 +646,7 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    // ✅ تم تغيير مفتاح التخزين المحلي
-                    const stored = localStorage.getItem('neama-visaStoredReports');
+                    const stored = localStorage.getItem('chicken-visaStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
@@ -688,8 +684,7 @@
                 let reports = serverFees || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
-                        const stored = localStorage.getItem('neama-visaStoredReports');
+                        const stored = localStorage.getItem('chicken-visaStoredReports');
                         if (stored) {
                             reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         }
@@ -987,8 +982,7 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
-                    const stored = localStorage.getItem('neama-visaStoredReports');
+                    const stored = localStorage.getItem('chicken-visaStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(reportId));
@@ -1116,8 +1110,7 @@
                 let report = null;
                 if (serverFees) report = serverFees.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    // ✅ تم تغيير مفتاح التخزين المحلي وفلترة حسب المطعم
-                    const stored = localStorage.getItem('neama-visaStoredReports');
+                    const stored = localStorage.getItem('chicken-visaStoredReports');
                     if (stored) {
                         const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
