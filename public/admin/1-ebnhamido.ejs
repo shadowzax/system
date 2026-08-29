@@ -62,6 +62,22 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(20px); }
         }
+
+        /* ⬇️ التعديل المطلوب: تعبئة كاملة للخلايا الملونة بدون انحناءات */
+        .day-input.has-value {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border-radius: 0 !important;
+            border: 1px solid #10b981 !important;
+            box-shadow: none !important;
+        }
+        .day-input.has-value-zero {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border-radius: 0 !important;
+            border: 1px solid #ef4444 !important;
+            box-shadow: none !important;
+        }
     </style>
     <script>
         tailwind.config = {
