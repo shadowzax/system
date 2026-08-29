@@ -156,22 +156,62 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mt-4 space-y-3" id="recentReportsList"></div>
-                    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-[var(--color-muted)]">عرض</span>
-                            <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
-                            <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                    <div id="recentReportsListView">
+                        <div class="mt-4 space-y-3" id="recentReportsList"></div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                                <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
+                                <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
+                                <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
-                            <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
-                            <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                    </div>
+                    <div id="editReportContainer" style="display:none;">
+                        <div class="border-t border-[var(--color-border)] pt-4 mt-4">
+                            <h4 class="text-lg font-bold text-[var(--color-white)] mb-3 flex items-center gap-2">
+                                <i class="las la-edit text-primary"></i> تعديل التقرير
+                            </h4>
+                            <div class="flex flex-wrap items-center gap-3 mb-4">
+                                <label class="text-sm text-[var(--color-muted)]">اسم التقرير:</label>
+                                <input type="text" id="editReportName" class="input-field" style="flex:1;">
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 mb-4">
+                                <label class="text-sm text-[var(--color-muted)]">التاريخ:</label>
+                                <input type="date" id="editReportDate" class="input-field">
+                            </div>
+                            <div class="overflow-x-auto mb-4">
+                                <table class="restaurant-table" id="editReportTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:32%;">البيان</th>
+                                            <th style="width:30%;">المبلغ (ج.م)</th>
+                                            <th style="width:38%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="editReportTbody"></tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td>الإجمالي</td>
+                                            <td id="editReportTotal">0</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="flex flex-wrap gap-3 justify-end">
+                                <button class="btn-outline btn-sm" id="cancelEditReportBtn"><i class="las la-times"></i> إلغاء</button>
+                                <button class="btn-primary btn-sm" id="saveEditReportBtn"><i class="las la-save"></i> حفظ التعديل</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -187,48 +227,6 @@
             <h3 class="text-xl font-bold mb-2 text-[var(--color-white)]">تم بنجاح</h3>
             <p id="successMessage" class="text-[var(--color-muted)]"></p>
             <button id="okSuccessBtn" class="btn-primary mt-6 w-full justify-center">حسناً</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="editReportModal">
-        <div class="modal-content" style="max-width: 800px;">
-            <button class="modal-close" id="closeEditModal"><i class="las la-times"></i></button>
-            <h3 class="text-xl font-bold mb-4 text-[var(--color-white)] flex items-center gap-2">
-                <i class="las la-edit text-primary"></i> تعديل التقرير
-            </h3>
-            <div class="edit-report-form">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <label class="text-sm text-[var(--color-muted)]">اسم التقرير:</label>
-                    <input type="text" id="editReportName" class="input-field" style="flex:1;">
-                </div>
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <label class="text-sm text-[var(--color-muted)]">التاريخ:</label>
-                    <input type="date" id="editReportDate" class="input-field">
-                </div>
-                <div class="overflow-x-auto mb-4">
-                    <table class="restaurant-table" id="editReportTable">
-                        <thead>
-                            <tr>
-                                <th style="width:32%;">البيان</th>
-                                <th style="width:30%;">المبلغ (ج.م)</th>
-                                <th style="width:38%;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="editReportTbody"></tbody>
-                        <tfoot>
-                            <tr class="total-row">
-                                <td>الإجمالي</td>
-                                <td id="editReportTotal">0</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="flex flex-wrap gap-3 justify-end">
-                    <button class="btn-outline btn-sm" id="cancelEditReportBtn"><i class="las la-times"></i> إلغاء</button>
-                    <button class="btn-primary btn-sm" id="saveEditReportBtn"><i class="las la-save"></i> حفظ التعديل</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -290,7 +288,7 @@
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
 
-            const editReportModal = document.getElementById('editReportModal');
+            const editReportContainer = document.getElementById('editReportContainer');
             const editReportName = document.getElementById('editReportName');
             const editReportDate = document.getElementById('editReportDate');
             const editReportTbody = document.getElementById('editReportTbody');
@@ -801,6 +799,7 @@
             const viewReportTotal2 = document.getElementById('viewReportTotal2');
             const recentReportsCard = document.getElementById('recentReportsCard');
             const recentReportsList = document.getElementById('recentReportsList');
+            const recentReportsListView = document.getElementById('recentReportsListView');
             let currentViewReportId = null;
 
             function hideReportView() {
@@ -898,7 +897,7 @@
                     btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.edit-report-btn').forEach(btn => {
-                    btn.addEventListener('click', function() { openEditModal(this.getAttribute('data-id')); });
+                    btn.addEventListener('click', function() { openEditReport(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.delete-report-btn').forEach(btn => {
                     btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); });
@@ -978,7 +977,7 @@
                 });
             }
 
-            function openEditModal(reportId) {
+            function openEditReport(reportId) {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
                     return;
@@ -1003,20 +1002,17 @@
                     }
                 }
                 loadEditTableData(report.rows || []);
-                editReportModal.classList.add('active');
+                recentReportsListView.style.display = 'none';
+                editReportContainer.style.display = 'block';
             }
 
-            function closeEditModal() {
-                editReportModal.classList.remove('active');
+            function closeEditReport() {
+                editReportContainer.style.display = 'none';
+                recentReportsListView.style.display = 'block';
                 editingReportId = null;
             }
 
-            document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
-            document.getElementById('cancelEditReportBtn').addEventListener('click', closeEditModal);
-
-            window.addEventListener('click', (e) => {
-                if (e.target === editReportModal) closeEditModal();
-            });
+            document.getElementById('cancelEditReportBtn').addEventListener('click', closeEditReport);
 
             document.getElementById('saveEditReportBtn').addEventListener('click', async function() {
                 if (!editingReportId || isViewer) return;
@@ -1072,7 +1068,7 @@
                         const idxAll = allReports.findIndex(r => String(r.id) === String(editingReportId));
                         if (idxAll !== -1) allReports[idxAll] = data.report;
                         renderRecentReportsPage();
-                        closeEditModal();
+                        closeEditReport();
                         Swal.fire('تم التعديل', data.message, 'success');
                     } else {
                         Swal.fire('خطأ', data.message, 'error');
