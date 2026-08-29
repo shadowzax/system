@@ -64,19 +64,55 @@
         }
 
         /* ⬇️ التعديل المطلوب: تعبئة كاملة للخلايا الملونة بدون انحناءات */
-        .day-input.has-value {
+        .shared-table tbody td.colored-cell {
+            padding: 0 !important;
+            border: 1px solid var(--border-color);
+        }
+        .shared-table tbody td.colored-cell .day-input {
+            width: 100%;
+            height: 100%;
+            border: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 6px 2px !important;
+            box-sizing: border-box;
+            display: block;
+            background: transparent;
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 0.78rem;
+            text-align: center;
+            outline: none;
+            transition: none;
+            box-shadow: none !important;
+        }
+        .shared-table tbody td.colored-cell .day-input.has-value {
             background: #10b981 !important;
             color: #ffffff !important;
-            border-radius: 0 !important;
             border: 1px solid #10b981 !important;
             box-shadow: none !important;
         }
-        .day-input.has-value-zero {
+        .shared-table tbody td.colored-cell .day-input.has-value-zero {
             background: #ef4444 !important;
             color: #ffffff !important;
-            border-radius: 0 !important;
             border: 1px solid #ef4444 !important;
             box-shadow: none !important;
+        }
+        .shared-table tbody td.colored-cell .day-input:focus {
+            border: 1px solid var(--color-primary) !important;
+            box-shadow: none !important;
+            background: rgba(13, 153, 255, 0.06) !important;
+            color: var(--color-white) !important;
+        }
+        .shared-table tbody td.colored-cell .day-input.has-value:focus {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border: 1px solid #0d99ff !important;
+        }
+        .shared-table tbody td.colored-cell .day-input.has-value-zero:focus {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border: 1px solid #0d99ff !important;
         }
     </style>
     <script>
@@ -140,19 +176,10 @@
                             <button class="btn-primary btn-sm" id="addEmployeeBtn"><i class="las la-user-plus"></i> إضافة موظف</button>
                         </div>
                         <div class="mb-4">
-<div class="relative">
-    <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-    <input
-        type="text"
-        id="employeeSearchInput"
-        class="input-field pr-10"
-        placeholder="ابحث عن موظف..."
-        autocomplete="new-password"
-        name="employee-search"
-        spellcheck="false"
-    >
-</div>
-
+                            <div class="relative">
+                                <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
+                                <input type="text" id="employeeSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف..." autocomplete="new-password" name="employee-search" spellcheck="false">
+                            </div>
                         </div>
                         <div class="shared-table-wrapper">
                             <table class="shared-table" id="employeesTable">
@@ -1095,7 +1122,11 @@
                         if (isZero) cls = ' has-value-zero';
                         else if (hasVal && numVal !== 0) cls = ' has-value';
                         if (hasVal && numVal > 0) attendanceDays++;
-                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"></td>';
+                        let tdClass = '';
+                        if (cls.includes('has-value') || cls.includes('has-value-zero')) {
+                            tdClass = ' class="colored-cell"';
+                        }
+                        row += '<td' + tdClass + '><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"></td>';
                     }
                     const totalLoans = getEmployeeTotalLoans(emp);
                     const daysSalary = dayRate * attendanceDays;
@@ -1186,6 +1217,14 @@
                             if (num === 0) this.classList.add('has-value-zero');
                             else this.classList.add('has-value');
                         }
+                        // تحديث كلاس الـ td الأب
+                        const td = this.closest('td');
+                        if (td) {
+                            td.classList.remove('colored-cell');
+                            if (this.classList.contains('has-value') || this.classList.contains('has-value-zero')) {
+                                td.classList.add('colored-cell');
+                            }
+                        }
                         const empId = this.getAttribute('data-eid');
                         if (empId) updateSalaryRowSummary(empId);
                     });
@@ -1199,6 +1238,13 @@
                         } else {
                             this.value = '';
                             this.classList.remove('has-value', 'has-value-zero');
+                        }
+                        const td = this.closest('td');
+                        if (td) {
+                            td.classList.remove('colored-cell');
+                            if (this.classList.contains('has-value') || this.classList.contains('has-value-zero')) {
+                                td.classList.add('colored-cell');
+                            }
                         }
                         const empId = this.getAttribute('data-eid');
                         if (empId) updateSalaryRowSummary(empId);
@@ -1304,7 +1350,11 @@
                         let cls = '';
                         if (hasVal && numVal !== 0) cls = ' has-value';
                         else if (hasVal && numVal === 0) cls = ' has-value-zero';
-                        row += '<td><input type="text" class="day-input' + cls + '" id="advance-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + advanceVal + '" inputmode="decimal" placeholder="0"></td>';
+                        let tdClass = '';
+                        if (cls.includes('has-value') || cls.includes('has-value-zero')) {
+                            tdClass = ' class="colored-cell"';
+                        }
+                        row += '<td' + tdClass + '><input type="text" class="day-input' + cls + '" id="advance-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + advanceVal + '" inputmode="decimal" placeholder="0"></td>';
                     }
                     row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
                     row += '</tr>';
@@ -1393,6 +1443,13 @@
                             if (num === 0) this.classList.add('has-value-zero');
                             else this.classList.add('has-value');
                         }
+                        const td = this.closest('td');
+                        if (td) {
+                            td.classList.remove('colored-cell');
+                            if (this.classList.contains('has-value') || this.classList.contains('has-value-zero')) {
+                                td.classList.add('colored-cell');
+                            }
+                        }
                         const empId = this.getAttribute('data-eid');
                         if (empId) updateAdvanceRowSummary(empId);
                         updateAdvancesTableFootSummary();
@@ -1407,6 +1464,13 @@
                         } else {
                             this.value = '';
                             this.classList.remove('has-value', 'has-value-zero');
+                        }
+                        const td = this.closest('td');
+                        if (td) {
+                            td.classList.remove('colored-cell');
+                            if (this.classList.contains('has-value') || this.classList.contains('has-value-zero')) {
+                                td.classList.add('colored-cell');
+                            }
                         }
                         const empId = this.getAttribute('data-eid');
                         if (empId) updateAdvanceRowSummary(empId);
