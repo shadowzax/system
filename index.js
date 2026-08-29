@@ -197,9 +197,9 @@ app.get("/", (req, res) => {
         return res.redirect("/login");
     }
 
-    res.render("system/outgoing", {
-        title: "خوارج",
-        activePage: "outgoing-invoices",
+    res.render("index", {
+        title: "",
+        activePage: "",
     });
 });
 app.get("/visa", (req, res) => {
