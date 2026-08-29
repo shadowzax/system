@@ -36,6 +36,7 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script>
         window.__APP_DATA__ = {
             token: "<%- token %>",
@@ -105,7 +106,7 @@
                             <button class="btn-primary btn-sm" id="storeBtn"><i class="las la-save"></i> تخزين</button>
                             <button class="btn-outline btn-sm hidden" id="cancelEditBtn"><i class="las la-times"></i> إلغاء التعديل</button>
                             <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة (82.5mm)</button>
-                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> CSV</button>
+                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> Excel</button>
                         </div>
                     </div>
                 </div>
@@ -1213,18 +1214,20 @@
             document.getElementById('exportRestaurantBtn').addEventListener('click', function() {
                 saveToSession();
                 const name = restaurantNameInput.value || '';
-                let csv = 'البيان,المبلغ (ج.م)\n';
                 const rows = getTableData();
-                rows.forEach(row => {
-                    csv += (row.desc || '') + ',' + (row.amount || '0') + '\n';
-                });
-                csv += 'الإجمالي,' + totalAmountEl.textContent + '\n';
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = name + '_تقرير.csv';
-                link.click();
-                Swal.fire('تم', 'تم تصدير التقرير بصيغة CSV بنجاح.', 'success');
+                const total = totalAmountEl.textContent;
+                const dateStr = getReportDateString();
+
+                const wsData = [
+                    ['البيان', 'المبلغ (ج.م)'],
+                    ...rows.map(row => [row.desc, row.amount]),
+                    ['الإجمالي', total]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'تقرير');
+                XLSX.writeFile(wb, (name || 'تقرير') + '_' + dateStr.replace(/\//g, '-') + '.xlsx');
+                Swal.fire('تم', 'تم تصدير التقرير بصيغة Excel بنجاح.', 'success');
             });
 
             document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
