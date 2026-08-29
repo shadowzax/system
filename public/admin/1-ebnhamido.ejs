@@ -62,6 +62,82 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(20px); }
         }
+        .shared-table td {
+            padding: 2px !important;
+        }
+        .shared-table th {
+            padding: 6px 4px !important;
+            font-size: 11px;
+        }
+        .day-input {
+            width: 100%;
+            min-width: 30px;
+            height: 30px;
+            text-align: center;
+            background: transparent;
+            border: none !important;
+            border-radius: 3px;
+            padding: 0;
+            font-family: 'Alexandria', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-white);
+            outline: none !important;
+            box-shadow: none !important;
+            transition: background 0.15s ease;
+            display: block;
+            margin: 0 auto;
+            line-height: 30px;
+        }
+        .day-input:focus {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: rgba(255,255,255,0.08);
+        }
+        .day-input::placeholder {
+            color: transparent;
+        }
+        .day-input.has-value {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            font-weight: 600;
+        }
+        .day-input.has-value:focus {
+            background: #10b981 !important;
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .day-input.has-value-zero {
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            font-weight: 600;
+        }
+        .day-input.has-value-zero:focus {
+            background: #ef4444 !important;
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .shared-table td:has(.day-input) {
+            padding: 1px !important;
+            text-align: center;
+        }
+        .shared-table th.day-num-header {
+            min-width: 30px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 2px !important;
+            color: var(--color-muted);
+        }
     </style>
     <script>
         tailwind.config = {
@@ -83,7 +159,6 @@
 <body>
     <%- include('../sections/admin-header-ebnhamido.ejs') %>
 
-             <!--------------------------------------------------------------------------->
                 <div id="viewButtons" class="flex flex-wrap justify-center gap-3 mb-6">
                     <button class="view-btn active" id="filesViewBtn" data-mode="files">
                         <i class="las la-users"></i> الملفات والموظفين
@@ -124,19 +199,10 @@
                             <button class="btn-primary btn-sm" id="addEmployeeBtn"><i class="las la-user-plus"></i> إضافة موظف</button>
                         </div>
                         <div class="mb-4">
-<div class="relative">
-    <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
-    <input
-        type="text"
-        id="employeeSearchInput"
-        class="input-field pr-10"
-        placeholder="ابحث عن موظف..."
-        autocomplete="new-password"
-        name="employee-search"
-        spellcheck="false"
-    >
-</div>
-
+                            <div class="relative">
+                                <i class="las la-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--color-muted)] text-lg"></i>
+                                <input type="text" id="employeeSearchInput" class="input-field pr-10" placeholder="ابحث عن موظف..." autocomplete="new-password" name="employee-search" spellcheck="false">
+                            </div>
                         </div>
                         <div class="shared-table-wrapper">
                             <table class="shared-table" id="employeesTable">
