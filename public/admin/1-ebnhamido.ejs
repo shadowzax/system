@@ -62,6 +62,34 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(20px); }
         }
+        .viewer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .viewer-badge i {
+            font-size: 14px;
+        }
+        .day-input[readonly] {
+            cursor: default;
+            opacity: 0.85;
+        }
+        .day-input[readonly]:hover {
+            border-color: var(--color-border, #374151);
+            box-shadow: none;
+        }
+        .day-input[readonly]:focus {
+            border-color: var(--color-border, #374151);
+            box-shadow: none;
+            outline: none;
+        }
     </style>
     <script>
         tailwind.config = {
@@ -94,6 +122,9 @@
                     <button class="view-btn" id="salariesViewBtn" data-mode="salaries">
                         <i class="las la-money-bill-wave"></i> رواتب وحضور
                     </button>
+                    <span class="viewer-badge" id="viewerBadge" style="display:none;">
+                        <i class="las la-eye"></i> وضع العرض فقط
+                    </span>
                 </div>
 
                 <div id="monthFilterContainer" class="mb-4 flex items-center gap-3" style="display:none;">
@@ -211,7 +242,7 @@
                                 <tfoot id="sharedTableFoot"></tfoot>
                             </table>
                         </div>
-                        <div class="text-center text-xs text-[var(--color-muted)] mt-3">يمكنك تعديل المضاعفات مباشرة في الجدول أعلاه، وسيتم الحفظ تلقائياً عند الانتقال من الخلية أو بالضغط على Enter.</div>
+                        <div class="text-center text-xs text-[var(--color-muted)] mt-3" id="editHint">يمكنك تعديل المضاعفات مباشرة في الجدول أعلاه، وسيتم الحفظ تلقائياً عند الانتقال من الخلية أو بالضغط على Enter.</div>
                     </div>
                 </div>
             </div>
@@ -314,6 +345,8 @@
         window.__SERVER_DATA__ = <%- JSON.stringify(adminFiles) %>;
         (function() {
             const RESTAURANT_ID = "<%= restaurant.id %>";
+            const ACCOUNT_TYPE = "<%= accountType || 'admin' %>";
+            const isViewer = ACCOUNT_TYPE === 'viewer';
             const arabicToEnglishMap = { '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9' };
             const Swal = window.Swal;
 
@@ -579,6 +612,15 @@
             const confirmCreateFolderBtn = document.getElementById('confirmCreateFolderBtn');
             const createFolderNameInput = document.getElementById('createFolderNameInput');
 
+            function applyViewerRestrictions() {
+                if (!isViewer) return;
+                document.getElementById('viewerBadge').style.display = 'inline-flex';
+                if (createFolderBtn) createFolderBtn.style.display = 'none';
+                if (addEmployeeBtn) addEmployeeBtn.style.display = 'none';
+                document.getElementById('editHint').textContent = 'وضع العرض فقط - لا يمكنك تعديل البيانات';
+                document.getElementById('editHint').style.color = '#f59e0b';
+            }
+
             function renderFoldersList() {
                 const query = folderSearchInput ? folderSearchInput.value.toLowerCase().trim() : '';
                 foldersList.innerHTML = '';
@@ -595,17 +637,29 @@
                     card.className = 'file-card';
                     card.setAttribute('data-id', file.id);
                     card.style.cursor = 'pointer';
+                    let actionButtons = '';
+                    if (!isViewer) {
+                        actionButtons = `
+                            <div class="flex gap-2 flex-shrink-0">
+                                <button class="btn-outline btn-xs open-folder-btn" data-id="${file.id}"><i class="las la-folder-open"></i> فتح</button>
+                                <button class="btn-outline btn-xs copy-folder-btn" data-id="${file.id}" style="border-color:#10b981;color:#10b981;"><i class="las la-copy"></i> نسخ</button>
+                                <button class="btn-outline btn-xs delete-folder-btn" data-id="${file.id}" style="border-color:#ef4444;color:#ef4444;"><i class="las la-trash"></i> حذف</button>
+                            </div>
+                        `;
+                    } else {
+                        actionButtons = `
+                            <div class="flex gap-2 flex-shrink-0">
+                                <button class="btn-outline btn-xs open-folder-btn" data-id="${file.id}"><i class="las la-folder-open"></i> فتح</button>
+                            </div>
+                        `;
+                    }
                     card.innerHTML = `
                         <div class="file-icon"><i class="las la-folder"></i></div>
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-[var(--color-white)] text-base">${file.name || 'ملف بدون اسم'}</p>
                             <p class="text-xs text-[var(--color-muted)]">${employeeCount} موظف · ${dateStr}</p>
                         </div>
-                        <div class="flex gap-2 flex-shrink-0">
-                            <button class="btn-outline btn-xs open-folder-btn" data-id="${file.id}"><i class="las la-folder-open"></i> فتح</button>
-                            <button class="btn-outline btn-xs copy-folder-btn" data-id="${file.id}" style="border-color:#10b981;color:#10b981;"><i class="las la-copy"></i> نسخ</button>
-                            <button class="btn-outline btn-xs delete-folder-btn" data-id="${file.id}" style="border-color:#ef4444;color:#ef4444;"><i class="las la-trash"></i> حذف</button>
-                        </div>
+                        ${actionButtons}
                     `;
                     card.addEventListener('click', function(e) {
                         if (e.target.closest('button')) return;
@@ -616,15 +670,18 @@
                 document.querySelectorAll('.open-folder-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) { e.stopPropagation(); openFolder(this.getAttribute('data-id')); });
                 });
-                document.querySelectorAll('.copy-folder-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) { e.stopPropagation(); copyFolder(this.getAttribute('data-id')); });
-                });
-                document.querySelectorAll('.delete-folder-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) { e.stopPropagation(); deleteFolder(this.getAttribute('data-id')); });
-                });
+                if (!isViewer) {
+                    document.querySelectorAll('.copy-folder-btn').forEach(btn => {
+                        btn.addEventListener('click', function(e) { e.stopPropagation(); copyFolder(this.getAttribute('data-id')); });
+                    });
+                    document.querySelectorAll('.delete-folder-btn').forEach(btn => {
+                        btn.addEventListener('click', function(e) { e.stopPropagation(); deleteFolder(this.getAttribute('data-id')); });
+                    });
+                }
             }
 
             function openCreateFolderModal() {
+                if (isViewer) { showToast('لا يمكنك إنشاء ملف في وضع العرض', 'error'); return; }
                 createFolderNameInput.value = '';
                 createFolderModal.classList.add('active');
             }
@@ -634,6 +691,7 @@
             }
 
             async function performCreateFolder() {
+                if (isViewer) { showToast('لا يمكنك إنشاء ملف في وضع العرض', 'error'); return; }
                 const name = createFolderNameInput.value.trim();
                 if (!name) {
                     Swal.fire({ icon: 'error', title: 'خطأ', text: 'يرجى إدخال اسم الملف' });
@@ -662,6 +720,7 @@
             window.addEventListener('click', (e) => { if (e.target === createFolderModal) closeCreateFolderModal(); });
 
             function copyFolder(folderId) {
+                if (isViewer) { showToast('لا يمكنك نسخ ملف في وضع العرض', 'error'); return; }
                 const sourceFile = appData.files.find(f => String(f.id) === String(folderId));
                 if (!sourceFile) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 pendingCopyFolderId = folderId;
@@ -671,6 +730,7 @@
             }
 
             async function performCopyFolder() {
+                if (isViewer) { showToast('لا يمكنك نسخ ملف في وضع العرض', 'error'); return; }
                 const folderId = pendingCopyFolderId;
                 if (!folderId) return;
                 const sourceFile = appData.files.find(f => String(f.id) === String(folderId));
@@ -708,6 +768,7 @@
             window.addEventListener('click', (e) => { if (e.target === document.getElementById('copyFolderModal')) hideCopyFolderModal(); });
 
             async function deleteFolder(folderId) {
+                if (isViewer) { showToast('لا يمكنك حذف ملف في وضع العرض', 'error'); return; }
                 const fileIndex = appData.files.findIndex(f => String(f.id) === String(folderId));
                 if (fileIndex === -1) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'الملف غير موجود' }); return; }
                 const { value: password } = await Swal.fire({
@@ -856,6 +917,19 @@
                     const monthlySalary = parseNumber(emp.monthlySalary || 0);
                     const dailyRate = monthlySalary / 30;
                     const tr = document.createElement('tr');
+                    let actionCol = '';
+                    if (isViewer) {
+                        actionCol = '<td><span class="text-[var(--color-muted)] text-xs">---</span></td>';
+                    } else {
+                        actionCol = `
+                            <td>
+                                <div class="emp-actions">
+                                    <button class="btn-outline btn-xs edit-emp-btn" data-eid="${emp.id}" title="تعديل"><i class="las la-edit"></i></button>
+                                    <button class="btn-outline btn-xs delete-emp-btn" data-eid="${emp.id}" title="حذف" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i></button>
+                                </div>
+                            </td>
+                        `;
+                    }
                     tr.innerHTML = `
                         <td>${counter++}</td>
                         <td>${emp.code || '---'}</td>
@@ -864,36 +938,34 @@
                         <td>${emp.profession || '---'}</td>
                         <td>${formatNumber(monthlySalary)}</td>
                         <td>${formatNumber(dailyRate)}</td>
-                        <td>
-                            <div class="emp-actions">
-                                <button class="btn-outline btn-xs edit-emp-btn" data-eid="${emp.id}" title="تعديل"><i class="las la-edit"></i></button>
-                                <button class="btn-outline btn-xs delete-emp-btn" data-eid="${emp.id}" title="حذف" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i></button>
-                            </div>
-                        </td>
+                        ${actionCol}
                     `;
                     employeesTableBody.appendChild(tr);
                 });
-                document.querySelectorAll('.edit-emp-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const empId = this.getAttribute('data-eid');
-                        const emp = file.employees.find(e => e.id === empId);
-                        if (emp) {
-                            openEmployeeFormModal(emp);
-                        }
+                if (!isViewer) {
+                    document.querySelectorAll('.edit-emp-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const empId = this.getAttribute('data-eid');
+                            const emp = file.employees.find(e => e.id === empId);
+                            if (emp) {
+                                openEmployeeFormModal(emp);
+                            }
+                        });
                     });
-                });
-                document.querySelectorAll('.delete-emp-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const empId = this.getAttribute('data-eid');
-                        const emp = file.employees.find(e => e.id === empId);
-                        if (emp) {
-                            deleteEmployee(currentRestaurantId, empId);
-                        }
+                    document.querySelectorAll('.delete-emp-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const empId = this.getAttribute('data-eid');
+                            const emp = file.employees.find(e => e.id === empId);
+                            if (emp) {
+                                deleteEmployee(currentRestaurantId, empId);
+                            }
+                        });
                     });
-                });
+                }
             }
 
             function openEmployeeFormModal(emp) {
+                if (isViewer) { showToast('لا يمكنك تعديل الموظف في وضع العرض', 'error'); return; }
                 document.getElementById('empEditId').value = emp.id;
                 document.getElementById('empCodeInput').value = emp.code || '';
                 document.getElementById('empNameInput').value = emp.name || '';
@@ -912,6 +984,7 @@
             window.addEventListener('click', (e) => { if (e.target === document.getElementById('employeeFormModal')) closeEmployeeFormModal(); });
 
             document.getElementById('saveEmployeeBtn').addEventListener('click', async function() {
+                if (isViewer) { showToast('لا يمكنك تعديل الموظف في وضع العرض', 'error'); return; }
                 const empId = document.getElementById('empEditId').value;
                 const file = getFileByRestaurantId(currentRestaurantId);
                 if (!file) return;
@@ -945,12 +1018,13 @@
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        document.getElementById('saveEmployeeBtn').click();
+                        if (!isViewer) document.getElementById('saveEmployeeBtn').click();
                     }
                 });
             });
 
             function openAddEmployeeModal() {
+                if (isViewer) { showToast('لا يمكنك إضافة موظف في وضع العرض', 'error'); return; }
                 addEmpNameInput.value = '';
                 addEmpPhoneInput.value = '';
                 addEmpProfessionInput.value = '';
@@ -968,6 +1042,7 @@
             window.addEventListener('click', (e) => { if (e.target === addEmployeeModal) closeAddEmployeeModal(); });
 
             saveAddEmployeeBtn.addEventListener('click', async function() {
+                if (isViewer) { showToast('لا يمكنك إضافة موظف في وضع العرض', 'error'); return; }
                 const name = addEmpNameInput.value.trim();
                 const phone = addEmpPhoneInput.value.trim();
                 const profession = addEmpProfessionInput.value.trim();
@@ -994,12 +1069,13 @@
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        document.getElementById('saveAddEmployeeBtn').click();
+                        if (!isViewer) document.getElementById('saveAddEmployeeBtn').click();
                     }
                 });
             });
 
             function deleteEmployee(fileId, empId) {
+                if (isViewer) { showToast('لا يمكنك حذف موظف في وضع العرض', 'error'); return; }
                 const file = getFileByRestaurantId(fileId);
                 if (!file) return;
                 const emp = file.employees.find(e => e.id === empId);
@@ -1079,7 +1155,8 @@
                         if (isZero) cls = ' has-value-zero';
                         else if (hasVal && numVal !== 0) cls = ' has-value';
                         if (hasVal && numVal > 0) attendanceDays++;
-                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"></td>';
+                        const readonlyAttr = isViewer ? ' readonly' : '';
+                        row += '<td><input type="text" class="day-input' + cls + '" id="day-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + multiplierVal + '" inputmode="decimal" placeholder="0"' + readonlyAttr + '></td>';
                     }
                     const totalLoans = getEmployeeTotalLoans(emp);
                     const daysSalary = dayRate * attendanceDays;
@@ -1096,7 +1173,9 @@
                     sharedTableBody.innerHTML += row;
                 });
                 sharedTableFoot.innerHTML = '<tr><td colspan="' + (daysInMonth + 6) + '" class="summary-label-cell"></td></tr>';
-                bindSalaryInputEvents();
+                if (!isViewer) {
+                    bindSalaryInputEvents();
+                }
                 filterSalariesTable();
             }
 
@@ -1162,6 +1241,7 @@
 
             function bindSalaryInputEvents() {
                 sharedTableBody.querySelectorAll('.day-input').forEach(input => {
+                    if (isViewer) return;
                     input.addEventListener('input', function() {
                         const val = convertArabicNumerals(this.value).replace(/,/g, '');
                         const num = parseFloat(val);
@@ -1230,6 +1310,7 @@
             }
 
             async function saveSalaryInput(input) {
+                if (isViewer) { showToast('لا يمكنك تعديل البيانات في وضع العرض', 'error'); return; }
                 const fileId = currentRestaurantId;
                 const employeeId = input.getAttribute('data-eid');
                 const day = parseInt(input.getAttribute('data-day'));
@@ -1288,7 +1369,8 @@
                         let cls = '';
                         if (hasVal && numVal !== 0) cls = ' has-value';
                         else if (hasVal && numVal === 0) cls = ' has-value-zero';
-                        row += '<td><input type="text" class="day-input' + cls + '" id="advance-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + advanceVal + '" inputmode="decimal" placeholder="0"></td>';
+                        const readonlyAttr = isViewer ? ' readonly' : '';
+                        row += '<td><input type="text" class="day-input' + cls + '" id="advance-input-' + emp.id + '-' + d + '" data-day="' + d + '" data-eid="' + emp.id + '" value="' + advanceVal + '" inputmode="decimal" placeholder="0"' + readonlyAttr + '></td>';
                     }
                     row += '<td class="emp-cell" style="color:#ef4444;font-weight:700;">' + formatNumber(totalLoans) + '</td>';
                     row += '</tr>';
@@ -1298,7 +1380,9 @@
                 for (let d = 1; d <= daysInMonth; d++) footRow += '<td class="summary-value-cell">-</td>';
                 footRow += '<td class="summary-label-cell"></td></tr>';
                 advancesTableFoot.innerHTML = footRow;
-                bindAdvanceInputEvents();
+                if (!isViewer) {
+                    bindAdvanceInputEvents();
+                }
                 updateAdvancesTableFootSummary();
                 filterAdvancesTable();
             }
@@ -1369,6 +1453,7 @@
 
             function bindAdvanceInputEvents() {
                 advancesTableBody.querySelectorAll('.day-input').forEach(input => {
+                    if (isViewer) return;
                     input.addEventListener('input', function() {
                         const val = convertArabicNumerals(this.value).replace(/,/g, '');
                         const num = parseFloat(val);
@@ -1439,6 +1524,7 @@
             }
 
             async function saveAdvanceInput(input) {
+                if (isViewer) { showToast('لا يمكنك تعديل البيانات في وضع العرض', 'error'); return; }
                 const fileId = currentRestaurantId;
                 const employeeId = input.getAttribute('data-eid');
                 const day = parseInt(input.getAttribute('data-day'));
@@ -1677,6 +1763,7 @@
                         localStorage.setItem('theme', newTheme);
                     });
                 });
+                applyViewerRestrictions();
                 loadAppDataFromServer();
             });
         })();
