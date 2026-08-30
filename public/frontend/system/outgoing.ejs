@@ -37,6 +37,183 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* ==== Edit Report Form Compact Styles ==== */
+        .edit-report-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-top: 16px;
+            backdrop-filter: blur(6px);
+        }
+
+        .edit-report-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .edit-report-header-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: rgba(13, 153, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d99ff;
+            font-size: 20px;
+            transition: all 0.25s ease;
+        }
+
+        .edit-report-header:hover .edit-report-header-icon {
+            background: rgba(13, 153, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .edit-report-header h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .edit-report-header p {
+            font-size: 11px;
+            color: #888;
+            margin: 2px 0 0 0;
+        }
+
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        @media (min-width: 640px) {
+            .edit-form-grid {
+                grid-template-columns: 1fr 190px;
+                gap: 16px;
+            }
+        }
+
+        .edit-form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.02em;
+        }
+
+        .edit-form-group .input-field {
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .edit-form-group .input-field:focus {
+            border-color: #0d99ff;
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.12);
+            outline: none;
+        }
+
+        .edit-form-group .input-date-compact {
+            max-width: 170px;
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .edit-form-group .input-date-compact::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .edit-form-group .input-date-compact:focus {
+            border-color: #0d99ff;
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.12);
+            outline: none;
+        }
+
+        .edit-table-wrapper {
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .edit-table-wrapper .restaurant-table {
+            margin: 0;
+        }
+
+        .edit-report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+
+        /* ==== Light Theme Overrides ==== */
+        body.light .edit-report-section {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .edit-report-header {
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
+
+        body.light .edit-report-header h4 {
+            color: #1a1a1a;
+        }
+
+        body.light .edit-report-header p {
+            color: #666;
+        }
+
+        body.light .edit-form-group label {
+            color: #555;
+        }
+
+        body.light .edit-form-group .input-field,
+        body.light .edit-form-group .input-date-compact {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
+        }
+
+        body.light .edit-form-group .input-field:focus,
+        body.light .edit-form-group .input-date-compact:focus {
+            border-color: #0d99ff;
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.15);
+        }
+
+        body.light .edit-table-wrapper {
+            border-color: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.02);
+        }
+    </style>
     <script>
         window.__APP_DATA__ = {
             token: "<%- token %>",
@@ -178,19 +355,27 @@
                         </div>
                     </div>
                     <div id="editReportContainer" style="display:none;">
-                        <div class="border-t border-[var(--color-border)] pt-4 mt-4">
-                            <h4 class="text-lg font-bold text-[var(--color-white)] mb-3 flex items-center gap-2">
-                                <i class="las la-edit text-primary"></i> تعديل التقرير
-                            </h4>
-                            <div class="flex flex-wrap items-center gap-3 mb-4">
-                                <label class="text-sm text-[var(--color-muted)]">اسم التقرير:</label>
-                                <input type="text" id="editReportName" class="input-field" style="flex:1;">
+                        <div class="edit-report-section">
+                            <div class="edit-report-header">
+                                <div class="edit-report-header-icon">
+                                    <i class="las la-edit"></i>
+                                </div>
+                                <div>
+                                    <h4>تعديل التقرير</h4>
+                                    <p>قم بتعديل بيانات التقرير ثم احفظ التغييرات</p>
+                                </div>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3 mb-4">
-                                <label class="text-sm text-[var(--color-muted)]">التاريخ:</label>
-                                <input type="date" id="editReportDate" class="input-field">
+                            <div class="edit-form-grid">
+                                <div class="edit-form-group">
+                                    <label for="editReportName">اسم التقرير</label>
+                                    <input type="text" id="editReportName" class="input-field" placeholder="أدخل اسم التقرير">
+                                </div>
+                                <div class="edit-form-group">
+                                    <label for="editReportDate">التاريخ</label>
+                                    <input type="date" id="editReportDate" class="input-date-compact">
+                                </div>
                             </div>
-                            <div class="overflow-x-auto mb-4">
+                            <div class="edit-table-wrapper">
                                 <table class="restaurant-table" id="editReportTable">
                                     <thead>
                                         <tr>
@@ -209,7 +394,7 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            <div class="flex flex-wrap gap-3 justify-end">
+                            <div class="edit-report-actions">
                                 <button class="btn-outline btn-sm" id="cancelEditReportBtn"><i class="las la-times"></i> إلغاء</button>
                                 <button class="btn-primary btn-sm" id="saveEditReportBtn"><i class="las la-save"></i> حفظ التعديل</button>
                             </div>
