@@ -83,6 +83,9 @@
             transition: background-color 0.3s, color 0.3s;
             overflow-x: hidden;
             padding-bottom: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         ::-webkit-scrollbar {
@@ -124,6 +127,7 @@
 
         main {
             padding-top: var(--header-height);
+            flex: 1 0 auto;
         }
 
         .title-cell {
@@ -336,17 +340,20 @@
         }
 
         .header-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--color-white);
             display: flex;
             align-items: center;
-            gap: 10px;
         }
 
-        .header-title i {
-            color: var(--color-primary);
-            font-size: 1.5rem;
+        .header-title img {
+            height: 65px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 6px;
+            transition: filter 0.3s;
+        }
+
+        body:not(.light) .header-title img {
+            filter: brightness(0) invert(1);
         }
 
         .logout-btn {
@@ -382,16 +389,17 @@
                 gap: 12px;
             }
 
-            .header-title {
-                font-size: 1rem;
-            }
-
-            .header-title i {
-                font-size: 1.2rem;
+            .header-title img {
+                height: 50px;
             }
 
             .logout-btn span {
                 display: none;
+            }
+
+            .logout-btn {
+                padding: 8px 10px;
+                border-radius: 10px;
             }
 
             .title-cell {
@@ -401,6 +409,14 @@
             .title-cell h1 {
                 font-size: 1.4rem;
             }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            #mainHeader {
+                padding: 0 16px;
+            }
         }
     </style>
 </head>
@@ -408,8 +424,7 @@
 <body>
     <header id="mainHeader">
         <div class="header-title">
-            <i class="las la-utensils"></i>
-            <span>Elbaraka Mall</span>
+            <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X">
         </div>
         <div class="header-actions">
             <button id="themetoggle" class="theme-toggle" aria-label="تبديل السمة">
@@ -430,7 +445,7 @@
             <div class="title-cell">
                 <div class="title-icon"><i class="las la-utensils"></i></div>
                 <h1>إدارة المطاعم</h1>
-                <p>Elbaraka Mall</p>
+                <p>نظام متكامل لإدارة المطاعم</p>
             </div>
             <div class="restaurant-grid" id="restaurantGrid"></div>
         </div>
