@@ -869,6 +869,39 @@
             border-top: 1px solid var(--border-color);
             margin: 20px 0;
         }
+
+        .account-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .account-status::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .account-status-active {
+            color: #1f9d55;
+            background: rgba(31, 157, 85, 0.10);
+        }
+        .account-status-inactive {
+            color: #8a8a8a;
+            background: rgba(138, 138, 138, 0.10);
+        }
+        .account-status-suspended {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.10);
+        }
+        .account-status-pending {
+            color: #d99a00;
+            background: rgba(217, 154, 0, 0.10);
+        }
     </style>
 </head>
 <body>
@@ -1082,698 +1115,67 @@
                         </div>
                     </div>
                 </div>
-                <style>
-.account-details-swal {
-    width: min(720px, 94vw) !important;
-    max-width: 720px !important;
-    border-radius: 24px !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    direction: rtl !important;
-}
 
-.account-details-swal .swal2-title {
-    margin: 0 !important;
-    padding: 24px 28px 18px !important;
-    font-size: 24px !important;
-    font-weight: 800 !important;
-    text-align: right !important;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.15) !important;
-}
+                <!-- قائمة الحسابات الحالية -->
+                <div class="info-card mt-6" id="accountsListCard">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2">
+                                <i class="las la-users text-primary"></i>
+                                الحسابات الحالية
+                            </h3>
+                            <p class="text-sm text-[var(--color-muted)]" id="accountsCountLabel">
+                                جاري التحميل...
+                            </p>
+                        </div>
 
-.account-details-swal .swal2-html-container {
-    margin: 0 !important;
-    padding: 24px 28px 10px !important;
-}
+                        <div class="flex gap-2">
+                            <button class="btn-outline btn-sm" id="refreshAccountsBtn">
+                                <i class="las la-sync-alt"></i>
+                                تحديث
+                            </button>
+                        </div>
+                    </div>
 
-.account-details-swal .swal2-actions {
-    margin: 0 !important;
-    padding: 12px 28px 24px !important;
-    justify-content: flex-start !important;
-}
+                    <div class="overflow-x-auto">
+                        <table class="accounts-table" id="accountsTable" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>المستخدم</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>الدور</th>
+                                    <th>الحالة</th>
+                                    <th>تاريخ الإنشاء</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
 
-.account-details-swal .swal2-confirm {
-    min-width: 120px !important;
-    height: 44px !important;
-    border-radius: 12px !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    box-shadow: none !important;
-}
+                            <tbody id="accountsTableBody"></tbody>
+                        </table>
+                    </div>
 
-.account-details-wrapper {
-    direction: rtl;
-    text-align: right;
-}
-
-.account-profile-header {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 18px;
-    margin-bottom: 20px;
-    border-radius: 18px;
-    background: linear-gradient(
-        135deg,
-        rgba(240, 128, 128, 0.12),
-        rgba(254, 200, 154, 0.10)
-    );
-    border: 1px solid rgba(240, 128, 128, 0.16);
-}
-
-.account-profile-image-wrapper {
-    flex-shrink: 0;
-    width: 86px;
-    height: 86px;
-    padding: 3px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #f08080, #fec89a);
-}
-
-.account-profile-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #fff;
-}
-
-.account-profile-info {
-    min-width: 0;
-    flex: 1;
-}
-
-.account-profile-name {
-    margin: 0 0 6px;
-    font-size: 21px;
-    font-weight: 800;
-    color: var(--text-dark, #2d2d2d);
-}
-
-.account-profile-phone {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-muted, #8a8a8a);
-    direction: ltr;
-    text-align: right;
-}
-
-.account-details-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.account-detail-item {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    min-height: 72px;
-    padding: 13px 15px;
-    border-radius: 15px;
-    background: rgba(128, 128, 128, 0.055);
-    border: 1px solid rgba(128, 128, 128, 0.10);
-    transition: all 0.2s ease;
-}
-
-.account-detail-item:hover {
-    border-color: rgba(240, 128, 128, 0.25);
-    background: rgba(240, 128, 128, 0.055);
-}
-
-.account-detail-icon {
-    flex-shrink: 0;
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    background: rgba(240, 128, 128, 0.12);
-    color: #f08080;
-    font-size: 20px;
-}
-
-.account-detail-content {
-    min-width: 0;
-    flex: 1;
-}
-
-.account-detail-label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted, #8a8a8a);
-}
-
-.account-detail-value {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-dark, #2d2d2d);
-    overflow-wrap: anywhere;
-}
-
-.account-detail-value.ltr {
-    direction: ltr;
-    text-align: right;
-}
-
-.account-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 11px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.account-status-badge::before {
-    content: "";
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-}
-
-.account-status-active {
-    color: #1f9d55;
-    background: rgba(31, 157, 85, 0.10);
-}
-
-.account-status-inactive {
-    color: #8a8a8a;
-    background: rgba(138, 138, 138, 0.10);
-}
-
-.account-status-suspended {
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.10);
-}
-
-.account-status-pending {
-    color: #d99a00;
-    background: rgba(217, 154, 0, 0.10);
-}
-
-@media (max-width: 600px) {
-    .account-details-swal {
-        width: 94vw !important;
-        max-width: 94vw !important;
-        border-radius: 20px !important;
-    }
-
-    .account-details-swal .swal2-title {
-        padding: 20px 18px 15px !important;
-        font-size: 20px !important;
-    }
-
-    .account-details-swal .swal2-html-container {
-        padding: 18px !important;
-    }
-
-    .account-details-swal .swal2-actions {
-        padding: 8px 18px 18px !important;
-    }
-
-    .account-profile-header {
-        padding: 14px;
-        gap: 13px;
-    }
-
-    .account-profile-image-wrapper {
-        width: 70px;
-        height: 70px;
-    }
-
-    .account-profile-name {
-        font-size: 18px;
-    }
-
-    .account-details-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-<div class="info-card mt-6" id="accountsListCard">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div>
-            <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2">
-                <i class="las la-users text-primary"></i>
-                الحسابات الحالية
-            </h3>
-            <p class="text-sm text-[var(--color-muted)]" id="accountsCountLabel">
-                جاري التحميل...
-            </p>
-        </div>
-
-        <div class="flex gap-2">
-            <button class="btn-outline btn-sm" id="refreshAccountsBtn">
-                <i class="las la-sync-alt"></i>
-                تحديث
-            </button>
-        </div>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="accounts-table" id="accountsTable" style="display:none;">
-            <thead>
-                <tr>
-                    <th>المستخدم</th>
-                    <th>البريد الإلكتروني</th>
-                    <th>الدور</th>
-                    <th>الحالة</th>
-                    <th>تاريخ الإنشاء</th>
-                    <th>إجراءات</th>
-                </tr>
-            </thead>
-
-            <tbody id="accountsTableBody"></tbody>
-        </table>
-    </div>
-
-    <div
-        class="text-center py-6 text-[var(--color-muted)] text-sm"
-        id="noAccountsMsg"
-        style="display:none;"
-    >
-        <i class="las la-users-slash text-4xl block mb-3 opacity-40"></i>
-        لا توجد حسابات مضافة بعد
-    </div>
-
-    <div
-        class="text-center py-6 text-[var(--color-muted)] text-sm"
-        id="accountsLoadingMsg"
-    >
-        <i class="las la-spinner la-spin text-4xl block mb-3 opacity-40"></i>
-        جاري تحميل الحسابات...
-    </div>
-</div>
-
-
-<script>
-const accountsApiUrl = "https://xsysx.shadowza.space/api/admin/create/users";
-
-const accountsTable = document.getElementById("accountsTable");
-const accountsTableBody = document.getElementById("accountsTableBody");
-const accountsCountLabel = document.getElementById("accountsCountLabel");
-const accountsLoadingMsg = document.getElementById("accountsLoadingMsg");
-const noAccountsMsg = document.getElementById("noAccountsMsg");
-const refreshAccountsBtn = document.getElementById("refreshAccountsBtn");
-
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getAccountTypeLabel(accountType) {
-    const types = {
-        admin: "ادمن",
-        cashier: "كاشير",
-        viewer: "مشاهد"
-    };
-
-    return types[accountType] || accountType || "غير محدد";
-}
-
-function getAccountStatusLabel(status) {
-    const statuses = {
-        active: "نشط",
-        inactive: "غير نشط",
-        suspended: "موقوف",
-        pending: "معلق"
-    };
-
-    return statuses[status] || status || "غير محدد";
-}
-
-function getAccountStatusClass(status) {
-    const classes = {
-        active: "status-active",
-        inactive: "status-inactive",
-        suspended: "status-suspended",
-        pending: "status-pending"
-    };
-
-    return classes[status] || "status-inactive";
-}
-
-function getAccountStatusSwalClass(status) {
-    const classes = {
-        active: "account-status-active",
-        inactive: "account-status-inactive",
-        suspended: "account-status-suspended",
-        pending: "account-status-pending"
-    };
-
-    return classes[status] || "account-status-inactive";
-}
-
-function formatDate(dateValue) {
-    if (!dateValue) {
-        return "غير متوفر";
-    }
-
-    const date = new Date(dateValue.replace(" ", "T"));
-
-    if (isNaN(date.getTime())) {
-        return escapeHtml(dateValue);
-    }
-
-    return date.toLocaleString("ar-EG", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-
-function getProfilePicture(user) {
-    if (user.profile_picture) {
-        return escapeHtml(user.profile_picture);
-    }
-
-    return "https://via.placeholder.com/80x80?text=User";
-}
-
-function renderAccounts(users) {
-    accountsTableBody.innerHTML = "";
-
-    if (!Array.isArray(users) || users.length === 0) {
-        accountsTable.style.display = "none";
-        noAccountsMsg.style.display = "block";
-        accountsCountLabel.textContent = "لا توجد حسابات";
-        return;
-    }
-
-    noAccountsMsg.style.display = "none";
-    accountsTable.style.display = "table";
-    accountsCountLabel.textContent = `إجمالي الحسابات: ${users.length}`;
-
-    users.forEach(user => {
-        const accountType = getAccountTypeLabel(user.account_type);
-        const accountStatus = getAccountStatusLabel(user.account_status);
-        const statusClass = getAccountStatusClass(user.account_status);
-
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>
-                <div class="flex items-center gap-3">
-                    <img
-                        src="${getProfilePicture(user)}"
-                        alt="${escapeHtml(user.name)}"
-                        class="w-10 h-10 rounded-full object-cover"
-                        onerror="this.src='https://via.placeholder.com/80x80?text=User';"
+                    <div
+                        class="text-center py-6 text-[var(--color-muted)] text-sm"
+                        id="noAccountsMsg"
+                        style="display:none;"
                     >
-                    <div>
-                        <div class="font-semibold text-[var(--color-white)]">
-                            ${escapeHtml(user.name || "بدون اسم")}
-                        </div>
-                        <div class="text-xs text-[var(--color-muted)]">
-                            ${escapeHtml(user.phone_number || "بدون رقم")}
-                        </div>
+                        <i class="las la-users-slash text-4xl block mb-3 opacity-40"></i>
+                        لا توجد حسابات مضافة بعد
                     </div>
-                </div>
-            </td>
 
-            <td>
-                <span class="text-sm">
-                    ${escapeHtml(user.email || "غير متوفر")}
-                </span>
-            </td>
-
-            <td>
-                <span class="text-sm">
-                    ${escapeHtml(accountType)}
-                </span>
-            </td>
-
-            <td>
-                <span class="account-status ${statusClass}">
-                    ${escapeHtml(accountStatus)}
-                </span>
-            </td>
-
-            <td>
-                <span class="text-sm">
-                    ${formatDate(user.created_at)}
-                </span>
-            </td>
-
-            <td>
-                <div class="flex items-center gap-2">
-                    <button
-                        type="button"
-                        class="btn-outline btn-sm"
-                        onclick="viewAccount('${escapeHtml(user.id)}')"
-                        title="عرض الحساب"
+                    <div
+                        class="text-center py-6 text-[var(--color-muted)] text-sm"
+                        id="accountsLoadingMsg"
                     >
-                        <i class="las la-eye"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-
-        accountsTableBody.appendChild(row);
-    });
-}
-
-async function loadAccounts() {
-    accountsLoadingMsg.style.display = "block";
-    noAccountsMsg.style.display = "none";
-    accountsTable.style.display = "none";
-    accountsCountLabel.textContent = "جاري التحميل...";
-
-    try {
-        const response = await fetch(accountsApiUrl, {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.message || "Failed to load accounts");
-        }
-
-        renderAccounts(data.users || []);
-    } catch (error) {
-        console.error("Failed to load accounts:", error);
-
-        accountsTable.style.display = "none";
-        noAccountsMsg.style.display = "none";
-        accountsCountLabel.textContent = "تعذر تحميل الحسابات";
-    } finally {
-        accountsLoadingMsg.style.display = "none";
-    }
-}
-
-function viewAccount(id) {
-    const account = window.accountsData?.find(
-        user => String(user.id) === String(id)
-    );
-
-    if (!account) {
-        return;
-    }
-
-    const profilePicture = account.profile_picture
-        ? escapeHtml(account.profile_picture)
-        : "https://via.placeholder.com/80x80?text=User";
-
-    const accountStatus = getAccountStatusLabel(account.account_status);
-    const accountStatusClass = getAccountStatusSwalClass(account.account_status);
-
-    Swal.fire({
-        title: "تفاصيل الحساب",
-        html: `
-            <div class="account-details-wrapper">
-                <div class="account-profile-header">
-                    <div class="account-profile-image-wrapper">
-                        <img
-                            src="${profilePicture}"
-                            alt="${escapeHtml(account.name || "المستخدم")}"
-                            class="account-profile-image"
-                            onerror="this.src='https://via.placeholder.com/80x80?text=User';"
-                        >
-                    </div>
-
-                    <div class="account-profile-info">
-                        <h3 class="account-profile-name">
-                            ${escapeHtml(account.name || "بدون اسم")}
-                        </h3>
-
-                        <p class="account-profile-phone">
-                            ${escapeHtml(account.phone_number || "بدون رقم")}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="account-details-grid">
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-user"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">الاسم</span>
-                            <span class="account-detail-value">
-                                ${escapeHtml(account.name || "غير متوفر")}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-envelope"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">البريد الإلكتروني</span>
-                            <span class="account-detail-value ltr">
-                                ${escapeHtml(account.email || "غير متوفر")}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-phone"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">رقم الهاتف</span>
-                            <span class="account-detail-value ltr">
-                                ${escapeHtml(account.phone_number || "غير متوفر")}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-briefcase"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">المسمى الوظيفي</span>
-                            <span class="account-detail-value">
-                                ${escapeHtml(account.job_title || "غير متوفر")}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-user-shield"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">الدور</span>
-                            <span class="account-detail-value">
-                                ${escapeHtml(getAccountTypeLabel(account.account_type))}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item">
-                        <div class="account-detail-icon">
-                            <i class="las la-toggle-on"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">الحالة</span>
-                            <span class="account-detail-value">
-                                <span class="account-status-badge ${accountStatusClass}">
-                                    ${escapeHtml(accountStatus)}
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="account-detail-item" style="grid-column: 1 / -1;">
-                        <div class="account-detail-icon">
-                            <i class="las la-calendar-alt"></i>
-                        </div>
-                        <div class="account-detail-content">
-                            <span class="account-detail-label">تاريخ إنشاء الحساب</span>
-                            <span class="account-detail-value">
-                                ${formatDate(account.created_at)}
-                            </span>
-                        </div>
+                        <i class="las la-spinner la-spin text-4xl block mb-3 opacity-40"></i>
+                        جاري تحميل الحسابات...
                     </div>
                 </div>
             </div>
-        `,
-        confirmButtonText: "إغلاق",
-        confirmButtonColor: "#f08080",
-        width: "720px",
-        padding: "0",
-        background: "var(--color-light, #f9f7f7)",
-        color: "var(--text-dark, #2d2d2d)",
-        showCloseButton: true,
-        customClass: {
-            popup: "account-details-swal",
-            confirmButton: "btn-swal-confirm"
-        }
-    });
-}
-
-async function loadAccountsWithData() {
-    accountsLoadingMsg.style.display = "block";
-    noAccountsMsg.style.display = "none";
-    accountsTable.style.display = "none";
-    accountsCountLabel.textContent = "جاري التحميل...";
-
-    try {
-        const response = await fetch(accountsApiUrl, {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.message || "Failed to load accounts");
-        }
-
-        window.accountsData = Array.isArray(data.users)
-            ? data.users
-            : [];
-
-        renderAccounts(window.accountsData);
-    } catch (error) {
-        console.error("Failed to load accounts:", error);
-
-        accountsTable.style.display = "none";
-        noAccountsMsg.style.display = "none";
-        accountsCountLabel.textContent = "تعذر تحميل الحسابات";
-    } finally {
-        accountsLoadingMsg.style.display = "none";
-    }
-}
-
-refreshAccountsBtn.addEventListener("click", loadAccountsWithData);
-
-loadAccountsWithData();
-</script>
         </main>
     </div>
 
+    <!-- Modal تعديل الحساب -->
     <div class="modal-overlay" id="editAccountModal">
         <div class="modal-content">
             <button class="modal-close" id="closeEditAccountModal"><i class="las la-times"></i></button>
@@ -1816,659 +1218,825 @@ loadAccountsWithData();
             </div>
         </div>
     </div>
-<script>
-(function () {
-    var API_BASE = 'https://xsysx.shadowza.space/api/admin';
-    var CREATE_URL = API_BASE + '/create/account';
 
-    var accFullName = document.getElementById('accFullName');
-    var accEmail = document.getElementById('accEmail');
-    var accPhone = document.getElementById('accPhone');
-    var accJobTitle = document.getElementById('accJobTitle');
-    var accPassword = document.getElementById('accPassword');
-    var accConfirmPass = document.getElementById('accConfirmPass');
-    var accRole = document.getElementById('accRole');
-    var accStatus = document.getElementById('accStatus');
-    var accStatusLbl = document.getElementById('accStatusLbl');
-    var saveAccBtn = document.getElementById('saveAccBtn');
-    var resetAccBtn = document.getElementById('resetAccBtn');
-    var togglePassBtn = document.getElementById('togglePassBtn');
-    var toggleConfPassBtn = document.getElementById('toggleConfPassBtn');
-    var emailMsg = document.getElementById('emailMsg');
-    var phoneMsg = document.getElementById('phoneMsg');
-    var passMsg = document.getElementById('passMsg');
-    var confPassMsg = document.getElementById('confPassMsg');
-    var roleMsg = document.getElementById('roleMsg');
-    var permCheckboxes = document.querySelectorAll('.perm-checkbox');
+    <script>
+        (function () {
+            var API_BASE = 'https://xsysx.shadowza.space/api/admin';
+            var CREATE_URL = API_BASE + '/create/account';
+            var LIST_URL = API_BASE + '/create/users';
 
-    function clearValidationMsgs() {
-        emailMsg.textContent = '';
-        emailMsg.className = 'validation-msg';
-        phoneMsg.textContent = '';
-        phoneMsg.className = 'validation-msg';
-        passMsg.textContent = '';
-        passMsg.className = 'validation-msg';
-        confPassMsg.textContent = '';
-        confPassMsg.className = 'validation-msg';
-        roleMsg.textContent = '';
-        roleMsg.className = 'validation-msg';
-    }
+            var accFullName = document.getElementById('accFullName');
+            var accEmail = document.getElementById('accEmail');
+            var accPhone = document.getElementById('accPhone');
+            var accJobTitle = document.getElementById('accJobTitle');
+            var accPassword = document.getElementById('accPassword');
+            var accConfirmPass = document.getElementById('accConfirmPass');
+            var accRole = document.getElementById('accRole');
+            var accStatus = document.getElementById('accStatus');
+            var accStatusLbl = document.getElementById('accStatusLbl');
+            var saveAccBtn = document.getElementById('saveAccBtn');
+            var resetAccBtn = document.getElementById('resetAccBtn');
+            var togglePassBtn = document.getElementById('togglePassBtn');
+            var toggleConfPassBtn = document.getElementById('toggleConfPassBtn');
+            var emailMsg = document.getElementById('emailMsg');
+            var phoneMsg = document.getElementById('phoneMsg');
+            var passMsg = document.getElementById('passMsg');
+            var confPassMsg = document.getElementById('confPassMsg');
+            var roleMsg = document.getElementById('roleMsg');
+            var permCheckboxes = document.querySelectorAll('.perm-checkbox');
 
-    function validateEmailOnly(email) {
-        if (!email) return false;
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+            var accountsTable = document.getElementById('accountsTable');
+            var accountsTableBody = document.getElementById('accountsTableBody');
+            var accountsCountLabel = document.getElementById('accountsCountLabel');
+            var accountsLoadingMsg = document.getElementById('accountsLoadingMsg');
+            var noAccountsMsg = document.getElementById('noAccountsMsg');
+            var refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
 
-    function validateCreateForm() {
-        clearValidationMsgs();
-        var isValid = true;
+            var editAccountModal = document.getElementById('editAccountModal');
+            var closeEditAccountModal = document.getElementById('closeEditAccountModal');
+            var editAccountId = document.getElementById('editAccountId');
+            var editAccountFullName = document.getElementById('editAccountFullName');
+            var editAccountEmail = document.getElementById('editAccountEmail');
+            var editAccountPhone = document.getElementById('editAccountPhone');
+            var editAccountJobTitle = document.getElementById('editAccountJobTitle');
+            var editAccountRole = document.getElementById('editAccountRole');
+            var editAccountStatus = document.getElementById('editAccountStatus');
+            var editAccountStatusLabel = document.getElementById('editAccountStatusLabel');
+            var saveEditAccountBtn = document.getElementById('saveEditAccountBtn');
 
-        if (!accFullName.value.trim()) {
-            isValid = false;
-            accFullName.style.borderColor = '#ef4444';
-            setTimeout(function () {
-                accFullName.style.borderColor = '';
-            }, 3000);
-        }
+            var cachedAccounts = [];
 
-        var emailVal = accEmail.value.trim();
+            function escapeHtml(value) {
+                return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
 
-        if (!emailVal) {
-            isValid = false;
-            emailMsg.textContent = 'البريد الإلكتروني مطلوب';
-            emailMsg.className = 'validation-msg error';
-        } else if (!validateEmailOnly(emailVal)) {
-            isValid = false;
-            emailMsg.textContent = 'صيغة البريد الإلكتروني غير صالحة';
-            emailMsg.className = 'validation-msg error';
-        }
+            function getAccountTypeLabel(accountType) {
+                var types = {
+                    admin: "ادمن",
+                    cashier: "كاشير",
+                    viewer: "مشاهد"
+                };
+                return types[accountType] || accountType || "غير محدد";
+            }
 
-        if (!accPhone.value.trim()) {
-            isValid = false;
-            phoneMsg.textContent = 'رقم الهاتف مطلوب';
-            phoneMsg.className = 'validation-msg error';
-        }
+            function getAccountStatusLabel(status) {
+                var statuses = {
+                    active: "نشط",
+                    inactive: "غير نشط",
+                    suspended: "موقوف",
+                    pending: "معلق"
+                };
+                return statuses[status] || status || "غير محدد";
+            }
 
-        var passVal = accPassword.value;
+            function getAccountStatusClass(status) {
+                var classes = {
+                    active: "account-status-active",
+                    inactive: "account-status-inactive",
+                    suspended: "account-status-suspended",
+                    pending: "account-status-pending"
+                };
+                return classes[status] || "account-status-inactive";
+            }
 
-        if (!passVal) {
-            isValid = false;
-            passMsg.textContent = 'كلمة المرور مطلوبة';
-            passMsg.className = 'validation-msg error';
-        } else if (passVal.length < 6) {
-            isValid = false;
-            passMsg.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-            passMsg.className = 'validation-msg error';
-        }
+            function formatDate(dateValue) {
+                if (!dateValue) return "غير متوفر";
+                var date = new Date(dateValue.replace(" ", "T"));
+                if (isNaN(date.getTime())) return escapeHtml(dateValue);
+                return date.toLocaleString("ar-EG", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+            }
 
-        var confVal = accConfirmPass.value;
+            function getProfilePicture(user) {
+                if (user.profile_picture) return escapeHtml(user.profile_picture);
+                return "https://via.placeholder.com/80x80?text=User";
+            }
 
-        if (!confVal) {
-            isValid = false;
-            confPassMsg.textContent = 'تأكيد كلمة المرور مطلوب';
-            confPassMsg.className = 'validation-msg error';
-        } else if (passVal !== confVal) {
-            isValid = false;
-            confPassMsg.textContent = 'كلمتا المرور غير متطابقتين';
-            confPassMsg.className = 'validation-msg error';
-        }
+            function renderAccounts(users) {
+                accountsTableBody.innerHTML = "";
+                cachedAccounts = Array.isArray(users) ? users : [];
 
-        if (!accRole.value) {
-            isValid = false;
-            roleMsg.textContent = 'الدور الأساسي مطلوب';
-            roleMsg.className = 'validation-msg error';
-        }
+                if (cachedAccounts.length === 0) {
+                    accountsTable.style.display = "none";
+                    noAccountsMsg.style.display = "block";
+                    accountsCountLabel.textContent = "لا توجد حسابات";
+                    accountsLoadingMsg.style.display = "none";
+                    return;
+                }
 
-        return isValid;
-    }
+                noAccountsMsg.style.display = "none";
+                accountsTable.style.display = "table";
+                accountsCountLabel.textContent = 'إجمالي الحسابات: ' + cachedAccounts.length;
+                accountsLoadingMsg.style.display = "none";
 
-    function collectPermissions() {
-        var permissions = {};
+                cachedAccounts.forEach(function (user) {
+                    var accountType = getAccountTypeLabel(user.account_type);
+                    var accountStatus = getAccountStatusLabel(user.account_status);
+                    var statusClass = getAccountStatusClass(user.account_status);
+                    var row = document.createElement("tr");
 
-        permCheckboxes.forEach(function (cb) {
-            permissions[cb.getAttribute('data-perm')] = cb.checked ? 1 : 0;
-        });
+                    row.innerHTML =
+                        '<td>' +
+                        '<div class="flex items-center gap-3">' +
+                        '<img src="' + getProfilePicture(user) + '" alt="' + escapeHtml(user.name) + '" class="w-10 h-10 rounded-full object-cover" onerror="this.src=\'https://via.placeholder.com/80x80?text=User\';">' +
+                        '<div>' +
+                        '<div class="font-semibold text-[var(--color-white)]">' + escapeHtml(user.name || "بدون اسم") + '</div>' +
+                        '<div class="text-xs text-[var(--color-muted)]">' + escapeHtml(user.phone_number || "بدون رقم") + '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td><span class="text-sm">' + escapeHtml(user.email || "غير متوفر") + '</span></td>' +
+                        '<td><span class="text-sm">' + escapeHtml(accountType) + '</span></td>' +
+                        '<td><span class="account-status ' + statusClass + '">' + escapeHtml(accountStatus) + '</span></td>' +
+                        '<td><span class="text-sm">' + formatDate(user.created_at) + '</span></td>' +
+                        '<td><div class="flex items-center gap-2">' +
+                        '<button type="button" class="btn-outline btn-sm view-account-btn" data-id="' + escapeHtml(user.id) + '" title="عرض الحساب"><i class="las la-eye"></i></button>' +
+                        '<button type="button" class="btn-outline btn-sm edit-account-btn" data-id="' + escapeHtml(user.id) + '" title="تعديل"><i class="las la-edit"></i></button>' +
+                        '</div></td>';
 
-        return permissions;
-    }
-
-    function buildCreatePayload() {
-        var permissions = collectPermissions();
-
-        return {
-            name: accFullName.value.trim(),
-            email: accEmail.value.trim().toLowerCase(),
-            phone_number: accPhone.value.trim(),
-            password: accPassword.value,
-            account_type: accRole.value,
-            job_title: accJobTitle.value.trim(),
-            account_status: accStatus.checked ? 'active' : 'inactive',
-            advances: [],
-            expenses: [],
-            transfers: [],
-            fees: [],
-            dashboard_view: permissions.dashboard_view,
-            outgoing_manage: permissions.outgoing_manage,
-            visa_manage: permissions.visa_manage,
-            transfers_manage: permissions.transfers_manage,
-            advances_manage: permissions.advances_manage,
-            payments_manage: permissions.payments_manage,
-            accounts_manage: permissions.accounts_manage,
-            logs_view: permissions.logs_view,
-            settings_manage: permissions.settings_manage,
-            print_reports: permissions.print_reports
-        };
-    }
-
-    function resetCreateForm() {
-        accFullName.value = '';
-        accEmail.value = '';
-        accPhone.value = '';
-        accJobTitle.value = '';
-        accPassword.value = '';
-        accConfirmPass.value = '';
-        accRole.value = '';
-        accStatus.checked = true;
-        accStatusLbl.textContent = 'نشط';
-
-        accPassword.setAttribute('type', 'password');
-        accConfirmPass.setAttribute('type', 'password');
-
-        togglePassBtn.querySelector('i').classList.remove('la-eye-slash');
-        togglePassBtn.querySelector('i').classList.add('la-eye');
-
-        toggleConfPassBtn.querySelector('i').classList.remove('la-eye-slash');
-        toggleConfPassBtn.querySelector('i').classList.add('la-eye');
-
-        permCheckboxes.forEach(function (cb) {
-            cb.checked = cb.getAttribute('data-perm') === 'dashboard_view';
-        });
-
-        clearValidationMsgs();
-        accFullName.style.borderColor = '';
-        accEmail.style.borderColor = '';
-    }
-
-    window.accountCreateFunctions = {
-        clearValidationMsgs: clearValidationMsgs,
-        validateEmailOnly: validateEmailOnly,
-        validateCreateForm: validateCreateForm,
-        collectPermissions: collectPermissions,
-        buildCreatePayload: buildCreatePayload,
-        resetCreateForm: resetCreateForm
-    };
-
-    togglePassBtn.addEventListener('click', function () {
-        var type = accPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-
-        accPassword.setAttribute('type', type);
-
-        var icon = togglePassBtn.querySelector('i');
-
-        icon.classList.toggle('la-eye', type === 'password');
-        icon.classList.toggle('la-eye-slash', type === 'text');
-    });
-
-    toggleConfPassBtn.addEventListener('click', function () {
-        var type = accConfirmPass.getAttribute('type') === 'password' ? 'text' : 'password';
-
-        accConfirmPass.setAttribute('type', type);
-
-        var icon = toggleConfPassBtn.querySelector('i');
-
-        icon.classList.toggle('la-eye', type === 'password');
-        icon.classList.toggle('la-eye-slash', type === 'text');
-    });
-
-    accStatus.addEventListener('change', function () {
-        accStatusLbl.textContent = accStatus.checked ? 'نشط' : 'غير نشط';
-    });
-
-    saveAccBtn.addEventListener('click', function () {
-        clearValidationMsgs();
-
-        if (!validateCreateForm()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'خطأ في النموذج',
-                text: 'يرجى تصحيح الأخطاء في النموذج',
-                confirmButtonText: 'حسناً'
-            });
-            return;
-        }
-
-        saveAccBtn.disabled = true;
-        saveAccBtn.innerHTML = '<i class="las la-spinner la-spin"></i> جاري الحفظ...';
-
-        fetch(CREATE_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(buildCreatePayload())
-        })
-        .then(function (res) {
-            return res.json();
-        })
-        .then(function (data) {
-            saveAccBtn.disabled = false;
-            saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
-
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تم بنجاح',
-                    text: 'تم إنشاء الحساب بنجاح',
-                    confirmButtonText: 'حسناً'
+                    accountsTableBody.appendChild(row);
                 });
 
-                resetCreateForm();
+                accountsTableBody.querySelectorAll('.view-account-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        viewAccount(this.getAttribute('data-id'));
+                    });
+                });
 
-                if (window.accountListFunctions) {
-                    window.accountListFunctions.loadAccounts();
+                accountsTableBody.querySelectorAll('.edit-account-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        openEditModal(this.getAttribute('data-id'));
+                    });
+                });
+            }
+
+            function loadAccounts() {
+                accountsLoadingMsg.style.display = "block";
+                noAccountsMsg.style.display = "none";
+                accountsTable.style.display = "none";
+                accountsCountLabel.textContent = "جاري التحميل...";
+
+                fetch(LIST_URL, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data.success) throw new Error(data.message || 'Failed to load accounts');
+                    renderAccounts(data.users || []);
+                })
+                .catch(function (error) {
+                    console.error("Failed to load accounts:", error);
+                    accountsTable.style.display = "none";
+                    noAccountsMsg.style.display = "none";
+                    accountsCountLabel.textContent = "تعذر تحميل الحسابات";
+                    accountsLoadingMsg.style.display = "none";
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'فشل تحميل الحسابات: ' + error.message,
+                        confirmButtonText: 'حسناً'
+                    });
+                });
+            }
+
+            function viewAccount(id) {
+                var account = cachedAccounts.find(function (user) {
+                    return String(user.id) === String(id);
+                });
+
+                if (!account) return;
+
+                var profilePicture = account.profile_picture
+                    ? escapeHtml(account.profile_picture)
+                    : "https://via.placeholder.com/80x80?text=User";
+
+                var accountStatus = getAccountStatusLabel(account.account_status);
+                var accountStatusClass = getAccountStatusClass(account.account_status);
+
+                Swal.fire({
+                    title: "تفاصيل الحساب",
+                    html:
+                        '<div class="account-details-wrapper">' +
+                        '<div class="account-profile-header">' +
+                        '<div class="account-profile-image-wrapper">' +
+                        '<img src="' + profilePicture + '" alt="' + escapeHtml(account.name || "المستخدم") + '" class="account-profile-image" onerror="this.src=\'https://via.placeholder.com/80x80?text=User\';">' +
+                        '</div>' +
+                        '<div class="account-profile-info">' +
+                        '<h3 class="account-profile-name">' + escapeHtml(account.name || "بدون اسم") + '</h3>' +
+                        '<p class="account-profile-phone">' + escapeHtml(account.phone_number || "بدون رقم") + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="account-details-grid">' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-user"></i></div><div class="account-detail-content"><span class="account-detail-label">الاسم</span><span class="account-detail-value">' + escapeHtml(account.name || "غير متوفر") + '</span></div></div>' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-envelope"></i></div><div class="account-detail-content"><span class="account-detail-label">البريد الإلكتروني</span><span class="account-detail-value ltr">' + escapeHtml(account.email || "غير متوفر") + '</span></div></div>' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-phone"></i></div><div class="account-detail-content"><span class="account-detail-label">رقم الهاتف</span><span class="account-detail-value ltr">' + escapeHtml(account.phone_number || "غير متوفر") + '</span></div></div>' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-briefcase"></i></div><div class="account-detail-content"><span class="account-detail-label">المسمى الوظيفي</span><span class="account-detail-value">' + escapeHtml(account.job_title || "غير متوفر") + '</span></div></div>' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-user-shield"></i></div><div class="account-detail-content"><span class="account-detail-label">الدور</span><span class="account-detail-value">' + escapeHtml(getAccountTypeLabel(account.account_type)) + '</span></div></div>' +
+                        '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-toggle-on"></i></div><div class="account-detail-content"><span class="account-detail-label">الحالة</span><span class="account-detail-value"><span class="account-status-badge ' + accountStatusClass + '">' + escapeHtml(accountStatus) + '</span></span></div></div>' +
+                        '<div class="account-detail-item" style="grid-column: 1 / -1;"><div class="account-detail-icon"><i class="las la-calendar-alt"></i></div><div class="account-detail-content"><span class="account-detail-label">تاريخ إنشاء الحساب</span><span class="account-detail-value">' + formatDate(account.created_at) + '</span></div></div>' +
+                        '</div>' +
+                        '</div>',
+                    confirmButtonText: "إغلاق",
+                    confirmButtonColor: "#0d99ff",
+                    width: "720px",
+                    padding: "0",
+                    background: "var(--color-light, #f9f7f7)",
+                    color: "var(--text-dark, #2d2d2d)",
+                    showCloseButton: true,
+                    customClass: {
+                        popup: 'account-details-swal'
+                    }
+                });
+            }
+
+            function openEditModal(id) {
+                var account = cachedAccounts.find(function (user) {
+                    return String(user.id) === String(id);
+                });
+
+                if (!account) return;
+
+                editAccountId.value = account.id || '';
+                editAccountFullName.value = account.name || '';
+                editAccountEmail.value = account.email || '';
+                editAccountPhone.value = account.phone_number || '';
+                editAccountJobTitle.value = account.job_title || '';
+                editAccountRole.value = account.account_type || 'viewer';
+                editAccountStatus.checked = account.account_status === 'active';
+                editAccountStatusLabel.textContent = editAccountStatus.checked ? 'نشط' : 'غير نشط';
+
+                editAccountModal.classList.add('active');
+            }
+
+            function closeEditModal() {
+                editAccountModal.classList.remove('active');
+            }
+
+            editAccountStatus.addEventListener('change', function () {
+                editAccountStatusLabel.textContent = editAccountStatus.checked ? 'نشط' : 'غير نشط';
+            });
+
+            closeEditAccountModal.addEventListener('click', closeEditModal);
+
+            editAccountModal.addEventListener('click', function (e) {
+                if (e.target === editAccountModal) closeEditModal();
+            });
+
+            saveEditAccountBtn.addEventListener('click', function () {
+                var id = editAccountId.value;
+                var payload = {
+                    name: editAccountFullName.value.trim(),
+                    email: editAccountEmail.value.trim().toLowerCase(),
+                    phone_number: editAccountPhone.value.trim(),
+                    job_title: editAccountJobTitle.value.trim(),
+                    account_type: editAccountRole.value,
+                    account_status: editAccountStatus.checked ? 'active' : 'inactive'
+                };
+
+                if (!payload.name || !payload.email) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'الاسم والبريد الإلكتروني مطلوبان',
+                        confirmButtonText: 'حسناً'
+                    });
+                    return;
                 }
-            } else {
-                var message = data.message || '';
 
-                if (
-                    message.toLowerCase().indexOf('email') !== -1 &&
-                    message.toLowerCase().indexOf('exist') !== -1
-                ) {
-                    emailMsg.textContent = 'البريد الإلكتروني مستخدم بالفعل';
+                fetch(API_BASE + '/update/account/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم',
+                            text: 'تم تحديث الحساب بنجاح',
+                            confirmButtonText: 'حسناً'
+                        });
+                        closeEditModal();
+                        loadAccounts();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: data.message || 'فشل تحديث الحساب',
+                            confirmButtonText: 'حسناً'
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'فشل الاتصال: ' + err.message,
+                        confirmButtonText: 'حسناً'
+                    });
+                });
+            });
+
+            function clearValidationMsgs() {
+                emailMsg.textContent = '';
+                emailMsg.className = 'validation-msg';
+                phoneMsg.textContent = '';
+                phoneMsg.className = 'validation-msg';
+                passMsg.textContent = '';
+                passMsg.className = 'validation-msg';
+                confPassMsg.textContent = '';
+                confPassMsg.className = 'validation-msg';
+                roleMsg.textContent = '';
+                roleMsg.className = 'validation-msg';
+            }
+
+            function validateEmailOnly(email) {
+                if (!email) return false;
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            function validateCreateForm() {
+                clearValidationMsgs();
+                var isValid = true;
+
+                if (!accFullName.value.trim()) {
+                    isValid = false;
+                    accFullName.style.borderColor = '#ef4444';
+                    setTimeout(function () { accFullName.style.borderColor = ''; }, 3000);
+                }
+
+                var emailVal = accEmail.value.trim();
+                if (!emailVal) {
+                    isValid = false;
+                    emailMsg.textContent = 'البريد الإلكتروني مطلوب';
+                    emailMsg.className = 'validation-msg error';
+                } else if (!validateEmailOnly(emailVal)) {
+                    isValid = false;
+                    emailMsg.textContent = 'صيغة البريد الإلكتروني غير صالحة';
                     emailMsg.className = 'validation-msg error';
                 }
 
-                if (
-                    message.toLowerCase().indexOf('phone') !== -1 &&
-                    message.toLowerCase().indexOf('exist') !== -1
-                ) {
-                    phoneMsg.textContent = 'رقم الهاتف مستخدم بالفعل';
+                if (!accPhone.value.trim()) {
+                    isValid = false;
+                    phoneMsg.textContent = 'رقم الهاتف مطلوب';
                     phoneMsg.className = 'validation-msg error';
                 }
 
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: data.message || 'حدث خطأ أثناء إنشاء الحساب',
-                    confirmButtonText: 'حسناً'
+                var passVal = accPassword.value;
+                if (!passVal) {
+                    isValid = false;
+                    passMsg.textContent = 'كلمة المرور مطلوبة';
+                    passMsg.className = 'validation-msg error';
+                } else if (passVal.length < 6) {
+                    isValid = false;
+                    passMsg.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    passMsg.className = 'validation-msg error';
+                }
+
+                var confVal = accConfirmPass.value;
+                if (!confVal) {
+                    isValid = false;
+                    confPassMsg.textContent = 'تأكيد كلمة المرور مطلوب';
+                    confPassMsg.className = 'validation-msg error';
+                } else if (passVal !== confVal) {
+                    isValid = false;
+                    confPassMsg.textContent = 'كلمتا المرور غير متطابقتين';
+                    confPassMsg.className = 'validation-msg error';
+                }
+
+                if (!accRole.value) {
+                    isValid = false;
+                    roleMsg.textContent = 'الدور الأساسي مطلوب';
+                    roleMsg.className = 'validation-msg error';
+                }
+
+                return isValid;
+            }
+
+            function collectPermissions() {
+                var permissions = {};
+                permCheckboxes.forEach(function (cb) {
+                    permissions[cb.getAttribute('data-perm')] = cb.checked ? 1 : 0;
                 });
+                return permissions;
             }
-        })
-        .catch(function (err) {
-            saveAccBtn.disabled = false;
-            saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
 
-            Swal.fire({
-                icon: 'error',
-                title: 'فشل الاتصال',
-                text: 'فشل الاتصال بالخادم: ' + err.message,
-                confirmButtonText: 'حسناً'
+            function buildCreatePayload() {
+                var permissions = collectPermissions();
+                return {
+                    name: accFullName.value.trim(),
+                    email: accEmail.value.trim().toLowerCase(),
+                    phone_number: accPhone.value.trim(),
+                    password: accPassword.value,
+                    account_type: accRole.value,
+                    job_title: accJobTitle.value.trim(),
+                    account_status: accStatus.checked ? 'active' : 'inactive',
+                    advances: [],
+                    expenses: [],
+                    transfers: [],
+                    fees: [],
+                    dashboard_view: permissions.dashboard_view,
+                    outgoing_manage: permissions.outgoing_manage,
+                    visa_manage: permissions.visa_manage,
+                    transfers_manage: permissions.transfers_manage,
+                    advances_manage: permissions.advances_manage,
+                    payments_manage: permissions.payments_manage,
+                    accounts_manage: permissions.accounts_manage,
+                    logs_view: permissions.logs_view,
+                    settings_manage: permissions.settings_manage,
+                    print_reports: permissions.print_reports
+                };
+            }
+
+            function resetCreateForm() {
+                accFullName.value = '';
+                accEmail.value = '';
+                accPhone.value = '';
+                accJobTitle.value = '';
+                accPassword.value = '';
+                accConfirmPass.value = '';
+                accRole.value = '';
+                accStatus.checked = true;
+                accStatusLbl.textContent = 'نشط';
+                accPassword.setAttribute('type', 'password');
+                accConfirmPass.setAttribute('type', 'password');
+                togglePassBtn.querySelector('i').classList.remove('la-eye-slash');
+                togglePassBtn.querySelector('i').classList.add('la-eye');
+                toggleConfPassBtn.querySelector('i').classList.remove('la-eye-slash');
+                toggleConfPassBtn.querySelector('i').classList.add('la-eye');
+                permCheckboxes.forEach(function (cb) {
+                    cb.checked = cb.getAttribute('data-perm') === 'dashboard_view';
+                });
+                clearValidationMsgs();
+                accFullName.style.borderColor = '';
+                accEmail.style.borderColor = '';
+            }
+
+            togglePassBtn.addEventListener('click', function () {
+                var type = accPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                accPassword.setAttribute('type', type);
+                var icon = togglePassBtn.querySelector('i');
+                icon.classList.toggle('la-eye', type === 'password');
+                icon.classList.toggle('la-eye-slash', type === 'text');
             });
-        });
-    });
 
-    resetAccBtn.addEventListener('click', function () {
-        resetCreateForm();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'تم',
-            text: 'تم إعادة تعيين النموذج',
-            confirmButtonText: 'حسناً',
-            timer: 1500,
-            showConfirmButton: false
-        });
-    });
-})();
-</script>
-
-<script>
-(function () {
-    var API_BASE = 'http://108.181.221.18:7049/api/admin';
-    var LIST_URL = API_BASE + '/accounts';
-    var accountsTable = document.getElementById('accountsTable');
-    var accountsTableBody = document.getElementById('accountsTableBody');
-    var noAccountsMsg = document.getElementById('noAccountsMsg');
-    var accountsCountLabel = document.getElementById('accountsCountLabel');
-    var accountsLoadingMsg = document.getElementById('accountsLoadingMsg');
-    var accountsErrorMsg = document.getElementById('accountsErrorMsg');
-    var refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
-    var retryLoadAccountsBtn = document.getElementById('retryLoadAccountsBtn');
-    var cachedAccounts = [];
-
-    function formatDate(isoString) {
-        if (!isoString) return 'لم يسجل بعد';
-
-        try {
-            var d = new Date(isoString);
-
-            return d.toLocaleDateString('ar-EG', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            }) + ' ' + d.toLocaleTimeString('ar-EG', {
-                hour: '2-digit',
-                minute: '2-digit'
+            toggleConfPassBtn.addEventListener('click', function () {
+                var type = accConfirmPass.getAttribute('type') === 'password' ? 'text' : 'password';
+                accConfirmPass.setAttribute('type', type);
+                var icon = toggleConfPassBtn.querySelector('i');
+                icon.classList.toggle('la-eye', type === 'password');
+                icon.classList.toggle('la-eye-slash', type === 'text');
             });
-        } catch (e) {
-            return isoString;
-        }
-    }
 
-    function getRoleBadgeClass(role) {
-        var map = {
-            admin: 'admin',
-            cashier: 'cashier',
-            viewer: 'viewer'
-        };
+            accStatus.addEventListener('change', function () {
+                accStatusLbl.textContent = accStatus.checked ? 'نشط' : 'غير نشط';
+            });
 
-        return map[role] || 'viewer';
-    }
+            saveAccBtn.addEventListener('click', function () {
+                clearValidationMsgs();
 
-    function getRoleLabel(role) {
-        var map = {
-            admin: 'ادمن',
-            cashier: 'كاشير',
-            viewer: 'مشاهد'
-        };
-
-        return map[role] || 'مشاهد';
-    }
-
-    function getStatusBadge(status) {
-        var isActive = status === 'active' || status === true || status === 1;
-
-        if (isActive) {
-            return '<span class="badge-success"><i class="las la-check-circle"></i> نشط</span>';
-        }
-
-        return '<span class="badge-danger"><i class="las la-times-circle"></i> غير نشط</span>';
-    }
-
-    function renderAccountsTable(accounts) {
-        cachedAccounts = accounts || [];
-        accountsTableBody.innerHTML = '';
-
-        if (!cachedAccounts.length) {
-            noAccountsMsg.style.display = 'block';
-            accountsTable.style.display = 'none';
-            accountsCountLabel.textContent = '0 حساب';
-            accountsLoadingMsg.style.display = 'none';
-            accountsErrorMsg.style.display = 'none';
-            return;
-        }
-
-        noAccountsMsg.style.display = 'none';
-        accountsTable.style.display = 'table';
-        accountsLoadingMsg.style.display = 'none';
-        accountsErrorMsg.style.display = 'none';
-        accountsCountLabel.textContent = cachedAccounts.length + ' حساب';
-
-        cachedAccounts.forEach(function (acc) {
-            var tr = document.createElement('tr');
-
-            var accId = acc.id || acc._id || '';
-            var accName = acc.name || acc.fullName || acc.full_name || '-';
-            var accEmailVal = acc.email || '-';
-            var accRoleVal = acc.account_type || acc.role || acc.accountType || 'viewer';
-            var accStatusVal = acc.account_status || acc.status || acc.active;
-            var accLastLogin = acc.last_login || acc.lastLogin || null;
-            var accJobTitleVal = acc.job_title || acc.jobTitle || '';
-
-            tr.innerHTML =
-                '<td><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-[var(--darker-bg)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0"><i class="las la-user text-sm text-[var(--color-muted)]"></i></div><div><p class="font-medium text-[var(--color-white)] text-sm">' +
-                accName +
-                '</p>' +
-                (accJobTitleVal ? '<p class="text-xs text-[var(--color-muted)]">' + accJobTitleVal + '</p>' : '') +
-                '</div></div></td>' +
-                '<td class="text-sm text-[var(--color-muted)]" dir="ltr" style="text-align:right;">' +
-                accEmailVal +
-                '</td>' +
-                '<td><span class="role-badge ' +
-                getRoleBadgeClass(accRoleVal) +
-                '">' +
-                getRoleLabel(accRoleVal) +
-                '</span></td>' +
-                '<td>' +
-                getStatusBadge(accStatusVal) +
-                '</td>' +
-                '<td class="text-xs text-[var(--color-muted)]">' +
-                formatDate(accLastLogin) +
-                '</td>' +
-                '<td><div class="flex gap-1"><button class="btn-outline btn-xs edit-account-btn" data-id="' +
-                accId +
-                '" title="تعديل"><i class="las la-edit"></i></button><button class="btn-outline btn-xs delete-account-btn" data-id="' +
-                accId +
-                '" title="حذف" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i></button></div></td>';
-
-            accountsTableBody.appendChild(tr);
-        });
-
-        accountsTableBody.querySelectorAll('.edit-account-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                if (window.accountEditFunctions) {
-                    window.accountEditFunctions.openEditModal(this.getAttribute('data-id'));
+                if (!validateCreateForm()) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ في النموذج',
+                        text: 'يرجى تصحيح الأخطاء في النموذج',
+                        confirmButtonText: 'حسناً'
+                    });
+                    return;
                 }
+
+                saveAccBtn.disabled = true;
+                saveAccBtn.innerHTML = '<i class="las la-spinner la-spin"></i> جاري الحفظ...';
+
+                fetch(CREATE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildCreatePayload())
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    saveAccBtn.disabled = false;
+                    saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم بنجاح',
+                            text: 'تم إنشاء الحساب بنجاح',
+                            confirmButtonText: 'حسناً'
+                        });
+                        resetCreateForm();
+                        loadAccounts();
+                    } else {
+                        var message = data.message || '';
+                        if (message.toLowerCase().indexOf('email') !== -1 && message.toLowerCase().indexOf('exist') !== -1) {
+                            emailMsg.textContent = 'البريد الإلكتروني مستخدم بالفعل';
+                            emailMsg.className = 'validation-msg error';
+                        }
+                        if (message.toLowerCase().indexOf('phone') !== -1 && message.toLowerCase().indexOf('exist') !== -1) {
+                            phoneMsg.textContent = 'رقم الهاتف مستخدم بالفعل';
+                            phoneMsg.className = 'validation-msg error';
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: data.message || 'حدث خطأ أثناء إنشاء الحساب',
+                            confirmButtonText: 'حسناً'
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    saveAccBtn.disabled = false;
+                    saveAccBtn.innerHTML = '<i class="las la-save"></i> حفظ الحساب';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'فشل الاتصال',
+                        text: 'فشل الاتصال بالخادم: ' + err.message,
+                        confirmButtonText: 'حسناً'
+                    });
+                });
             });
-        });
 
-        accountsTableBody.querySelectorAll('.delete-account-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                if (window.accountDeleteFunctions) {
-                    window.accountDeleteFunctions.confirmDeleteAccount(this.getAttribute('data-id'));
-                }
+            resetAccBtn.addEventListener('click', function () {
+                resetCreateForm();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم',
+                    text: 'تم إعادة تعيين النموذج',
+                    confirmButtonText: 'حسناً',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             });
-        });
-    }
 
-    function showLoadingState() {
-        accountsTable.style.display = 'none';
-        noAccountsMsg.style.display = 'none';
-        accountsErrorMsg.style.display = 'none';
-        accountsLoadingMsg.style.display = 'block';
-        accountsCountLabel.textContent = 'جاري التحميل...';
-    }
+            refreshAccountsBtn.addEventListener('click', loadAccounts);
 
-    function showErrorState() {
-        accountsTable.style.display = 'none';
-        noAccountsMsg.style.display = 'none';
-        accountsLoadingMsg.style.display = 'none';
-        accountsErrorMsg.style.display = 'block';
-        accountsCountLabel.textContent = 'فشل التحميل';
-    }
-
-    function loadAccounts() {
-        showLoadingState();
-
-        fetch(LIST_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(function (res) {
-            if (!res.ok) {
-                throw new Error('HTTP ' + res.status);
-            }
-
-            return res.json();
-        })
-        .then(function (data) {
-            var accounts = [];
-
-            if (Array.isArray(data)) {
-                accounts = data;
-            } else if (data && data.success && Array.isArray(data.data)) {
-                accounts = data.data;
-            } else if (data && Array.isArray(data.accounts)) {
-                accounts = data.accounts;
-            } else if (data && Array.isArray(data.results)) {
-                accounts = data.results;
-            }
-
-            renderAccountsTable(accounts);
-        })
-        .catch(function () {
-            showErrorState();
-        });
-    }
-
-    window.accountListFunctions = {
-        loadAccounts: loadAccounts,
-        getCachedAccounts: function () {
-            return cachedAccounts;
-        }
-    };
-
-    refreshAccountsBtn.addEventListener('click', function () {
-        loadAccounts();
-    });
-
-    if (retryLoadAccountsBtn) {
-        retryLoadAccountsBtn.addEventListener('click', function () {
+            // تحميل الحسابات عند البدء
             loadAccounts();
-        });
-    }
-})();
-</script>
+        })();
+    </script>
 
+    <script>
+        (function () {
+            var themeToggles = document.querySelectorAll('.theme-toggle');
+            var body = document.body;
+            var savedTheme = localStorage.getItem('theme') || 'dark';
 
-
-
-<script>
-(function () {
-    var bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-    var navNotch = document.getElementById('navNotch');
-    var bottomMobileNav = document.getElementById('bottomMobileNav');
-
-    function moveNotch(activeItem) {
-        if (!navNotch || !activeItem || !bottomMobileNav) return;
-
-        var rect = activeItem.getBoundingClientRect();
-        var navRect = bottomMobileNav.getBoundingClientRect();
-
-        navNotch.style.left =
-            (rect.left + rect.width / 2 - navRect.left) + 'px';
-    }
-
-    function setBottomNavActive() {
-        var activeItem = null;
-
-        bottomNavItems.forEach(function (item) {
-            item.classList.remove('active');
-
-            if (item.getAttribute('data-tab') === 'accounts') {
-                item.classList.add('active');
-                activeItem = item;
+            function applyTheme(theme) {
+                var isDark = theme === 'dark';
+                body.classList.toggle('light', !isDark);
+                themeToggles.forEach(function (toggle) {
+                    toggle.classList.toggle('dark', isDark);
+                });
+                localStorage.setItem('theme', theme);
             }
-        });
 
-        if (activeItem) {
-            moveNotch(activeItem);
-        } else if (bottomNavItems.length > 0) {
-            bottomNavItems[0].classList.add('active');
-            moveNotch(bottomNavItems[0]);
-        }
-    }
+            applyTheme(savedTheme);
 
-    setBottomNavActive();
-
-    window.addEventListener('resize', function () {
-        var activeItem = document.querySelector('.bottom-nav-item.active');
-
-        if (activeItem) {
-            moveNotch(activeItem);
-        }
-    });
-
-    bottomNavItems.forEach(function (item) {
-        item.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            bottomNavItems.forEach(function (i) {
-                i.classList.remove('active');
+            themeToggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    var isDark = !body.classList.contains('light');
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
             });
+        })();
+    </script>
 
-            this.classList.add('active');
-            moveNotch(this);
-        });
-    });
-})();
-</script>
+    <script>
+        (function () {
+            var userFullNameEl = document.getElementById('userFullName');
+            var roleEl = document.getElementById('role');
+            var headerAvatarImg = document.getElementById('headerAvatar');
+            var userAvatarImg = document.getElementById('userAvatar');
 
-<script>
-(function () {
-    var themeToggles = document.querySelectorAll('.theme-toggle');
-    var body = document.body;
-    var savedTheme = localStorage.getItem('theme') || 'dark';
-
-    function applyTheme(theme) {
-        var isDark = theme === 'dark';
-
-        body.classList.toggle('light', !isDark);
-
-        themeToggles.forEach(function (toggle) {
-            toggle.classList.toggle('dark', isDark);
-        });
-
-        localStorage.setItem('theme', theme);
-    }
-
-    applyTheme(savedTheme);
-
-    themeToggles.forEach(function (toggle) {
-        toggle.addEventListener('click', function () {
-            var isDark = !body.classList.contains('light');
-
-            applyTheme(isDark ? 'light' : 'dark');
-        });
-    });
-})();
-</script>
-
-<script>
-(function () {
-    var userFullNameEl = document.getElementById('userFullName');
-    var roleEl = document.getElementById('role');
-    var headerAvatarImg = document.getElementById('headerAvatar');
-    var userAvatarImg = document.getElementById('userAvatar');
-
-    try {
-        var stored = localStorage.getItem('userProfileData');
-
-        if (stored) {
-            var data = JSON.parse(stored);
-
-            if (data.fullName && userFullNameEl) {
-                userFullNameEl.textContent = data.fullName;
-            }
-
-            if (data.role && roleEl) {
-                roleEl.textContent = data.role;
-            }
-
-            if (data.avatar) {
-                if (headerAvatarImg) {
-                    headerAvatarImg.src = data.avatar;
+            try {
+                var stored = localStorage.getItem('userProfileData');
+                if (stored) {
+                    var data = JSON.parse(stored);
+                    if (data.fullName && userFullNameEl) userFullNameEl.textContent = data.fullName;
+                    if (data.role && roleEl) roleEl.textContent = data.role;
+                    if (data.avatar) {
+                        if (headerAvatarImg) headerAvatarImg.src = data.avatar;
+                        if (userAvatarImg) userAvatarImg.src = data.avatar;
+                    }
                 }
+            } catch (e) {}
+        })();
+    </script>
 
-                if (userAvatarImg) {
-                    userAvatarImg.src = data.avatar;
-                }
+    <style>
+        .account-details-swal {
+            width: min(720px, 94vw) !important;
+            max-width: 720px !important;
+            border-radius: 24px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            direction: rtl !important;
+        }
+        .account-details-swal .swal2-title {
+            margin: 0 !important;
+            padding: 24px 28px 18px !important;
+            font-size: 24px !important;
+            font-weight: 800 !important;
+            text-align: right !important;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.15) !important;
+        }
+        .account-details-swal .swal2-html-container {
+            margin: 0 !important;
+            padding: 24px 28px 10px !important;
+        }
+        .account-details-swal .swal2-actions {
+            margin: 0 !important;
+            padding: 12px 28px 24px !important;
+            justify-content: flex-start !important;
+        }
+        .account-details-swal .swal2-confirm {
+            min-width: 120px !important;
+            height: 44px !important;
+            border-radius: 12px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            box-shadow: none !important;
+        }
+        .account-details-wrapper {
+            direction: rtl;
+            text-align: right;
+        }
+        .account-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(13, 153, 255, 0.12), rgba(124, 58, 237, 0.10));
+            border: 1px solid rgba(13, 153, 255, 0.16);
+        }
+        .account-profile-image-wrapper {
+            flex-shrink: 0;
+            width: 86px;
+            height: 86px;
+            padding: 3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d99ff, #7c3aed);
+        }
+        .account-profile-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #fff;
+        }
+        .account-profile-info {
+            min-width: 0;
+            flex: 1;
+        }
+        .account-profile-name {
+            margin: 0 0 6px;
+            font-size: 21px;
+            font-weight: 800;
+            color: var(--text-dark, #2d2d2d);
+        }
+        .account-profile-phone {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-muted, #8a8a8a);
+            direction: ltr;
+            text-align: right;
+        }
+        .account-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .account-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-height: 72px;
+            padding: 13px 15px;
+            border-radius: 15px;
+            background: rgba(128, 128, 128, 0.055);
+            border: 1px solid rgba(128, 128, 128, 0.10);
+            transition: all 0.2s ease;
+        }
+        .account-detail-item:hover {
+            border-color: rgba(13, 153, 255, 0.25);
+            background: rgba(13, 153, 255, 0.055);
+        }
+        .account-detail-icon {
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(13, 153, 255, 0.12);
+            color: #0d99ff;
+            font-size: 20px;
+        }
+        .account-detail-content {
+            min-width: 0;
+            flex: 1;
+        }
+        .account-detail-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted, #8a8a8a);
+        }
+        .account-detail-value {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark, #2d2d2d);
+            overflow-wrap: anywhere;
+        }
+        .account-detail-value.ltr {
+            direction: ltr;
+            text-align: right;
+        }
+        .account-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .account-status-badge::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .account-status-active {
+            color: #1f9d55;
+            background: rgba(31, 157, 85, 0.10);
+        }
+        .account-status-inactive {
+            color: #8a8a8a;
+            background: rgba(138, 138, 138, 0.10);
+        }
+        .account-status-suspended {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.10);
+        }
+        .account-status-pending {
+            color: #d99a00;
+            background: rgba(217, 154, 0, 0.10);
+        }
+        @media (max-width: 600px) {
+            .account-details-swal {
+                width: 94vw !important;
+                max-width: 94vw !important;
+                border-radius: 20px !important;
+            }
+            .account-details-swal .swal2-title {
+                padding: 20px 18px 15px !important;
+                font-size: 20px !important;
+            }
+            .account-details-swal .swal2-html-container {
+                padding: 18px !important;
+            }
+            .account-details-swal .swal2-actions {
+                padding: 8px 18px 18px !important;
+            }
+            .account-profile-header {
+                padding: 14px;
+                gap: 13px;
+            }
+            .account-profile-image-wrapper {
+                width: 70px;
+                height: 70px;
+            }
+            .account-profile-name {
+                font-size: 18px;
+            }
+            .account-details-grid {
+                grid-template-columns: 1fr;
             }
         }
-    } catch (e) {
-    }
-})();
-</script>
-
-<script>
-(function () {
-    if (window.accountListFunctions) {
-        window.accountListFunctions.loadAccounts();
-    }
-})();
-</script>
-
+    </style>
 </body>
 </html>
