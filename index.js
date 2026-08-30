@@ -448,6 +448,22 @@ app.get("/chicken/employee-salary", (req, res) => {
 
 /*------------------------------------------*/
 // - Admin - //
+app.get("/admin/account", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+    res.render("../admin/0-account", {
+        title: "",
+        description: "",
+        activePage: "admin-restaurant",
+        restaurant: {
+            id: 1,
+            name: "",
+            section: "",
+            logo: ""
+        }
+    });
+});
 /*------------------------------------------*/
 app.get("/admin/resturant/1", (req, res) => {
     if (!req.isAuthenticated) {
