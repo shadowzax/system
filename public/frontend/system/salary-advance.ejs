@@ -32,6 +32,127 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .edit-report-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-top: 16px;
+            backdrop-filter: blur(6px);
+        }
+        .edit-report-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .edit-report-header-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: rgba(13, 153, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d99ff;
+            font-size: 20px;
+            transition: all 0.25s ease;
+        }
+        .edit-report-header h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .edit-report-header p {
+            font-size: 11px;
+            color: #888;
+            margin: 2px 0 0 0;
+        }
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        @media (min-width: 640px) {
+            .edit-form-grid {
+                grid-template-columns: 1fr 190px;
+                gap: 16px;
+            }
+        }
+        .edit-form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .edit-form-group .input-field,
+        .edit-form-group .input-date-compact {
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .edit-form-group .input-date-compact {
+            max-width: 170px;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .edit-form-group .input-date-compact::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            cursor: pointer;
+        }
+        .edit-form-group .input-field:focus,
+        .edit-form-group .input-date-compact:focus {
+            border-color: #0d99ff;
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.12);
+            outline: none;
+        }
+        .edit-table-wrapper {
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        .edit-report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+        body.light .edit-report-section {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+        body.light .edit-report-header {
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
+        body.light .edit-report-header h4 { color: #1a1a1a; }
+        body.light .edit-report-header p { color: #666; }
+        body.light .edit-form-group label { color: #555; }
+        body.light .edit-form-group .input-field,
+        body.light .edit-form-group .input-date-compact {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
+        }
+        body.light .edit-table-wrapper {
+            border-color: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.02);
+        }
+    </style>
     <script>
         window.__APP_DATA__ = {
             token: "<%- token %>",
@@ -149,22 +270,70 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mt-4 space-y-3" id="recentReportsList"></div>
-                    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-[var(--color-muted)]">عرض</span>
-                            <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
-                            <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                    <div id="recentReportsListView">
+                        <div class="mt-4 space-y-3" id="recentReportsList"></div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                                <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
+                                <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
+                                <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
-                            <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
-                            <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
+                    </div>
+                    <div id="editReportContainer" style="display:none;">
+                        <div class="edit-report-section">
+                            <div class="edit-report-header">
+                                <div class="edit-report-header-icon">
+                                    <i class="las la-edit"></i>
+                                </div>
+                                <div>
+                                    <h4>تعديل التقرير</h4>
+                                    <p>قم بتعديل بيانات التقرير ثم احفظ التغييرات</p>
+                                </div>
+                            </div>
+                            <div class="edit-form-grid">
+                                <div class="edit-form-group">
+                                    <label for="editReportName">اسم التقرير</label>
+                                    <input type="text" id="editReportName" class="input-field" placeholder="أدخل اسم التقرير">
+                                </div>
+                                <div class="edit-form-group">
+                                    <label for="editReportDate">التاريخ</label>
+                                    <input type="date" id="editReportDate" class="input-date-compact">
+                                </div>
+                            </div>
+                            <div class="edit-table-wrapper">
+                                <table class="restaurant-table" id="editReportTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:32%;">البيان</th>
+                                            <th style="width:30%;">المبلغ (ج.م)</th>
+                                            <th style="width:38%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="editReportTbody"></tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td>الإجمالي</td>
+                                            <td id="editReportTotal">0</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="edit-report-actions">
+                                <button class="btn-outline btn-sm" id="cancelEditReportBtn"><i class="las la-times"></i> إلغاء</button>
+                                <button class="btn-primary btn-sm" id="saveEditReportBtn"><i class="las la-save"></i> حفظ التعديل</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -203,9 +372,8 @@
             let allReports = [];
             let currentReportsPage = 1;
             let reportsPageSize = 5;
-            let currentEditReportId = null;
             let sortOrder = 'newest';
-            let previousState = null;
+            let editingReportId = null;
 
             document.getElementById('userFullName').textContent = userData.name || 'مستخدم';
             document.getElementById('role').textContent = userData.job_title || userData.account_type || 'مستخدم';
@@ -238,6 +406,12 @@
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
 
+            const editReportContainer = document.getElementById('editReportContainer');
+            const editReportName = document.getElementById('editReportName');
+            const editReportDate = document.getElementById('editReportDate');
+            const editReportTbody = document.getElementById('editReportTbody');
+            const editReportTotal = document.getElementById('editReportTotal');
+
             function updateTotal() {
                 let total = 0;
                 const rows = tbody.querySelectorAll('tr');
@@ -246,6 +420,16 @@
                     if (input) total += parseNumber(input.value);
                 });
                 totalAmountEl.textContent = formatNumber(total);
+            }
+
+            function updateEditTotal() {
+                let total = 0;
+                const rows = editReportTbody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const input = row.querySelector('.amount-input');
+                    if (input) total += parseNumber(input.value);
+                });
+                editReportTotal.textContent = formatNumber(total);
             }
 
             function focusInput(input) {
@@ -358,7 +542,7 @@
                 }
             }
 
-            function createRowElement(description, amount) {
+            function createRowElement(description, amount, isEditMode = false) {
                 const tr = document.createElement('tr');
 
                 const descTd = document.createElement('td');
@@ -367,7 +551,6 @@
                 descInput.className = 'input-field desc-input';
                 descInput.placeholder = 'أدخل البيان';
                 descInput.value = description || '';
-                setupKeyboardNavigation(descInput);
                 descTd.appendChild(descInput);
 
                 const amountTd = document.createElement('td');
@@ -377,125 +560,178 @@
                 amountInput.placeholder = 'المبلغ';
                 amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
                 amountInput.setAttribute('inputmode', 'decimal');
-                setupKeyboardNavigation(amountInput);
                 amountTd.appendChild(amountInput);
 
                 const actionTd = document.createElement('td');
                 actionTd.style.whiteSpace = 'nowrap';
                 actionTd.style.textAlign = 'right';
 
-                const upBtn = document.createElement('button');
-                upBtn.className = 'row-action-btn arrow-btn';
-                upBtn.tabIndex = -1;
-                upBtn.title = 'إضافة صف للأعلى';
-                upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
-                if (isViewer) {
-                    upBtn.disabled = true;
-                    upBtn.style.opacity = '0.4';
-                    upBtn.style.cursor = 'not-allowed';
-                }
-                upBtn.addEventListener('click', function() {
-                    if (isViewer) return;
-                    const newTr = createRowElement('', '');
-                    tbody.insertBefore(newTr, tr);
-                    updateTotal();
-                    saveToSession();
-                    const { descInput: newDesc } = getInputsInRow(newTr);
-                    if (newDesc) focusInput(newDesc);
-                });
+                if (isEditMode) {
+                    const signBtn = document.createElement('button');
+                    signBtn.className = 'row-action-btn sign-btn positive';
+                    signBtn.tabIndex = -1;
+                    signBtn.title = 'تغيير إشارة المبلغ';
+                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
+                    signBtn.addEventListener('click', function() {
+                        const currentVal = parseNumber(amountInput.value);
+                        if (currentVal === 0) {
+                            amountInput.value = '';
+                            updateSignButton(tr);
+                            updateEditTotal();
+                            return;
+                        }
+                        amountInput.value = formatNumber(-currentVal);
+                        updateSignButton(tr);
+                        updateEditTotal();
+                    });
 
-                const downBtn = document.createElement('button');
-                downBtn.className = 'row-action-btn arrow-btn';
-                downBtn.tabIndex = -1;
-                downBtn.title = 'إضافة صف للأسفل';
-                downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
-                if (isViewer) {
-                    downBtn.disabled = true;
-                    downBtn.style.opacity = '0.4';
-                    downBtn.style.cursor = 'not-allowed';
-                }
-                downBtn.addEventListener('click', function() {
-                    if (isViewer) return;
-                    const newTr = createRowElement('', '');
-                    if (tr.nextSibling) tbody.insertBefore(newTr, tr.nextSibling);
-                    else tbody.appendChild(newTr);
-                    updateTotal();
-                    saveToSession();
-                    const { descInput: newDesc } = getInputsInRow(newTr);
-                    if (newDesc) focusInput(newDesc);
-                });
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'row-action-btn delete-btn';
+                    deleteBtn.tabIndex = -1;
+                    deleteBtn.title = 'حذف الصف';
+                    deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                    deleteBtn.addEventListener('click', function() {
+                        if (editReportTbody.children.length > 1) {
+                            tr.remove();
+                            updateEditTotal();
+                        } else {
+                            Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
+                        }
+                    });
 
-                const signBtn = document.createElement('button');
-                signBtn.className = 'row-action-btn sign-btn positive';
-                signBtn.tabIndex = -1;
-                signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
-                signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                if (isViewer) {
-                    signBtn.disabled = true;
-                    signBtn.style.opacity = '0.4';
-                    signBtn.style.cursor = 'not-allowed';
-                }
-                signBtn.addEventListener('click', function() {
-                    if (isViewer) return;
-                    const currentVal = parseNumber(amountInput.value);
-                    if (currentVal === 0) {
-                        amountInput.value = '';
+                    actionTd.appendChild(signBtn);
+                    actionTd.appendChild(deleteBtn);
+                } else {
+                    const upBtn = document.createElement('button');
+                    upBtn.className = 'row-action-btn arrow-btn';
+                    upBtn.tabIndex = -1;
+                    upBtn.title = 'إضافة صف للأعلى';
+                    upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
+                    if (isViewer) {
+                        upBtn.disabled = true;
+                        upBtn.style.opacity = '0.4';
+                        upBtn.style.cursor = 'not-allowed';
+                    }
+                    upBtn.addEventListener('click', function() {
+                        if (isViewer) return;
+                        const newTr = createRowElement('', '');
+                        tbody.insertBefore(newTr, tr);
+                        updateTotal();
+                        saveToSession();
+                        const { descInput: newDesc } = getInputsInRow(newTr);
+                        if (newDesc) focusInput(newDesc);
+                    });
+
+                    const downBtn = document.createElement('button');
+                    downBtn.className = 'row-action-btn arrow-btn';
+                    downBtn.tabIndex = -1;
+                    downBtn.title = 'إضافة صف للأسفل';
+                    downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
+                    if (isViewer) {
+                        downBtn.disabled = true;
+                        downBtn.style.opacity = '0.4';
+                        downBtn.style.cursor = 'not-allowed';
+                    }
+                    downBtn.addEventListener('click', function() {
+                        if (isViewer) return;
+                        const newTr = createRowElement('', '');
+                        if (tr.nextSibling) tbody.insertBefore(newTr, tr.nextSibling);
+                        else tbody.appendChild(newTr);
+                        updateTotal();
+                        saveToSession();
+                        const { descInput: newDesc } = getInputsInRow(newTr);
+                        if (newDesc) focusInput(newDesc);
+                    });
+
+                    const signBtn = document.createElement('button');
+                    signBtn.className = 'row-action-btn sign-btn positive';
+                    signBtn.tabIndex = -1;
+                    signBtn.title = 'تغيير إشارة المبلغ';
+                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
+                    if (isViewer) {
+                        signBtn.disabled = true;
+                        signBtn.style.opacity = '0.4';
+                        signBtn.style.cursor = 'not-allowed';
+                    }
+                    signBtn.addEventListener('click', function() {
+                        if (isViewer) return;
+                        const currentVal = parseNumber(amountInput.value);
+                        if (currentVal === 0) {
+                            amountInput.value = '';
+                            updateSignButton(tr);
+                            updateTotal();
+                            saveToSession();
+                            return;
+                        }
+                        amountInput.value = formatNumber(-currentVal);
                         updateSignButton(tr);
                         updateTotal();
                         saveToSession();
-                        return;
-                    }
-                    const newVal = -currentVal;
-                    amountInput.value = formatNumber(newVal);
-                    updateSignButton(tr);
-                    updateTotal();
-                    saveToSession();
-                });
+                    });
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'row-action-btn delete-btn';
-                deleteBtn.tabIndex = -1;
-                deleteBtn.title = 'حذف الصف';
-                deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                if (isViewer) {
-                    deleteBtn.disabled = true;
-                    deleteBtn.style.opacity = '0.4';
-                    deleteBtn.style.cursor = 'not-allowed';
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'row-action-btn delete-btn';
+                    deleteBtn.tabIndex = -1;
+                    deleteBtn.title = 'حذف الصف';
+                    deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                    if (isViewer) {
+                        deleteBtn.disabled = true;
+                        deleteBtn.style.opacity = '0.4';
+                        deleteBtn.style.cursor = 'not-allowed';
+                    }
+                    deleteBtn.addEventListener('click', function() {
+                        if (isViewer) return;
+                        if (tbody.children.length > 1) {
+                            tr.remove();
+                            updateTotal();
+                            saveToSession();
+                        } else {
+                            Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
+                        }
+                    });
+
+                    actionTd.appendChild(upBtn);
+                    actionTd.appendChild(downBtn);
+                    actionTd.appendChild(signBtn);
+                    actionTd.appendChild(deleteBtn);
                 }
-                deleteBtn.addEventListener('click', function() {
-                    if (isViewer) return;
-                    if (tbody.children.length > 1) {
-                        tr.remove();
-                        updateTotal();
-                        saveToSession();
-                    } else {
-                        Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
-                    }
-                });
-
-                actionTd.appendChild(upBtn);
-                actionTd.appendChild(downBtn);
-                actionTd.appendChild(signBtn);
-                actionTd.appendChild(deleteBtn);
 
                 tr.appendChild(descTd);
                 tr.appendChild(amountTd);
                 tr.appendChild(actionTd);
 
-                amountInput.addEventListener('input', function() {
-                    updateTotal();
-                    updateSignButton(tr);
-                });
-                amountInput.addEventListener('blur', function() {
-                    let val = convertArabicNumerals(this.value).replace(/,/g, '');
-                    const num = parseFloat(val);
-                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
-                    else this.value = '';
-                    updateTotal();
-                    updateSignButton(tr);
-                    saveToSession();
-                });
-                descInput.addEventListener('input', function() { saveToSession(); });
+                if (isEditMode) {
+                    descInput.addEventListener('input', updateEditTotal);
+                    amountInput.addEventListener('input', function() {
+                        updateEditTotal();
+                        updateSignButton(tr);
+                    });
+                    amountInput.addEventListener('blur', function() {
+                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
+                        const num = parseFloat(val);
+                        if (!isNaN(num) && val !== '') this.value = formatNumber(num);
+                        else this.value = '';
+                        updateEditTotal();
+                        updateSignButton(tr);
+                    });
+                } else {
+                    setupKeyboardNavigation(descInput);
+                    setupKeyboardNavigation(amountInput);
+                    amountInput.addEventListener('input', function() {
+                        updateTotal();
+                        updateSignButton(tr);
+                    });
+                    amountInput.addEventListener('blur', function() {
+                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
+                        const num = parseFloat(val);
+                        if (!isNaN(num) && val !== '') this.value = formatNumber(num);
+                        else this.value = '';
+                        updateTotal();
+                        updateSignButton(tr);
+                        saveToSession();
+                    });
+                    descInput.addEventListener('input', function() { saveToSession(); });
+                }
 
                 updateSignButton(tr);
                 return tr;
@@ -506,6 +742,13 @@
                 const tr = createRowElement(description, amount);
                 tbody.appendChild(tr);
                 updateTotal();
+                return tr;
+            }
+
+            function addEditRow(description, amount) {
+                const tr = createRowElement(description, amount, true);
+                editReportTbody.appendChild(tr);
+                updateEditTotal();
                 return tr;
             }
 
@@ -527,11 +770,29 @@
                 return data;
             }
 
+            function getEditTableData() {
+                const rows = editReportTbody.querySelectorAll('tr');
+                const data = [];
+                rows.forEach(row => {
+                    const descInput = row.querySelector('.desc-input');
+                    const amountInput = row.querySelector('.amount-input');
+                    if (descInput && amountInput) data.push({ desc: descInput.value || '', amount: amountInput.value || '0' });
+                });
+                return data;
+            }
+
             function loadTableData(data) {
                 tbody.innerHTML = '';
                 if (data.length === 0) addRowAtEnd('', '');
                 else data.forEach(item => addRowAtEnd(item.desc, item.amount));
                 updateTotal();
+            }
+
+            function loadEditTableData(data) {
+                editReportTbody.innerHTML = '';
+                if (data.length === 0) addEditRow('', '');
+                else data.forEach(item => addEditRow(item.desc, item.amount));
+                updateEditTotal();
             }
 
             function saveToSession() {
@@ -631,6 +892,7 @@
             const viewReportTotal2 = document.getElementById('viewReportTotal2');
             const recentReportsCard = document.getElementById('recentReportsCard');
             const recentReportsList = document.getElementById('recentReportsList');
+            const recentReportsListView = document.getElementById('recentReportsListView');
             let currentViewReportId = null;
 
             function hideReportView() {
@@ -728,7 +990,7 @@
                     btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.edit-report-btn').forEach(btn => {
-                    btn.addEventListener('click', function() { editReportById(this.getAttribute('data-id')); });
+                    btn.addEventListener('click', function() { openEditReport(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.delete-report-btn').forEach(btn => {
                     btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); });
@@ -808,6 +1070,17 @@
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
                     return;
                 }
+
+                // Check cashier free first store rule
+                if (isCashier && !isAdmin) {
+                    const dateStr = getReportDateString();
+                    const existingToday = allReports.some(r => String(r.restaurant_id) === restaurantId && String(r.date) === dateStr);
+                    if (!existingToday) {
+                        performStore('');
+                        return;
+                    }
+                }
+
                 if (!isAdmin) {
                     Swal.fire({
                         title: 'كلمة المرور مطلوبة',
@@ -826,8 +1099,7 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const password = result.value;
-                            performStore(password);
+                            performStore(result.value);
                         }
                     });
                 } else {
@@ -867,19 +1139,45 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
-            function restorePreviousState() {
-                if (previousState) {
-                    restaurantNameInput.value = previousState.name || '';
-                    updateDateToggleUI(previousState.isAuto !== undefined ? previousState.isAuto : true);
-                    if (previousState.customDate) reportDateInput.value = previousState.customDate;
-                    else reportDateInput.value = formatDateForInput(new Date());
-                    loadTableData(previousState.rows || []);
-                    previousState = null;
+            function openEditReport(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
                 }
+                let report = null;
+                if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(reportId));
+                if (!report) {
+                    const stored = localStorage.getItem('advanceStoredReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        report = reports.find(r => String(r.id) === String(reportId));
+                    }
+                }
+                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
+
+                editingReportId = reportId;
+                editReportName.value = report.name || '';
+                if (report.date) {
+                    const parts = report.date.split('/');
+                    if (parts.length === 3) {
+                        editReportDate.value = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+                    }
+                }
+                loadEditTableData(report.rows || []);
+                recentReportsListView.style.display = 'none';
+                editReportContainer.style.display = 'block';
             }
 
-            async function updateCurrentReport() {
-                if (!currentEditReportId || isViewer) return;
+            function closeEditReport() {
+                editReportContainer.style.display = 'none';
+                recentReportsListView.style.display = 'block';
+                editingReportId = null;
+            }
+
+            document.getElementById('cancelEditReportBtn').addEventListener('click', closeEditReport);
+
+            document.getElementById('saveEditReportBtn').addEventListener('click', async function() {
+                if (!editingReportId || isViewer) return;
                 let password = '';
                 if (!isAdmin) {
                     const result = await Swal.fire({
@@ -898,101 +1196,52 @@
                         return;
                     }
                 }
-                const name = restaurantNameInput.value || '';
-                const rows = getTableData();
-                const total = totalAmountEl.textContent;
-                const dateStr = getReportDateString();
+                const name = editReportName.value || '';
+                const rows = getEditTableData();
+                const total = editReportTotal.textContent;
+                const dateStr = editReportDate.value ? 
+                    (() => {
+                        const d = new Date(editReportDate.value + 'T00:00:00');
+                        return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+                    })() : '';
+
                 fetch(apiBase + '/api/expenses/advances-update', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, restaurant_id: restaurantId, reportId: currentEditReportId, code: '', name, date: dateStr, rows, total, password })
+                    body: JSON.stringify({
+                        token,
+                        restaurant_id: restaurantId,
+                        reportId: editingReportId,
+                        code: '',
+                        name,
+                        date: dateStr,
+                        rows,
+                        total,
+                        password
+                    })
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
                         if (serverAdvances) {
-                            const idx = serverAdvances.findIndex(r => String(r.id) === String(currentEditReportId));
+                            const idx = serverAdvances.findIndex(r => String(r.id) === String(editingReportId));
                             if (idx !== -1) serverAdvances[idx] = data.report;
                         }
-                        const idxAll = allReports.findIndex(r => String(r.id) === String(currentEditReportId));
+                        const idxAll = allReports.findIndex(r => String(r.id) === String(editingReportId));
                         if (idxAll !== -1) allReports[idxAll] = data.report;
                         renderRecentReportsPage();
+                        closeEditReport();
                         Swal.fire('تم التعديل', data.message, 'success');
-                        restorePreviousState();
-                        cancelEditMode();
                     } else {
                         Swal.fire('خطأ', data.message, 'error');
                     }
                 })
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
-            }
-
-            function cancelEditMode() {
-                currentEditReportId = null;
-                storeBtn.innerHTML = '<i class="las la-save"></i> تخزين';
-                cancelEditBtn.classList.add('hidden');
-            }
-
-            function editReportById(reportId) {
-                if (isViewer) {
-                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
-                    return;
-                }
-                let report = null;
-                if (serverAdvances) report = serverAdvances.find(r => String(r.id) === String(reportId));
-                if (!report) {
-                    const stored = localStorage.getItem('advanceStoredReports');
-                    if (stored) {
-                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
-                        report = reports.find(r => String(r.id) === String(reportId));
-                    }
-                }
-                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
-
-                if (currentEditReportId) {
-                    cancelEditMode();
-                }
-
-                previousState = {
-                    name: restaurantNameInput.value || '',
-                    isAuto: dateToggleBtn.classList.contains('active'),
-                    customDate: reportDateInput.value,
-                    rows: getTableData()
-                };
-
-                currentEditReportId = reportId;
-                restaurantNameInput.value = report.name || '';
-                if (report.date) {
-                    const parts = report.date.split('/');
-                    if (parts.length === 3) {
-                        reportDateInput.value = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
-                    }
-                }
-                updateDateToggleUI(false);
-                tbody.innerHTML = '';
-                if (report.rows && report.rows.length) {
-                    report.rows.forEach(row => addRowAtEnd(row.desc || '', row.amount || ''));
-                } else {
-                    addRowAtEnd('', '');
-                }
-                updateTotal();
-                storeBtn.innerHTML = '<i class="las la-edit"></i> تحديث التقرير';
-                cancelEditBtn.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            cancelEditBtn.addEventListener('click', function() {
-                if (previousState) {
-                    restorePreviousState();
-                }
-                cancelEditMode();
-                Swal.fire('تم', 'تم إلغاء التعديل.', 'info');
             });
 
             storeBtn.addEventListener('click', function() {
                 saveToSession();
-                if (currentEditReportId) updateCurrentReport();
-                else storeCurrentReport();
+                storeCurrentReport();
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
