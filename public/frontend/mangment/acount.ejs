@@ -1177,6 +1177,24 @@
 
     <script>
         (function () {
+            var userData = {};
+            try { userData = JSON.parse(localStorage.getItem('userProfileData') || '{}'); } catch(e) {}
+            var isAdmin = (userData.role || '').toLowerCase() === 'admin' || (userData.role || '').toLowerCase() === 'administrator';
+
+            if (!isAdmin) {
+                var container = document.querySelector('main .container');
+                if (container) {
+                    container.innerHTML = '<div class="info-card text-center py-12"><i class="las la-lock text-6xl text-error mb-4 block"></i><h2 class="text-2xl font-bold mb-2 text-[var(--color-white)]">غير مصرح لك بالوصول</h2><p class="text-muted">هذه الصفحة مخصصة للمسؤولين فقط.</p></div>';
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'غير مصرح',
+                    text: 'يجب أن تكون مسؤولاً للوصول إلى هذه الصفحة.',
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+
             var API_BASE = 'https://xsysx.shadowza.space/api/admin';
             var CREATE_URL = API_BASE + '/create/account';
             var LIST_URL = API_BASE + '/create/users';
