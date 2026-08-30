@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0d99ff">
-    <title>تقرير إيرادات - خوارج</title>
-    <meta name="description" content="تقرير إيرادات المطعم">
+    <title>تقرير فيزا</title>
+    <meta name="description" content="تقرير معاملات الفيزا">
     <link rel="icon" type="image/png" href="https://files.catbox.moe/kdxauw.png">
     <link rel="apple-touch-icon" href="https://files.catbox.moe/kdxauw.png">
     <link rel="manifest" href="/manifest.json">
@@ -15,9 +15,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/css/outgoing.css">
+    <link rel="stylesheet" href="/css/visa.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -36,191 +40,13 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-    <style>
-        /* ==== Edit Report Form Compact Styles ==== */
-        .edit-report-section {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 16px 18px;
-            margin-top: 16px;
-            backdrop-filter: blur(6px);
-        }
-
-        .edit-report-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .edit-report-header-icon {
-            width: 38px;
-            height: 38px;
-            min-width: 38px;
-            border-radius: 50%;
-            background: rgba(13, 153, 255, 0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0d99ff;
-            font-size: 20px;
-            transition: all 0.25s ease;
-        }
-
-        .edit-report-header:hover .edit-report-header-icon {
-            background: rgba(13, 153, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .edit-report-header h4 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .edit-report-header p {
-            font-size: 11px;
-            color: #888;
-            margin: 2px 0 0 0;
-        }
-
-        .edit-form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        @media (min-width: 640px) {
-            .edit-form-grid {
-                grid-template-columns: 1fr 190px;
-                gap: 16px;
-            }
-        }
-
-        .edit-form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 500;
-            color: #999;
-            margin-bottom: 5px;
-            letter-spacing: 0.02em;
-        }
-
-        .edit-form-group .input-field {
-            padding: 6px 10px;
-            font-size: 13px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            color: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            width: 100%;
-        }
-
-        .edit-form-group .input-field:focus {
-            border-color: #0d99ff;
-            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.12);
-            outline: none;
-        }
-
-        .edit-form-group .input-date-compact {
-            max-width: 170px;
-            width: 100%;
-            padding: 6px 10px;
-            font-size: 13px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            color: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .edit-form-group .input-date-compact::-webkit-calendar-picker-indicator {
-            opacity: 0.5;
-            cursor: pointer;
-        }
-
-        .edit-form-group .input-date-compact:focus {
-            border-color: #0d99ff;
-            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.12);
-            outline: none;
-        }
-
-        .edit-table-wrapper {
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            background: rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-        }
-
-        .edit-table-wrapper .restaurant-table {
-            margin: 0;
-        }
-
-        .edit-report-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 14px;
-        }
-
-        /* ==== Light Theme Overrides ==== */
-        body.light .edit-report-section {
-            background: rgba(0, 0, 0, 0.02);
-            border-color: rgba(0, 0, 0, 0.08);
-        }
-
-        body.light .edit-report-header {
-            border-bottom-color: rgba(0, 0, 0, 0.06);
-        }
-
-        body.light .edit-report-header h4 {
-            color: #1a1a1a;
-        }
-
-        body.light .edit-report-header p {
-            color: #666;
-        }
-
-        body.light .edit-form-group label {
-            color: #555;
-        }
-
-        body.light .edit-form-group .input-field,
-        body.light .edit-form-group .input-date-compact {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.1);
-            color: #1a1a1a;
-        }
-
-        body.light .edit-form-group .input-field:focus,
-        body.light .edit-form-group .input-date-compact:focus {
-            border-color: #0d99ff;
-            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.15);
-        }
-
-        body.light .edit-table-wrapper {
-            border-color: rgba(0, 0, 0, 0.06);
-            background: rgba(0, 0, 0, 0.02);
-        }
-    </style>
     <script>
         window.__APP_DATA__ = {
             token: "<%- token %>",
             api: "<%- api %>",
             isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
             user: <%- JSON.stringify(user || null) %>,
-            expenses: <%- JSON.stringify(user && user.expenses ? JSON.parse(user.expenses) : []) %>,
+            fees: <%- JSON.stringify(user && user.fees ? JSON.parse(user.fees) : []) %>,
             restaurant_id: 1
         };
     </script>
@@ -230,16 +56,16 @@
     <%- include('../../sections/header-ebnhamido.ejs') %>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
-                    <div class="title-icon"><i class="las la-chart-pie"></i></div>
-                    <h1>الخوارج</h1>
-                    <p>اداره الفواتير</p>
+                    <div class="title-icon"><i class="las la-credit-card"></i></div>
+                    <h1>فيزا</h1>
+                    <p>تسجيل معاملات الفيزا</p>
                 </div>
                 <div class="restaurant-card">
                     <div class="restaurant-header">
-                        <i class="las la-utensils"></i>
-                        <h3>الخوارج</h3>
+                        <i class="las la-credit-card"></i>
+                        <h3>فيزا</h3>
                         <input type="text" class="restaurant-name-input" id="restaurantNameInput"
-                            placeholder="ابن حميدو السلام">
+                            placeholder="اسم المعاملة (فيزا)">
                         <div class="mr-auto flex items-center gap-2">
                             <button type="button" id="dateToggleBtn" class="date-toggle-btn active"
                                 title="تبديل بين التاريخ التلقائي واليدوي">
@@ -250,20 +76,22 @@
                                 style="width:140px;" disabled>
                         </div>
                     </div>
-                    <div class="overflow-x-auto pr-6">
+                    <div class="overflow-x-auto">
                         <table class="restaurant-table" id="restaurantTable">
                             <thead>
                                 <tr>
-                                    <th style="width:32%;">البيان</th>
-                                    <th style="width:30%;">المبلغ (ج.م)</th>
-                                    <th style="width:38%;"></th>
+                                    <th style="width:8%;text-align:center;">#</th>
+                                    <th style="width:35%;">المبلغ (ج.م)</th>
+                                    <th style="width:37%;text-align:center;">التاريخ والوقت</th>
+                                    <th style="width:20%;"></th>
                                 </tr>
                             </thead>
                             <tbody id="restaurantTbody"></tbody>
                             <tfoot>
                                 <tr class="total-row" id="totalRow">
-                                    <td>الإجمالي</td>
+                                    <td style="text-align:center;">-</td>
                                     <td id="totalAmount">0</td>
+                                    <td style="text-align:center;">الإجمالي</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -283,7 +111,7 @@
                             <button class="btn-primary btn-sm" id="storeBtn"><i class="las la-save"></i> تخزين</button>
                             <button class="btn-outline btn-sm hidden" id="cancelEditBtn"><i class="las la-times"></i> إلغاء التعديل</button>
                             <button class="btn-outline btn-sm" id="printInvoiceBtn"><i class="las la-print"></i> طباعة (82.5mm)</button>
-                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> Excel</button>
+                            <button class="btn-outline btn-sm" id="exportRestaurantBtn"><i class="las la-file-excel"></i> CSV</button>
                         </div>
                     </div>
                 </div>
@@ -292,7 +120,7 @@
                         <div class="w-full md:w-auto md:flex-1"></div>
                         <div class="w-full md:w-auto md:flex-1 text-center">
                             <i class="las la-file-alt text-4xl text-primary mb-2 block"></i>
-                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير</h3>
+                            <h3 class="text-xl font-bold text-[var(--color-white)]" id="viewReportTitle2">تقرير فيزا</h3>
                             <p class="text-sm text-[var(--color-muted)]" id="viewReportDate2"></p>
                         </div>
                         <div class="w-full md:w-auto md:flex-1 flex justify-center md:justify-end">
@@ -306,15 +134,17 @@
                         <table class="view-table" id="viewReportTable2">
                             <thead>
                                 <tr>
-                                    <th style="width:55%;">البيان</th>
+                                    <th style="width:10%;text-align:center;">#</th>
                                     <th style="width:45%;">المبلغ (ج.م)</th>
+                                    <th style="width:45%;text-align:center;">التاريخ والوقت</th>
                                 </tr>
                             </thead>
                             <tbody id="viewReportTbody2"></tbody>
                             <tfoot>
                                 <tr class="total-row">
-                                    <td>الإجمالي</td>
+                                    <td style="text-align:center;">-</td>
                                     <td id="viewReportTotal2">0</td>
+                                    <td style="text-align:center;">الإجمالي</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -334,70 +164,22 @@
                             </select>
                         </div>
                     </div>
-                    <div id="recentReportsListView">
-                        <div class="mt-4 space-y-3" id="recentReportsList"></div>
-                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-[var(--color-muted)]">عرض</span>
-                                <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                </select>
-                                <span class="text-xs text-[var(--color-muted)]">تقارير</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
-                                <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
-                                <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
-                            </div>
+                    <div class="mt-4 space-y-3" id="recentReportsList"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                            <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span class="text-xs text-[var(--color-muted)]">تقارير</span>
                         </div>
-                    </div>
-                    <div id="editReportContainer" style="display:none;">
-                        <div class="edit-report-section">
-                            <div class="edit-report-header">
-                                <div class="edit-report-header-icon">
-                                    <i class="las la-edit"></i>
-                                </div>
-                                <div>
-                                    <h4>تعديل التقرير</h4>
-                                    <p>قم بتعديل بيانات التقرير ثم احفظ التغييرات</p>
-                                </div>
-                            </div>
-                            <div class="edit-form-grid">
-                                <div class="edit-form-group">
-                                    <label for="editReportName">اسم التقرير</label>
-                                    <input type="text" id="editReportName" class="input-field" placeholder="أدخل اسم التقرير">
-                                </div>
-                                <div class="edit-form-group">
-                                    <label for="editReportDate">التاريخ</label>
-                                    <input type="date" id="editReportDate" class="input-date-compact">
-                                </div>
-                            </div>
-                            <div class="edit-table-wrapper">
-                                <table class="restaurant-table" id="editReportTable">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:32%;">البيان</th>
-                                            <th style="width:30%;">المبلغ (ج.م)</th>
-                                            <th style="width:38%;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="editReportTbody"></tbody>
-                                    <tfoot>
-                                        <tr class="total-row">
-                                            <td>الإجمالي</td>
-                                            <td id="editReportTotal">0</td>
-                                            <td></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                            <div class="edit-report-actions">
-                                <button class="btn-outline btn-sm" id="cancelEditReportBtn"><i class="las la-times"></i> إلغاء</button>
-                                <button class="btn-primary btn-sm" id="saveEditReportBtn"><i class="las la-save"></i> حفظ التعديل</button>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <button class="btn-outline btn-xs" id="prevReportsPageBtn"><i class="las la-angle-right"></i></button>
+                            <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">1 / 1</span>
+                            <button class="btn-outline btn-xs" id="nextReportsPageBtn"><i class="las la-angle-left"></i></button>
                         </div>
                     </div>
                 </div>
@@ -420,13 +202,11 @@
         (function() {
             const appData = window.__APP_DATA__ || {};
             const userData = appData.user || {};
-            const restaurantId = "1";
-            const serverExpenses = Array.isArray(appData.expenses)
-                ? appData.expenses.filter(f => String(f.restaurant_id) === restaurantId)
-                : null;
+            const serverFees = Array.isArray(appData.fees) ? appData.fees : null;
             const token = appData.token || "";
             const apiBase = appData.api || "";
-            const userRole = userData.account_type || 'viewer';
+            const restaurantId = "1";
+            const userRole = userData.account_type || 'viewer'; // admin, cashier, viewer
             const isAdmin = (userRole === 'admin');
             const isCashier = (userRole === 'cashier');
             const isViewer = (userRole === 'viewer');
@@ -437,8 +217,9 @@
             let allReports = [];
             let currentReportsPage = 1;
             let reportsPageSize = 5;
+            let currentEditReportId = null;
             let sortOrder = 'newest';
-            let editingReportId = null;
+            let preEditSnapshot = null;
 
             document.getElementById('userFullName').textContent = userData.name || 'مستخدم';
             document.getElementById('role').textContent = userData.job_title || userData.account_type || 'مستخدم';
@@ -449,7 +230,11 @@
 
             const editableActions = document.getElementById('editableActions');
             const storeBtn = document.getElementById('storeBtn');
+            const addRowBtn = document.getElementById('addRowBtn');
+            const addRowsBatchBtn = document.getElementById('addRowsBatchBtn');
+            const clearRowsBtn = document.getElementById('clearRowsBtn');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
+
             if (isViewer) {
                 editableActions.style.display = 'none';
                 storeBtn.style.display = 'none';
@@ -465,6 +250,39 @@
 
             function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
 
+            function formatDateTime(isoString) {
+                if (!isoString) return '';
+                const d = new Date(isoString);
+                if (isNaN(d.getTime())) return '';
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                let hours = d.getHours();
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                if (hours === 0) hours = 12;
+                hours = String(hours).padStart(2, '0');
+                return day + '-' + month + ' ' + hours + ':' + minutes + ' ' + ampm;
+            }
+
+            function parseDateTime(str) {
+                const regex = /^(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+                const match = str.trim().match(regex);
+                if (!match) return null;
+                let day = parseInt(match[1]);
+                let month = parseInt(match[2]);
+                let hours = parseInt(match[3]);
+                const minutes = parseInt(match[4]);
+                const ampm = match[5].toUpperCase();
+                if (month < 1 || month > 12 || day < 1 || day > 31 || hours < 1 || hours > 12 || minutes < 0 || minutes > 59) return null;
+                if (ampm === 'PM' && hours !== 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                const now = new Date();
+                const result = new Date(now.getFullYear(), month - 1, day, hours, minutes, 0, 0);
+                if (isNaN(result.getTime())) return null;
+                return result;
+            }
+
             function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
 
             const tbody = document.getElementById('restaurantTbody');
@@ -473,12 +291,6 @@
             const dateToggleBtn = document.getElementById('dateToggleBtn');
             const dateToggleText = document.getElementById('dateToggleText');
             const reportDateInput = document.getElementById('reportDateInput');
-
-            const editReportContainer = document.getElementById('editReportContainer');
-            const editReportName = document.getElementById('editReportName');
-            const editReportDate = document.getElementById('editReportDate');
-            const editReportTbody = document.getElementById('editReportTbody');
-            const editReportTotal = document.getElementById('editReportTotal');
 
             function updateTotal() {
                 let total = 0;
@@ -490,16 +302,6 @@
                 totalAmountEl.textContent = formatNumber(total);
             }
 
-            function updateEditTotal() {
-                let total = 0;
-                const rows = editReportTbody.querySelectorAll('tr');
-                rows.forEach(row => {
-                    const input = row.querySelector('.amount-input');
-                    if (input) total += parseNumber(input.value);
-                });
-                editReportTotal.textContent = formatNumber(total);
-            }
-
             function focusInput(input) {
                 if (input) {
                     input.focus();
@@ -507,326 +309,191 @@
                 }
             }
 
-            function getInputsInRow(tr) {
-                const descInput = tr.querySelector('.desc-input');
-                const amountInput = tr.querySelector('.amount-input');
-                return { descInput, amountInput };
-            }
-
-            function getCellIndex(input) {
-                if (input.classList.contains('desc-input')) return 0;
-                if (input.classList.contains('amount-input')) return 1;
-                return -1;
-            }
-
-            function navigateCell(currentInput, rowDelta, cellDelta) {
-                const currentTr = currentInput.closest('tr');
-                if (!currentTr) return;
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                const currentRowIndex = rows.indexOf(currentTr);
-                const currentCellIndex = getCellIndex(currentInput);
-                const targetRowIndex = currentRowIndex + rowDelta;
-                if (targetRowIndex < 0 || targetRowIndex >= rows.length) return;
-                const targetRow = rows[targetRowIndex];
-                const { descInput, amountInput } = getInputsInRow(targetRow);
-                const targetCellIndex = cellDelta !== undefined ? cellDelta : currentCellIndex;
-                if (targetCellIndex === 0 && descInput) focusInput(descInput);
-                else if (targetCellIndex === 1 && amountInput) focusInput(amountInput);
-            }
-
-            function setupKeyboardNavigation(input) {
-                input.addEventListener('keydown', function(e) {
-                    const key = e.key;
-                    const tr = this.closest('tr');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    const rowIndex = rows.indexOf(tr);
-                    const cellIndex = getCellIndex(this);
-
-                    if (key === 'Enter') {
-                        e.preventDefault();
-                        const isLastRow = rowIndex === rows.length - 1;
-                        const isAmountCell = cellIndex === 1;
-                        if (isLastRow && isAmountCell) {
-                            const newTr = addRowAtEnd('', '');
-                            const { descInput } = getInputsInRow(newTr);
-                            if (descInput) focusInput(descInput);
-                            saveToSession();
-                        } else if (isLastRow && cellIndex === 0) {
-                            const { amountInput } = getInputsInRow(tr);
-                            if (amountInput) focusInput(amountInput);
-                        } else {
-                            navigateCell(this, 1, cellIndex);
-                        }
-                    } else if (key === 'ArrowDown') {
-                        e.preventDefault();
-                        navigateCell(this, 1, cellIndex);
-                    } else if (key === 'ArrowUp') {
-                        e.preventDefault();
-                        navigateCell(this, -1, cellIndex);
-                    } else if (key === 'ArrowRight') {
-                        e.preventDefault();
-                        if (cellIndex === 1) {
-                            navigateCell(this, 0, 0);
-                        }
-                    } else if (key === 'ArrowLeft') {
-                        e.preventDefault();
-                        if (cellIndex === 0) {
-                            navigateCell(this, 0, 1);
-                        }
-                    } else if (key === 'Tab') {
-                        e.preventDefault();
-                        if (e.shiftKey) {
-                            if (cellIndex === 1) {
-                                navigateCell(this, 0, 0);
-                            } else if (cellIndex === 0 && rowIndex > 0) {
-                                navigateCell(this, -1, 1);
-                            }
-                        } else {
-                            if (cellIndex === 0) {
-                                navigateCell(this, 0, 1);
-                            } else if (cellIndex === 1) {
-                                if (rowIndex < rows.length - 1) {
-                                    navigateCell(this, 1, 0);
-                                } else {
-                                    const newTr = addRowAtEnd('', '');
-                                    const { descInput } = getInputsInRow(newTr);
-                                    if (descInput) focusInput(descInput);
-                                    saveToSession();
-                                }
-                            }
-                        }
-                    }
+            function updateSerials() {
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    const serialCell = row.querySelector('.serial-cell');
+                    if (serialCell) serialCell.textContent = index + 1;
                 });
             }
 
-            function updateSignButton(row) {
-                const amountInput = row.querySelector('.amount-input');
-                const signBtn = row.querySelector('.sign-btn');
-                if (!amountInput || !signBtn) return;
-                const val = parseNumber(amountInput.value);
-                if (val < 0) {
-                    signBtn.classList.add('negative');
-                    signBtn.classList.remove('positive');
-                    signBtn.innerHTML = '<i class="las la-minus-circle"></i>';
-                    signBtn.title = 'القيمة سالبة - اضغط لجعلها موجبة';
-                } else {
-                    signBtn.classList.add('positive');
-                    signBtn.classList.remove('negative');
-                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                    signBtn.title = 'القيمة موجبة - اضغط لجعلها سالبة';
-                }
-            }
-
-            function createRowElement(description, amount, isEditMode = false) {
+            function createRowElement(amount, isoDatetime) {
                 const tr = document.createElement('tr');
 
-                const descTd = document.createElement('td');
-                const descInput = document.createElement('input');
-                descInput.type = 'text';
-                descInput.className = 'input-field desc-input';
-                descInput.placeholder = 'أدخل البيان';
-                descInput.value = description || '';
-                if (!isEditMode) {
-                    setupKeyboardNavigation(descInput);
-                } else {
-                    descInput.addEventListener('input', updateEditTotal);
-                }
-                descTd.appendChild(descInput);
+                const serialTd = document.createElement('td');
+                serialTd.className = 'serial-cell';
+                serialTd.textContent = '0';
+                tr.appendChild(serialTd);
 
                 const amountTd = document.createElement('td');
                 const amountInput = document.createElement('input');
                 amountInput.type = 'text';
                 amountInput.className = 'input-field amount-input';
-                amountInput.placeholder = 'المبلغ';
-                amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
+                amountInput.placeholder = 'أدخل المبلغ';
                 amountInput.setAttribute('inputmode', 'decimal');
-                if (!isEditMode) {
-                    setupKeyboardNavigation(amountInput);
-                } else {
-                    amountInput.addEventListener('input', function() {
-                        updateEditTotal();
-                        updateSignButton(tr);
-                    });
-                    amountInput.addEventListener('blur', function() {
-                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
-                        const num = parseFloat(val);
-                        if (!isNaN(num) && val !== '') {
-                            this.value = formatNumber(num);
-                        } else {
-                            this.value = '';
-                        }
-                        updateEditTotal();
-                        updateSignButton(tr);
-                    });
-                }
+                amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
                 amountTd.appendChild(amountInput);
+                tr.appendChild(amountTd);
+
+                const datetimeTd = document.createElement('td');
+                datetimeTd.style.textAlign = 'center';
+                const datetimeInput = document.createElement('input');
+                datetimeInput.type = 'text';
+                datetimeInput.className = 'datetime-input';
+                datetimeInput.placeholder = 'DD-MM HH:MM AM/PM';
+                datetimeInput.dir = 'ltr';
+                datetimeInput.setAttribute('data-iso', isoDatetime || '');
+                datetimeInput.value = isoDatetime ? formatDateTime(isoDatetime) : '';
+                datetimeTd.appendChild(datetimeInput);
+                tr.appendChild(datetimeTd);
 
                 const actionTd = document.createElement('td');
                 actionTd.style.whiteSpace = 'nowrap';
                 actionTd.style.textAlign = 'right';
 
-                if (isEditMode) {
-                    const signBtn = document.createElement('button');
-                    signBtn.className = 'row-action-btn sign-btn positive';
-                    signBtn.tabIndex = -1;
-                    signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
-                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                    signBtn.addEventListener('click', function() {
-                        const currentVal = parseNumber(amountInput.value);
-                        if (currentVal === 0) {
-                            amountInput.value = '';
-                            updateSignButton(tr);
-                            updateEditTotal();
-                            return;
-                        }
-                        const newVal = -currentVal;
-                        amountInput.value = formatNumber(newVal);
-                        updateSignButton(tr);
-                        updateEditTotal();
-                    });
-
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'row-action-btn delete-btn';
-                    deleteBtn.tabIndex = -1;
-                    deleteBtn.title = 'حذف الصف';
-                    deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                    deleteBtn.addEventListener('click', function() {
-                        if (editReportTbody.children.length > 1) {
-                            tr.remove();
-                            updateEditTotal();
-                        } else {
-                            Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
-                        }
-                    });
-
-                    actionTd.appendChild(signBtn);
-                    actionTd.appendChild(deleteBtn);
-                } else {
-                    const upBtn = document.createElement('button');
-                    upBtn.className = 'row-action-btn arrow-btn';
-                    upBtn.tabIndex = -1;
-                    upBtn.title = 'إضافة صف للأعلى';
-                    upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
-                    upBtn.addEventListener('click', function() {
-                        if (isViewer) return;
-                        const newTr = createRowElement('', '');
-                        tbody.insertBefore(newTr, tr);
-                        updateTotal();
-                        saveToSession();
-                        const { descInput: newDesc } = getInputsInRow(newTr);
-                        if (newDesc) focusInput(newDesc);
-                    });
-
-                    const downBtn = document.createElement('button');
-                    downBtn.className = 'row-action-btn arrow-btn';
-                    downBtn.tabIndex = -1;
-                    downBtn.title = 'إضافة صف للأسفل';
-                    downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
-                    downBtn.addEventListener('click', function() {
-                        if (isViewer) return;
-                        const newTr = createRowElement('', '');
-                        if (tr.nextSibling) {
-                            tbody.insertBefore(newTr, tr.nextSibling);
-                        } else {
-                            tbody.appendChild(newTr);
-                        }
-                        updateTotal();
-                        saveToSession();
-                        const { descInput: newDesc } = getInputsInRow(newTr);
-                        if (newDesc) focusInput(newDesc);
-                    });
-
-                    const signBtn = document.createElement('button');
-                    signBtn.className = 'row-action-btn sign-btn positive';
-                    signBtn.tabIndex = -1;
-                    signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
-                    signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
-                    signBtn.addEventListener('click', function() {
-                        if (isViewer) return;
-                        const currentVal = parseNumber(amountInput.value);
-                        if (currentVal === 0) {
-                            amountInput.value = '';
-                            updateSignButton(tr);
-                            updateTotal();
-                            saveToSession();
-                            return;
-                        }
-                        const newVal = -currentVal;
-                        amountInput.value = formatNumber(newVal);
-                        updateSignButton(tr);
-                        updateTotal();
-                        saveToSession();
-                    });
-
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'row-action-btn delete-btn';
-                    deleteBtn.tabIndex = -1;
-                    deleteBtn.title = 'حذف الصف';
-                    deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
-                    if (isViewer) {
-                        deleteBtn.disabled = true;
-                        deleteBtn.style.opacity = '0.4';
-                        deleteBtn.style.cursor = 'not-allowed';
-                    }
-                    deleteBtn.addEventListener('click', function() {
-                        if (isViewer) return;
-                        if (tbody.children.length > 1) {
-                            tr.remove();
-                            updateTotal();
-                            saveToSession();
-                        } else {
-                            Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
-                        }
-                    });
-
-                    actionTd.appendChild(upBtn);
-                    actionTd.appendChild(downBtn);
-                    actionTd.appendChild(signBtn);
-                    actionTd.appendChild(deleteBtn);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'row-action-btn delete-btn';
+                deleteBtn.tabIndex = -1;
+                deleteBtn.title = 'حذف الصف';
+                deleteBtn.innerHTML = '<i class="las la-trash-alt"></i>';
+                if (isViewer) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.style.opacity = '0.4';
+                    deleteBtn.style.cursor = 'not-allowed';
                 }
-
-                tr.appendChild(descTd);
-                tr.appendChild(amountTd);
+                deleteBtn.addEventListener('click', function() {
+                    if (isViewer) return;
+                    if (tbody.children.length > 1) {
+                        tr.remove();
+                        updateSerials();
+                        updateTotal();
+                        saveToSession();
+                    } else {
+                        Swal.fire('تنبيه', 'لا يمكن حذف الصف الأخير.', 'info');
+                    }
+                });
+                actionTd.appendChild(deleteBtn);
                 tr.appendChild(actionTd);
 
-                if (!isEditMode) {
-                    amountInput.addEventListener('input', function() {
-                        updateTotal();
-                        updateSignButton(tr);
-                    });
-                    amountInput.addEventListener('blur', function() {
-                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
-                        const num = parseFloat(val);
-                        if (!isNaN(num) && val !== '') {
-                            this.value = formatNumber(num);
+                amountInput.addEventListener('input', function() {
+                    updateTotal();
+                });
+                amountInput.addEventListener('blur', function() {
+                    let val = convertArabicNumerals(this.value).replace(/,/g, '');
+                    const num = parseFloat(val);
+                    if (!isNaN(num) && val !== '') this.value = formatNumber(num);
+                    else this.value = '';
+                    updateTotal();
+                    saveToSession();
+                });
+
+                amountInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const now = new Date();
+                        datetimeInput.setAttribute('data-iso', now.toISOString());
+                        datetimeInput.value = formatDateTime(now.toISOString());
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex === rows.length - 1) {
+                            const newTr = addRowAtEnd('', '');
+                            updateSerials();
+                            const newAmountInput = newTr.querySelector('.amount-input');
+                            if (newAmountInput) focusInput(newAmountInput);
                         } else {
-                            this.value = '';
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
                         }
                         updateTotal();
-                        updateSignButton(tr);
                         saveToSession();
-                    });
-                    descInput.addEventListener('input', function() {
-                        saveToSession();
-                    });
-                }
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex > 0) {
+                            const prevRow = rows[currentIndex - 1];
+                            const prevAmountInput = prevRow.querySelector('.amount-input');
+                            if (prevAmountInput) focusInput(prevAmountInput);
+                        }
+                    }
+                });
 
-                updateSignButton(tr);
+                datetimeInput.addEventListener('blur', function() {
+                    const userValue = this.value.trim();
+                    if (userValue === '') {
+                        this.setAttribute('data-iso', '');
+                        saveToSession();
+                        return;
+                    }
+                    const parsed = parseDateTime(userValue);
+                    if (parsed) {
+                        this.setAttribute('data-iso', parsed.toISOString());
+                        this.value = formatDateTime(parsed.toISOString());
+                    } else {
+                        const iso = this.getAttribute('data-iso');
+                        this.value = iso ? formatDateTime(iso) : '';
+                    }
+                    saveToSession();
+                });
+
+                datetimeInput.addEventListener('keydown', function(e) {
+                    if (isViewer) return;
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextAmountInput = nextRow.querySelector('.amount-input');
+                            if (nextAmountInput) focusInput(nextAmountInput);
+                        } else {
+                            const newTr = addRowAtEnd('', '');
+                            updateSerials();
+                            const newAmountInput = newTr.querySelector('.amount-input');
+                            if (newAmountInput) focusInput(newAmountInput);
+                        }
+                        saveToSession();
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex < rows.length - 1) {
+                            const nextRow = rows[currentIndex + 1];
+                            const nextDtInput = nextRow.querySelector('.datetime-input');
+                            if (nextDtInput) focusInput(nextDtInput);
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const currentIndex = rows.indexOf(tr);
+                        if (currentIndex > 0) {
+                            const prevRow = rows[currentIndex - 1];
+                            const prevDtInput = prevRow.querySelector('.datetime-input');
+                            if (prevDtInput) focusInput(prevDtInput);
+                        }
+                    }
+                });
+
                 return tr;
             }
 
-            function addRowAtEnd(description, amount) {
+            function addRowAtEnd(amount, isoDatetime) {
                 if (isViewer) return null;
-                const tr = createRowElement(description, amount);
+                const tr = createRowElement(amount || '', isoDatetime || '');
                 tbody.appendChild(tr);
+                updateSerials();
                 updateTotal();
-                return tr;
-            }
-
-            function addEditRow(description, amount) {
-                const tr = createRowElement(description, amount, true);
-                editReportTbody.appendChild(tr);
-                updateEditTotal();
                 return tr;
             }
 
@@ -834,6 +501,7 @@
                 if (isViewer) return;
                 tbody.innerHTML = '';
                 addRowAtEnd('', '');
+                updateSerials();
                 updateTotal();
             }
 
@@ -841,23 +509,10 @@
                 const rows = tbody.querySelectorAll('tr');
                 const data = [];
                 rows.forEach(row => {
-                    const descInput = row.querySelector('.desc-input');
                     const amountInput = row.querySelector('.amount-input');
-                    if (descInput && amountInput) {
-                        data.push({ desc: descInput.value || '', amount: amountInput.value || '0' });
-                    }
-                });
-                return data;
-            }
-
-            function getEditTableData() {
-                const rows = editReportTbody.querySelectorAll('tr');
-                const data = [];
-                rows.forEach(row => {
-                    const descInput = row.querySelector('.desc-input');
-                    const amountInput = row.querySelector('.amount-input');
-                    if (descInput && amountInput) {
-                        data.push({ desc: descInput.value || '', amount: amountInput.value || '0' });
+                    const datetimeInput = row.querySelector('.datetime-input');
+                    if (amountInput && datetimeInput) {
+                        data.push({ amount: amountInput.value || '0', datetime: datetimeInput.getAttribute('data-iso') || '' });
                     }
                 });
                 return data;
@@ -866,15 +521,9 @@
             function loadTableData(data) {
                 tbody.innerHTML = '';
                 if (data.length === 0) addRowAtEnd('', '');
-                else data.forEach(item => addRowAtEnd(item.desc, item.amount));
+                else data.forEach(item => addRowAtEnd(item.amount || '', item.datetime || ''));
+                updateSerials();
                 updateTotal();
-            }
-
-            function loadEditTableData(data) {
-                editReportTbody.innerHTML = '';
-                if (data.length === 0) addEditRow('', '');
-                else data.forEach(item => addEditRow(item.desc, item.amount));
-                updateEditTotal();
             }
 
             function saveToSession() {
@@ -883,16 +532,8 @@
                 const name = restaurantNameInput.value || '';
                 const isAuto = dateToggleBtn.classList.contains('active');
                 const customDate = reportDateInput.value;
-                const payload = {
-                    name: name,
-                    rows: data,
-                    isAuto: isAuto,
-                    customDate: customDate,
-                    timestamp: new Date().toISOString()
-                };
-                try {
-                    localStorage.setItem('restaurantReportData', JSON.stringify(payload));
-                } catch (e) {}
+                const payload = { name: name, rows: data, isAuto: isAuto, customDate: customDate, timestamp: new Date().toISOString() };
+                try { localStorage.setItem('visaReportData', JSON.stringify(payload)); } catch (e) {}
             }
 
             function updateDateToggleUI(isAuto) {
@@ -915,17 +556,14 @@
 
             function loadFromSession() {
                 try {
-                    const stored = localStorage.getItem('restaurantReportData');
+                    const stored = localStorage.getItem('visaReportData');
                     if (stored) {
                         const payload = JSON.parse(stored);
                         restaurantNameInput.value = payload.name || '';
                         const isAuto = payload.isAuto !== undefined ? payload.isAuto : true;
                         updateDateToggleUI(isAuto);
-                        if (payload.customDate) {
-                            reportDateInput.value = payload.customDate;
-                        } else {
-                            reportDateInput.value = formatDateForInput(new Date());
-                        }
+                        if (payload.customDate) reportDateInput.value = payload.customDate;
+                        else reportDateInput.value = formatDateForInput(new Date());
                         loadTableData(payload.rows || []);
                         return true;
                     }
@@ -957,7 +595,7 @@
                 html += '<table class="header-table" style="width:100%; border-collapse:collapse; margin-bottom:3mm; border:none;">';
                 html += '<tr>';
                 html += '<td class="title-cell-print" style="width:62%; text-align:right; vertical-align:bottom; padding:0; border:none; background:transparent;">';
-                html += '<div class="restaurant-name">' + (name || '') + '</div>';
+                html += '<div class="restaurant-name">' + (name || 'تقرير فيزا') + '</div>';
                 html += '<div class="print-date">' + (dateStr || '') + '</div>';
                 html += '</td>';
                 html += '<td class="logo-cell" style="width:38%; text-align:left; vertical-align:bottom; padding:0; border:none; background:transparent;">';
@@ -966,15 +604,17 @@
                 html += '</tr></table>';
                 html += '<div class="header-separator"></div>';
                 html += '<table>';
-                html += '<thead><tr><th style="width:62%;">البيان</th><th style="width:38%;">المبلغ (ج.م)</th></tr></thead><tbody>';
+                html += '<thead><tr><th style="width:10%;text-align:center;">#</th><th style="width:50%;">المبلغ (ج.م)</th><th style="width:40%;text-align:center;">التاريخ والوقت</th></tr></thead><tbody>';
                 if (rowsData && rowsData.length) {
-                    rowsData.forEach(row => {
-                        html += '<tr><td>' + (row.desc || '') + '</td><td>' + (row.amount || '0') + '</td></tr>';
+                    rowsData.forEach((row, idx) => {
+                        const amount = row.amount || '0';
+                        const dt = row.desc || (row.datetime ? formatDateTime(row.datetime) : '');
+                        html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + amount + '</td><td style="text-align:center;">' + dt + '</td></tr>';
                     });
                 }
-                html += '<tr class="total-row"><td style="width:62%;"><strong>الإجمالي</strong></td><td style="width:38%;"><strong>' + (totalText || '0') + '</strong></td></tr>';
+                html += '<tr class="total-row"><td style="text-align:center;">-</td><td><strong>' + (totalText || '0') + '</strong></td><td style="text-align:center;"><strong>الإجمالي</strong></td></tr>';
                 html += '</tbody></table>';
-                html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
+                html += '<div class="footer"><div class="dev"><p>Developed By Abdelrahman &amp; Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div><div class="dev-version">v3.2</div></div>';
                 return html;
             }
 
@@ -985,7 +625,6 @@
             const viewReportTotal2 = document.getElementById('viewReportTotal2');
             const recentReportsCard = document.getElementById('recentReportsCard');
             const recentReportsList = document.getElementById('recentReportsList');
-            const recentReportsListView = document.getElementById('recentReportsListView');
             let currentViewReportId = null;
 
             function hideReportView() {
@@ -996,28 +635,34 @@
 
             function viewReportById(reportId) {
                 let report = null;
-                if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
                 if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
+                    const stored = localStorage.getItem('visaStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        const reports = JSON.parse(stored);
                         report = reports.find(r => String(r.id) === String(reportId));
                     }
                 }
                 if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
                 currentViewReportId = reportId;
-                viewReportTitle2.textContent = report.name || 'تقرير';
+                viewReportTitle2.textContent = report.name || 'تقرير فيزا';
                 viewReportDate2.textContent = report.date || '';
                 viewReportTbody2.innerHTML = '';
                 if (report.rows && report.rows.length) {
-                    report.rows.forEach(row => {
+                    report.rows.forEach((row, idx) => {
                         const tr = document.createElement('tr');
-                        const tdDesc = document.createElement('td');
-                        tdDesc.textContent = row.desc || '';
+                        const tdSerial = document.createElement('td');
+                        tdSerial.textContent = idx + 1;
+                        tdSerial.style.textAlign = 'center';
                         const tdAmount = document.createElement('td');
                         tdAmount.textContent = row.amount || '0';
-                        tr.appendChild(tdDesc);
+                        const tdDatetime = document.createElement('td');
+                        const dt = row.desc || (row.datetime ? formatDateTime(row.datetime) : '');
+                        tdDatetime.textContent = dt;
+                        tdDatetime.style.textAlign = 'center';
+                        tr.appendChild(tdSerial);
                         tr.appendChild(tdAmount);
+                        tr.appendChild(tdDatetime);
                         viewReportTbody2.appendChild(tr);
                     });
                 }
@@ -1027,11 +672,11 @@
             }
 
             function loadRecentReports() {
-                let reports = serverExpenses || [];
+                let reports = serverFees || [];
                 if (!Array.isArray(reports) || reports.length === 0) {
                     try {
-                        const stored = localStorage.getItem('restaurantStoredReports');
-                        if (stored) reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        const stored = localStorage.getItem('visaStoredReports');
+                        if (stored) reports = JSON.parse(stored);
                     } catch (e) { reports = []; }
                 }
                 allReports = Array.isArray(reports) ? reports : [];
@@ -1076,14 +721,14 @@
                     const editDeleteBtns = (isViewer) ? '' :
                         `<button class="btn-outline btn-xs edit-report-btn" data-id="${report.id}" title="تعديل التقرير"><i class="las la-edit"></i> تعديل</button>
                         <button class="btn-outline btn-xs delete-report-btn" data-id="${report.id}" title="حذف التقرير" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="las la-trash-alt"></i> حذف</button>`;
-                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
+                    html += '<div class="report-list-item"><div class="report-info"><span class="text-primary"><i class="las la-file-alt text-xl"></i></span><div><p class="font-medium text-[var(--color-white)]">' + (report.name || 'تقرير فيزا') + '</p><p class="text-xs text-[var(--color-muted)]">' + (report.date || '') + '</p></div></div><div class="report-actions"><button class="btn-outline btn-xs view-report-btn" data-id="' + report.id + '" title="عرض التقرير"><i class="las la-eye"></i> عرض</button>' + editDeleteBtns + '</div></div>';
                 });
                 recentReportsList.innerHTML = html;
                 document.querySelectorAll('.view-report-btn').forEach(btn => {
                     btn.addEventListener('click', function() { viewReportById(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.edit-report-btn').forEach(btn => {
-                    btn.addEventListener('click', function() { openEditReport(this.getAttribute('data-id')); });
+                    btn.addEventListener('click', function() { editReportById(this.getAttribute('data-id')); });
                 });
                 document.querySelectorAll('.delete-report-btn').forEach(btn => {
                     btn.addEventListener('click', function() { deleteReportById(this.getAttribute('data-id')); });
@@ -1129,7 +774,7 @@
                 }).then((result) => {
                     if (result.isConfirmed && result.value) {
                         const password = result.value;
-                        fetch(apiBase + '/api/expenses/expenses-delete', {
+                        fetch(apiBase + '/api/expenses/fees-delete', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1142,9 +787,9 @@
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                if (serverExpenses) {
-                                    const index = serverExpenses.findIndex(r => String(r.id) === String(reportId));
-                                    if (index !== -1) serverExpenses.splice(index, 1);
+                                if (serverFees) {
+                                    const index = serverFees.findIndex(r => String(r.id) === String(reportId));
+                                    if (index !== -1) serverFees.splice(index, 1);
                                 }
                                 allReports = allReports.filter(r => String(r.id) !== String(reportId));
                                 if (allReports.length === 0) loadRecentReports();
@@ -1163,112 +808,14 @@
                 });
             }
 
-            function openEditReport(reportId) {
-                if (isViewer) {
-                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
-                    return;
-                }
-                let report = null;
-                if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(reportId));
-                if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
-                    if (stored) {
-                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
-                        report = reports.find(r => String(r.id) === String(reportId));
-                    }
-                }
-                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
-
-                editingReportId = reportId;
-                editReportName.value = report.name || '';
-                if (report.date) {
-                    const parts = report.date.split('/');
-                    if (parts.length === 3) {
-                        editReportDate.value = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
-                    }
-                }
-                loadEditTableData(report.rows || []);
-                recentReportsListView.style.display = 'none';
-                editReportContainer.style.display = 'block';
-            }
-
-            function closeEditReport() {
-                editReportContainer.style.display = 'none';
-                recentReportsListView.style.display = 'block';
-                editingReportId = null;
-            }
-
-            document.getElementById('cancelEditReportBtn').addEventListener('click', closeEditReport);
-
-            document.getElementById('saveEditReportBtn').addEventListener('click', async function() {
-                if (!editingReportId || isViewer) return;
-                let password = '';
-                if (!isAdmin) {
-                    const result = await Swal.fire({
-                        title: 'كلمة المرور مطلوبة',
-                        text: 'أدخل كلمة المرور لتعديل التقرير',
-                        input: 'password',
-                        inputPlaceholder: 'كلمة المرور',
-                        showCancelButton: true,
-                        confirmButtonText: 'تحديث',
-                        cancelButtonText: 'إلغاء',
-                        reverseButtons: true
-                    });
-                    if (result.isConfirmed && result.value) {
-                        password = result.value;
-                    } else {
-                        return;
-                    }
-                }
-                const name = editReportName.value || '';
-                const rows = getEditTableData();
-                const total = editReportTotal.textContent;
-                const dateStr = editReportDate.value ? 
-                    (() => {
-                        const d = new Date(editReportDate.value + 'T00:00:00');
-                        return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
-                    })() : '';
-
-                fetch(apiBase + '/api/expenses/expenses-update', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token,
-                        restaurant_id: restaurantId,
-                        reportId: editingReportId,
-                        code: '',
-                        name: name,
-                        date: dateStr,
-                        rows: rows,
-                        total: total,
-                        password: password
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        if (serverExpenses) {
-                            const idx = serverExpenses.findIndex(r => String(r.id) === String(editingReportId));
-                            if (idx !== -1) serverExpenses[idx] = data.report;
-                        }
-                        const idxAll = allReports.findIndex(r => String(r.id) === String(editingReportId));
-                        if (idxAll !== -1) allReports[idxAll] = data.report;
-                        renderRecentReportsPage();
-                        closeEditReport();
-                        Swal.fire('تم التعديل', data.message, 'success');
-                    } else {
-                        Swal.fire('خطأ', data.message, 'error');
-                    }
-                })
-                .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
-            });
-
+            // دالة التخزين الرئيسية مع طلب باسورد إذا لم يكن أدمن
             function storeCurrentReport() {
                 if (isViewer) {
                     Swal.fire('غير مسموح', 'ليس لديك صلاحية تخزين التقارير.', 'error');
                     return;
                 }
 
+                // إذا لم يكن أدمن، نطلب باسورد
                 if (!isAdmin) {
                     Swal.fire({
                         title: 'كلمة المرور مطلوبة',
@@ -1292,6 +839,7 @@
                         }
                     });
                 } else {
+                    // أدمن: بدون باسورد
                     performStore('');
                 }
             }
@@ -1301,8 +849,8 @@
                 const rows = getTableData();
                 const total = totalAmountEl.textContent;
                 const dateStr = getReportDateString();
-
-                fetch(apiBase + '/api/expenses/expenses-store', {
+                const reportRows = rows.map(r => ({ desc: r.datetime ? formatDateTime(r.datetime) : '', amount: r.amount }));
+                fetch(apiBase + '/api/expenses/fees-store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1311,7 +859,7 @@
                         code: '',
                         name: name,
                         date: dateStr,
-                        rows: rows,
+                        rows: reportRows,
                         total: total,
                         password: password
                     })
@@ -1319,11 +867,11 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        if (serverExpenses) {
-                            const idx = serverExpenses.findIndex(r => String(r.restaurant_id) === restaurantId && String(r.date) === dateStr);
-                            if (idx !== -1) serverExpenses.splice(idx, 1);
-                            serverExpenses.unshift(data.report);
-                            if (serverExpenses.length > 20) serverExpenses.length = 20;
+                        if (serverFees) {
+                            const idx = serverFees.findIndex(r => String(r.restaurant_id) === restaurantId && String(r.date) === dateStr);
+                            if (idx !== -1) serverFees.splice(idx, 1);
+                            serverFees.unshift(data.report);
+                            if (serverFees.length > 20) serverFees.length = 20;
                         }
                         allReports = allReports.filter(r => !(String(r.restaurant_id) === restaurantId && String(r.date) === dateStr));
                         allReports.unshift(data.report);
@@ -1338,17 +886,151 @@
                 .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
             }
 
+            async function updateCurrentReport() {
+                if (!currentEditReportId || isViewer) return;
+                let password = '';
+                if (!isAdmin) {
+                    const result = await Swal.fire({
+                        title: 'كلمة المرور مطلوبة',
+                        text: 'أدخل كلمة المرور لتعديل التقرير',
+                        input: 'password',
+                        inputPlaceholder: 'كلمة المرور',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث',
+                        cancelButtonText: 'إلغاء',
+                        reverseButtons: true
+                    });
+                    if (result.isConfirmed && result.value) {
+                        password = result.value;
+                    } else {
+                        return;
+                    }
+                }
+                const name = restaurantNameInput.value || '';
+                const rows = getTableData();
+                const total = totalAmountEl.textContent;
+                const dateStr = getReportDateString();
+                const reportRows = rows.map(r => ({ desc: r.datetime ? formatDateTime(r.datetime) : '', amount: r.amount }));
+                fetch(apiBase + '/api/expenses/fees-update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        restaurant_id: restaurantId,
+                        reportId: currentEditReportId,
+                        code: '',
+                        name: name,
+                        date: dateStr,
+                        rows: reportRows,
+                        total: total,
+                        password: password
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (serverFees) {
+                            const idx = serverFees.findIndex(r => String(r.id) === String(currentEditReportId));
+                            if (idx !== -1) serverFees[idx] = data.report;
+                        }
+                        const idxAll = allReports.findIndex(r => String(r.id) === String(currentEditReportId));
+                        if (idxAll !== -1) allReports[idxAll] = data.report;
+                        renderRecentReportsPage();
+                        restorePreEditSnapshot();
+                        cancelEditMode();
+                        Swal.fire('تم التعديل', data.message, 'success');
+                    } else {
+                        Swal.fire('خطأ', data.message, 'error');
+                    }
+                })
+                .catch(err => Swal.fire('خطأ', 'فشل الاتصال بالخادم', 'error'));
+            }
+
+            function captureFormState() {
+                return {
+                    name: restaurantNameInput.value || '',
+                    rows: getTableData(),
+                    isAuto: dateToggleBtn.classList.contains('active'),
+                    customDate: reportDateInput.value
+                };
+            }
+
+            function restorePreEditSnapshot() {
+                if (!preEditSnapshot) return;
+                restaurantNameInput.value = preEditSnapshot.name || '';
+                updateDateToggleUI(preEditSnapshot.isAuto);
+                if (preEditSnapshot.customDate) reportDateInput.value = preEditSnapshot.customDate;
+                else reportDateInput.value = formatDateForInput(new Date());
+                loadTableData(preEditSnapshot.rows || []);
+                saveToSession();
+                preEditSnapshot = null;
+            }
+
+            function editReportById(reportId) {
+                if (isViewer) {
+                    Swal.fire('غير مسموح', 'ليس لديك صلاحية تعديل التقارير.', 'error');
+                    return;
+                }
+                let report = null;
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(reportId));
+                if (!report) {
+                    const stored = localStorage.getItem('visaStoredReports');
+                    if (stored) {
+                        const reports = JSON.parse(stored);
+                        report = reports.find(r => String(r.id) === String(reportId));
+                    }
+                }
+                if (!report) { Swal.fire('خطأ', 'التقرير غير موجود.', 'error'); return; }
+                preEditSnapshot = captureFormState();
+                currentEditReportId = reportId;
+                restaurantNameInput.value = report.name || '';
+                if (report.date) {
+                    const parts = report.date.split('/');
+                    if (parts.length === 3) {
+                        reportDateInput.value = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+                    }
+                }
+                updateDateToggleUI(false);
+                tbody.innerHTML = '';
+                if (report.rows && report.rows.length) {
+                    report.rows.forEach(row => {
+                        const iso = row.desc ? (parseDateTime(row.desc) ? parseDateTime(row.desc).toISOString() : '') : '';
+                        addRowAtEnd(row.amount || '', iso);
+                    });
+                } else {
+                    addRowAtEnd('', '');
+                }
+                updateSerials();
+                updateTotal();
+                storeBtn.innerHTML = '<i class="las la-edit"></i> تحديث التقرير';
+                cancelEditBtn.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function cancelEditMode() {
+                currentEditReportId = null;
+                storeBtn.innerHTML = '<i class="las la-save"></i> تخزين';
+                cancelEditBtn.classList.add('hidden');
+            }
+
+            cancelEditBtn.addEventListener('click', function() {
+                restorePreEditSnapshot();
+                cancelEditMode();
+                Swal.fire('تم', 'تم إلغاء التعديل.', 'info');
+            });
+
             storeBtn.addEventListener('click', function() {
                 saveToSession();
-                storeCurrentReport();
+                if (currentEditReportId) updateCurrentReport();
+                else storeCurrentReport();
             });
 
             document.getElementById('addRowBtn').addEventListener('click', function() {
                 if (isViewer) return;
                 const newTr = addRowAtEnd('', '');
                 if (newTr) {
-                    const { descInput } = getInputsInRow(newTr);
-                    if (descInput) focusInput(descInput);
+                    const amountInput = newTr.querySelector('.amount-input');
+                    if (amountInput) focusInput(amountInput);
                 }
                 saveToSession();
             });
@@ -1361,6 +1043,7 @@
                 if (count > 50) count = 50;
                 countInput.value = count;
                 for (let i = 0; i < count; i++) addRowAtEnd('', '');
+                updateSerials();
                 saveToSession();
                 Swal.fire('تم', 'تم إضافة ' + count + ' صفوف جديدة.', 'success');
             });
@@ -1399,37 +1082,35 @@
             document.getElementById('exportRestaurantBtn').addEventListener('click', function() {
                 saveToSession();
                 const name = restaurantNameInput.value || '';
+                let csv = '#,المبلغ (ج.م),التاريخ والوقت\n';
                 const rows = getTableData();
-                const total = totalAmountEl.textContent;
-                const dateStr = getReportDateString();
-
-                const wsData = [
-                    ['البيان', 'المبلغ (ج.م)'],
-                    ...rows.map(row => [row.desc, row.amount]),
-                    ['الإجمالي', total]
-                ];
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'تقرير');
-                XLSX.writeFile(wb, (name || 'تقرير') + '_' + dateStr.replace(/\//g, '-') + '.xlsx');
-                Swal.fire('تم', 'تم تصدير التقرير بصيغة Excel بنجاح.', 'success');
+                rows.forEach((row, idx) => {
+                    csv += (idx + 1) + ',' + (row.amount || '0') + ',' + (row.datetime ? formatDateTime(row.datetime) : '') + '\n';
+                });
+                csv += '-,الإجمالي,' + totalAmountEl.textContent + '\n';
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = name + '_تقرير_فيزا.csv';
+                link.click();
+                Swal.fire('تم', 'تم تصدير التقرير بصيغة CSV بنجاح.', 'success');
             });
 
             document.getElementById('closeDetailReportBtn').addEventListener('click', hideReportView);
             document.getElementById('printDetailReportBtn').addEventListener('click', function() {
                 if (!currentViewReportId) return;
                 let report = null;
-                if (serverExpenses) report = serverExpenses.find(r => String(r.id) === String(currentViewReportId));
+                if (serverFees) report = serverFees.find(r => String(r.id) === String(currentViewReportId));
                 if (!report) {
-                    const stored = localStorage.getItem('restaurantStoredReports');
+                    const stored = localStorage.getItem('visaStoredReports');
                     if (stored) {
-                        const reports = JSON.parse(stored).filter(f => String(f.restaurant_id) === restaurantId);
+                        const reports = JSON.parse(stored);
                         report = reports.find(r => String(r.id) === String(currentViewReportId));
                     }
                 }
                 if (!report) return;
                 const printArea = document.getElementById('printArea');
-                const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ desc: r.desc || '', amount: r.amount || '0' })) : [];
+                const rowsData = (report.rows && report.rows.length) ? report.rows.map(r => ({ amount: r.amount || '0', desc: r.desc || '', datetime: r.datetime || '' })) : [];
                 printArea.innerHTML = buildPrintHTML(report.name || '', report.date || '', rowsData, report.total || '0');
                 printArea.style.display = 'block';
                 setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300);
@@ -1465,28 +1146,11 @@
                     if (window.innerWidth < 1025) closeSidebar();
                 });
             });
-
             const logoutBtn = document.getElementById('logoutBtn');
-
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-
-                Swal.fire({
-                    title: 'تسجيل الخروج',
-                    text: 'هل أنت متأكد؟',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'نعم',
-                    cancelButtonText: 'إلغاء'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
-                        window.location.href = '/';
-                    }
-                });
+                Swal.fire({ title: 'تسجيل الخروج', text: 'هل أنت متأكد؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم', cancelButtonText: 'إلغاء' }).then((result) => { if (result.isConfirmed) window.location.href = '/'; });
             });
-
 
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
             const navNotch = document.getElementById('navNotch');
@@ -1561,6 +1225,7 @@
                 if (!loadFromSession()) {
                     tbody.innerHTML = '';
                     addRowAtEnd('', '');
+                    updateSerials();
                     updateTotal();
                     reportDateInput.value = formatDateForInput(new Date());
                 }
@@ -1570,4 +1235,4 @@
     </script>
 </body>
 
-</html>
+</html> هنا خلي عرض تقارير الفيز يكون للمطاعم ال الايدي بتاعها 1 فقط فاهمني ؟ وطبق نظام التعديل ايضا نفس النظام هنا 
