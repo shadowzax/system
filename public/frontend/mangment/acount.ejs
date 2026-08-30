@@ -806,16 +806,17 @@
         }
         .accounts-table th,
         .accounts-table td {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--border-color);
             text-align: right;
             color: var(--color-white);
+            font-size: 0.8rem;
         }
         .accounts-table th {
             background: var(--darker-bg);
             color: var(--color-muted);
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -1145,7 +1146,6 @@
                                     <th>البريد الإلكتروني</th>
                                     <th>الدور</th>
                                     <th>الحالة</th>
-                                    <th>تاريخ الإنشاء</th>
                                     <th>إجراءات</th>
                                 </tr>
                             </thead>
@@ -1173,50 +1173,6 @@
                 </div>
             </div>
         </main>
-    </div>
-
-    <!-- Modal تعديل الحساب -->
-    <div class="modal-overlay" id="editAccountModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeEditAccountModal"><i class="las la-times"></i></button>
-            <i class="las la-user-edit text-4xl text-primary mb-4 block text-center"></i>
-            <h3 class="text-xl font-bold mb-6 text-center text-[var(--color-white)]">تعديل الحساب</h3>
-            <div class="space-y-4">
-                <input type="hidden" id="editAccountId">
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">الاسم الكامل</label>
-                    <input type="text" class="input-field" id="editAccountFullName" placeholder="أدخل الاسم الكامل">
-                </div>
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">البريد الإلكتروني</label>
-                    <input type="email" class="input-field" id="editAccountEmail" placeholder="example@domain.com" dir="ltr">
-                </div>
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">رقم الهاتف</label>
-                    <input type="tel" class="input-field" id="editAccountPhone" placeholder="+20 1xx xxxx xxx">
-                </div>
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">المسمى الوظيفي</label>
-                    <input type="text" class="input-field" id="editAccountJobTitle" placeholder="المسمى الوظيفي">
-                </div>
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">الدور</label>
-                    <select class="select-field" id="editAccountRole">
-                        <option value="admin">ادمن</option>
-                        <option value="cashier">كاشير</option>
-                        <option value="viewer">مشاهد</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-sm text-[var(--color-muted)] block mb-1">الحالة</label>
-                    <div class="flex items-center gap-3 mt-2">
-                        <label class="toggle-switch"><input type="checkbox" id="editAccountStatus" checked><span class="toggle-slider"></span></label>
-                        <span class="text-sm font-medium" id="editAccountStatusLabel">نشط</span>
-                    </div>
-                </div>
-                <button class="btn-primary w-full justify-center mt-4" id="saveEditAccountBtn"><i class="las la-save"></i> حفظ التغييرات</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1251,18 +1207,6 @@
             var accountsLoadingMsg = document.getElementById('accountsLoadingMsg');
             var noAccountsMsg = document.getElementById('noAccountsMsg');
             var refreshAccountsBtn = document.getElementById('refreshAccountsBtn');
-
-            var editAccountModal = document.getElementById('editAccountModal');
-            var closeEditAccountModal = document.getElementById('closeEditAccountModal');
-            var editAccountId = document.getElementById('editAccountId');
-            var editAccountFullName = document.getElementById('editAccountFullName');
-            var editAccountEmail = document.getElementById('editAccountEmail');
-            var editAccountPhone = document.getElementById('editAccountPhone');
-            var editAccountJobTitle = document.getElementById('editAccountJobTitle');
-            var editAccountRole = document.getElementById('editAccountRole');
-            var editAccountStatus = document.getElementById('editAccountStatus');
-            var editAccountStatusLabel = document.getElementById('editAccountStatusLabel');
-            var saveEditAccountBtn = document.getElementById('saveEditAccountBtn');
 
             var cachedAccounts = [];
 
@@ -1302,19 +1246,6 @@
                     pending: "account-status-pending"
                 };
                 return classes[status] || "account-status-inactive";
-            }
-
-            function formatDate(dateValue) {
-                if (!dateValue) return "غير متوفر";
-                var date = new Date(dateValue.replace(" ", "T"));
-                if (isNaN(date.getTime())) return escapeHtml(dateValue);
-                return date.toLocaleString("ar-EG", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
             }
 
             function getProfilePicture(user) {
@@ -1358,10 +1289,8 @@
                         '<td><span class="text-sm">' + escapeHtml(user.email || "غير متوفر") + '</span></td>' +
                         '<td><span class="text-sm">' + escapeHtml(accountType) + '</span></td>' +
                         '<td><span class="account-status ' + statusClass + '">' + escapeHtml(accountStatus) + '</span></td>' +
-                        '<td><span class="text-sm">' + formatDate(user.created_at) + '</span></td>' +
                         '<td><div class="flex items-center gap-2">' +
                         '<button type="button" class="btn-outline btn-sm view-account-btn" data-id="' + escapeHtml(user.id) + '" title="عرض الحساب"><i class="las la-eye"></i></button>' +
-                        '<button type="button" class="btn-outline btn-sm edit-account-btn" data-id="' + escapeHtml(user.id) + '" title="تعديل"><i class="las la-edit"></i></button>' +
                         '</div></td>';
 
                     accountsTableBody.appendChild(row);
@@ -1370,12 +1299,6 @@
                 accountsTableBody.querySelectorAll('.view-account-btn').forEach(function (btn) {
                     btn.addEventListener('click', function () {
                         viewAccount(this.getAttribute('data-id'));
-                    });
-                });
-
-                accountsTableBody.querySelectorAll('.edit-account-btn').forEach(function (btn) {
-                    btn.addEventListener('click', function () {
-                        openEditModal(this.getAttribute('data-id'));
                     });
                 });
             }
@@ -1447,7 +1370,6 @@
                         '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-briefcase"></i></div><div class="account-detail-content"><span class="account-detail-label">المسمى الوظيفي</span><span class="account-detail-value">' + escapeHtml(account.job_title || "غير متوفر") + '</span></div></div>' +
                         '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-user-shield"></i></div><div class="account-detail-content"><span class="account-detail-label">الدور</span><span class="account-detail-value">' + escapeHtml(getAccountTypeLabel(account.account_type)) + '</span></div></div>' +
                         '<div class="account-detail-item"><div class="account-detail-icon"><i class="las la-toggle-on"></i></div><div class="account-detail-content"><span class="account-detail-label">الحالة</span><span class="account-detail-value"><span class="account-status-badge ' + accountStatusClass + '">' + escapeHtml(accountStatus) + '</span></span></div></div>' +
-                        '<div class="account-detail-item" style="grid-column: 1 / -1;"><div class="account-detail-icon"><i class="las la-calendar-alt"></i></div><div class="account-detail-content"><span class="account-detail-label">تاريخ إنشاء الحساب</span><span class="account-detail-value">' + formatDate(account.created_at) + '</span></div></div>' +
                         '</div>' +
                         '</div>',
                     confirmButtonText: "إغلاق",
@@ -1462,95 +1384,6 @@
                     }
                 });
             }
-
-            function openEditModal(id) {
-                var account = cachedAccounts.find(function (user) {
-                    return String(user.id) === String(id);
-                });
-
-                if (!account) return;
-
-                editAccountId.value = account.id || '';
-                editAccountFullName.value = account.name || '';
-                editAccountEmail.value = account.email || '';
-                editAccountPhone.value = account.phone_number || '';
-                editAccountJobTitle.value = account.job_title || '';
-                editAccountRole.value = account.account_type || 'viewer';
-                editAccountStatus.checked = account.account_status === 'active';
-                editAccountStatusLabel.textContent = editAccountStatus.checked ? 'نشط' : 'غير نشط';
-
-                editAccountModal.classList.add('active');
-            }
-
-            function closeEditModal() {
-                editAccountModal.classList.remove('active');
-            }
-
-            editAccountStatus.addEventListener('change', function () {
-                editAccountStatusLabel.textContent = editAccountStatus.checked ? 'نشط' : 'غير نشط';
-            });
-
-            closeEditAccountModal.addEventListener('click', closeEditModal);
-
-            editAccountModal.addEventListener('click', function (e) {
-                if (e.target === editAccountModal) closeEditModal();
-            });
-
-            saveEditAccountBtn.addEventListener('click', function () {
-                var id = editAccountId.value;
-                var payload = {
-                    name: editAccountFullName.value.trim(),
-                    email: editAccountEmail.value.trim().toLowerCase(),
-                    phone_number: editAccountPhone.value.trim(),
-                    job_title: editAccountJobTitle.value.trim(),
-                    account_type: editAccountRole.value,
-                    account_status: editAccountStatus.checked ? 'active' : 'inactive'
-                };
-
-                if (!payload.name || !payload.email) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'خطأ',
-                        text: 'الاسم والبريد الإلكتروني مطلوبان',
-                        confirmButtonText: 'حسناً'
-                    });
-                    return;
-                }
-
-                fetch(API_BASE + '/update/account/' + id, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم',
-                            text: 'تم تحديث الحساب بنجاح',
-                            confirmButtonText: 'حسناً'
-                        });
-                        closeEditModal();
-                        loadAccounts();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'خطأ',
-                            text: data.message || 'فشل تحديث الحساب',
-                            confirmButtonText: 'حسناً'
-                        });
-                    }
-                })
-                .catch(function (err) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'خطأ',
-                        text: 'فشل الاتصال: ' + err.message,
-                        confirmButtonText: 'حسناً'
-                    });
-                });
-            });
 
             function clearValidationMsgs() {
                 emailMsg.textContent = '';
@@ -1786,7 +1619,6 @@
 
             refreshAccountsBtn.addEventListener('click', loadAccounts);
 
-            // تحميل الحسابات عند البدء
             loadAccounts();
         })();
     </script>
