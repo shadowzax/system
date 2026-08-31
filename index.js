@@ -149,6 +149,16 @@ app.get("/about", (req, res) => {
         activePage: "",
     });
 });
+app.get("/", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("index", {
+        title: "",
+        activePage: "",
+    });
+});
 
 app.get("/employee-files", (req, res) => {
     res.render("finance/files", {
