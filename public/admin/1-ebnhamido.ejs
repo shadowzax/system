@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#0d99ff">
-    <title>إدارة <%= restaurant.name %></title>
-    <meta name="description" content="نظام إدارة الرواتب باليومية">
-    <link rel="icon" type="image/png" href="/favicon.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="/css/admin.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<!-- معلومات التطبيق -->
+<meta name="theme-color" content="#0d99ff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="إدارة <%= restaurant.name %>">
+
+<title>إدارة <%= restaurant.name %></title>
+
+<meta name="description" content="نظام إدارة الرواتب باليومية">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/logos/acsd.png">
+<link rel="shortcut icon" type="image/png" href="/logos/acsd.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- Android / Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="/logos/acsd.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/logos/acsd.png">
+
+<!-- iPhone / iPad -->
+<link rel="apple-touch-icon" href="/logos/acsd.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/logos/acsd.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/logos/acsd.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/logos/acsd.png">
+
+<!-- Windows / Microsoft -->
+<meta name="msapplication-TileColor" content="#0d99ff">
+<meta name="msapplication-TileImage" content="/logos/acsd.png">
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Line Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+
+<!-- Alexandria Font -->
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet">
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- SheetJS -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Admin CSS -->
+<link rel="stylesheet" href="/css/admin.css">
+
     <style>
         #toastContainer {
             position: fixed;
