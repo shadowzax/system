@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<!-- معلومات التطبيق -->
 <meta name="theme-color" content="#0d99ff">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,49 +14,37 @@
 
 <meta name="description" content="نظام إدارة الرواتب باليومية">
 
-<!-- Favicon -->
 <link rel="icon" type="image/png" href="/logos/acsd.png">
 <link rel="shortcut icon" type="image/png" href="/logos/acsd.png">
 
-<!-- PWA Manifest -->
 <link rel="manifest" href="/manifest.json">
 
-<!-- Android / Chrome -->
 <link rel="icon" type="image/png" sizes="192x192" href="/logos/acsd.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/logos/acsd.png">
 
-<!-- iPhone / iPad -->
 <link rel="apple-touch-icon" href="/logos/acsd.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/logos/acsd.png">
 <link rel="apple-touch-icon" sizes="152x152" href="/logos/acsd.png">
 <link rel="apple-touch-icon" sizes="120x120" href="/logos/acsd.png">
 
-<!-- Windows / Microsoft -->
 <meta name="msapplication-TileColor" content="#0d99ff">
 <meta name="msapplication-TileImage" content="/logos/acsd.png">
 
-<!-- Font Awesome -->
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- Line Awesome -->
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
 
-<!-- Alexandria Font -->
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
       rel="stylesheet">
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- SheetJS -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- Admin CSS -->
 <link rel="stylesheet" href="/css/admin.css">
 
     <style>
@@ -136,6 +123,45 @@
             box-shadow: none;
             outline: none;
         }
+        .deduction-input {
+            width: 50px;
+            min-width: 50px;
+            text-align: center;
+            padding: 0.25rem 0.2rem;
+            border-radius: 6px;
+            border: 1px solid var(--color-border, #374151);
+            background: var(--color-bg-input, #111827);
+            color: var(--color-white);
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .deduction-input:focus {
+            border-color: var(--color-primary, #0d99ff);
+            box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.2);
+            outline: none;
+        }
+        .deduction-input.has-value {
+            background: rgba(13, 153, 255, 0.1);
+            border-color: var(--color-primary, #0d99ff);
+        }
+        .deduction-input.has-value-zero {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        .deduction-input[readonly] {
+            cursor: default;
+            opacity: 0.85;
+        }
+        .deduction-input[readonly]:hover {
+            border-color: var(--color-border, #374151);
+            box-shadow: none;
+        }
+        .deduction-input[readonly]:focus {
+            border-color: var(--color-border, #374151);
+            box-shadow: none;
+            outline: none;
+        }
         @media (max-width: 640px) {
             .shared-table .day-input,
             .shared-table .deduction-input {
@@ -145,6 +171,10 @@
                 width: 30px;
                 height: 30px;
                 text-align: center;
+            }
+            .deduction-input {
+                width: 30px;
+                min-width: 30px;
             }
             .shared-table th, .shared-table td {
                 padding: 0.4rem 0.2rem;
@@ -555,10 +585,6 @@
 
             async function sendAdvanceToServer(fileId, employeeId, day, amount) {
                 return await apiRequest('/files/advance', 'POST', { fileId, employeeId, day, amount });
-            }
-
-            async function sendDeductionToServer(fileId, employeeId, type, value) {
-                return await apiRequest('/files/deduction', 'POST', { fileId, employeeId, type, value });
             }
 
             async function updateEmployeeOnServer(fileId, employee) {
@@ -1217,9 +1243,9 @@
                 for (let d = 1; d <= daysInMonth; d++) {
                     headRow += '<th class="day-num-header">' + d + '</th>';
                 }
-                headRow += '<th class="emp-header">خصم أيام</th>';
-                headRow += '<th class="emp-header">خصم تأمينات</th>';
-                headRow += '<th class="emp-header">خصم نقدي</th>';
+                headRow += '<th class="emp-header" style="width:50px; min-width:50px;">خصم أيام</th>';
+                headRow += '<th class="emp-header" style="width:60px; min-width:60px;">خصم تأمينات</th>';
+                headRow += '<th class="emp-header" style="width:60px; min-width:60px;">خصم نقدي</th>';
                 headRow += '<th class="emp-header">أيام الحضور</th>';
                 headRow += '<th class="emp-header">راتب الأيام</th>';
                 headRow += '<th class="emp-header">إجمالي السلف</th>';
@@ -1513,7 +1539,8 @@
                 const value = rawVal === '' ? 0 : parseFloat(rawVal);
                 if (isNaN(value)) { showToast('قيمة غير صحيحة', 'error'); return; }
                 try {
-                    await sendDeductionToServer(fileId, employeeId, type, value);
+                    const key = type === 'days' ? 'daysDeduction' : type === 'insurance' ? 'insuranceDeduction' : 'cashDeduction';
+                    await sendSalaryToServer(fileId, employeeId, key, value);
                     const monthKey = getFolderMonthKey(currentRestaurantId);
                     const file = getFileByRestaurantId(fileId);
                     const emp = file.employees.find(e => e.id === employeeId);
