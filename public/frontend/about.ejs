@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0d99ff">
+    <title>ACSD-X | Advanced Computing & Software Development</title>
+    <meta name="description" content="شركة ACSD-X الرائدة في مجال البرمجة وتصميم المواقع وخدمات السوشيال ميديا">
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="apple-touch-icon" href="https://files.catbox.moe/kdxauw.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d99ff',
+                        secondary: '#7c3aed',
+                        accent: '#06b6d4',
+                        error: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+            --header-height: 70px;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.08);
+            --footer-bg: #00050a;
+            --glass-bg: rgba(0, 10, 20, 0.75);
+            --accent-glow: 0 0 20px rgba(6, 182, 212, 0.4);
+            --btn-hover: #0b7ec4;
+        }
+
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+            --shadow-glow: 0 0 30px rgba(13, 153, 255, 0.04);
+            --footer-bg: #e8edf2;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --accent-glow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Alexandria', system-ui, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-background);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0563a7;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d99ff;
+        }
+
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: var(--glass-bg);
+            z-index: 110;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title img {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 4px;
+            transition: filter 0.3s;
+        }
+
+        body:not(.light) .header-title img {
+            filter: brightness(0) invert(1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 70px;
+            height: 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all .4s ease;
+        }
+
+        .theme-toggle .toggle-circle {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .8);
+            transition: all .45s cubic-bezier(.68, -0.55, .265, 1.55);
+        }
+
+        .theme-toggle .icon {
+            position: absolute;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .4s ease;
+        }
+
+        .theme-toggle .sun-icon {
+            color: #ff6b35;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .theme-toggle .moon-icon {
+            color: #a78bfa;
+            opacity: 0;
+            transform: rotate(180deg) scale(.5);
+        }
+
+        .theme-toggle.dark {
+            background: linear-gradient(45deg, #475569, #1e293b);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+
+        .theme-toggle.dark .toggle-circle {
+            right: calc(100% - 31px);
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+
+        .theme-toggle.dark .sun-icon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(.5);
+        }
+
+        .theme-toggle.dark .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--color-muted);
+            cursor: pointer;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            color: #ef4444;
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .main-content {
+            padding-top: var(--header-height);
+            flex: 1 0 auto;
+            width: 100%;
+            padding-bottom: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            padding: 80px 0 60px;
+            background: transparent;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 280px;
+            text-align: right;
+        }
+
+        .hero-text h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--color-white);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .hero-text h1 span {
+            color: var(--color-accent);
+            text-shadow: var(--accent-glow);
+        }
+
+        .hero-text p {
+            color: var(--color-muted);
+            font-size: 1.1rem;
+            line-height: 1.9;
+            margin-bottom: 25px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--color-primary);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(13, 153, 255, 0.3);
+        }
+
+        .btn-accent {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: #fff;
+        }
+
+        .btn-accent:hover {
+            background: #0598b3;
+            border-color: #0598b3;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.02);
+        }
+
+        .services,
+        .portfolio,
+        .about,
+        .contact {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--color-white);
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: var(--color-muted);
+            font-size: 1rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--color-primary);
+            box-shadow: 0 12px 30px rgba(13, 153, 255, 0.15);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: 15px;
+        }
+
+        .service-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--color-white);
+            margin-bottom: 10px;
+        }
+
+        .service-card p {
+            color: var(--color-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .portfolio-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: var(--shadow-glow);
+            aspect-ratio: 16/10;
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 20px;
+            color: #fff;
+            text-align: right;
+        }
+
+        .portfolio-overlay h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .portfolio-overlay p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .about-text h2 {
+            font-size: 2rem;
+            color: var(--color-white);
+            margin-bottom: 20px;
+        }
+
+        .about-text p {
+            color: var(--color-muted);
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            font-size: 0.85rem;
+            color: var(--color-muted);
+        }
+
+        .about-image {
+            flex: 1;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .about-image img {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            display: block;
+        }
+
+        .contact-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: flex-start;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        .contact-text h3 {
+            color: var(--color-white);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .contact-text p {
+            color: var(--color-muted);
+            font-size: 0.9rem;
+        }
+
+        .contact-form {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--color-white);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--darker-bg);
+            color: var(--color-white);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(13, 153, 255, 0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        footer {
+            background: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 30px 0 20px;
+            flex-shrink: 0;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 6px;
+            transition: filter 0.3s;
+        }
+
+        body:not(.light) .footer-logo {
+            filter: brightness(0) invert(1);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--color-primary);
+            color: #fff;
+            border-color: var(--color-primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--color-muted);
+            font-size: 0.85rem;
+        }
+
+        .copyright i {
+            color: #ef4444;
+            margin: 0 5px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .copyright a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content,
+            .about-content,
+            .contact-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-text {
+                text-align: center;
+            }
+            .hero-btns {
+                justify-content: center;
+            }
+            .hero-image {
+                order: -1;
+            }
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            .header-actions {
+                gap: 8px;
+            }
+            .header-title img {
+                height: 45px;
+            }
+            .logout-btn span {
+                display: none;
+            }
+            .contact-container {
+                flex-direction: column;
+            }
+            .contact-form {
+                width: 100%;
+            }
+            .hero-image img {
+                max-width: 100%;
+            }
+            .about-image img {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title img {
+                height: 40px;
+            }
+            #mainHeader {
+                padding: 0 14px;
+            }
+            .container {
+                padding: 0 15px;
+            }
+            .hero {
+                padding: 40px 0;
+            }
+            .hero-text h1 {
+                font-size: 1.8rem;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .services-grid,
+            .portfolio-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .portfolio-item {
+                aspect-ratio: 16/9;
+            }
+            .footer-logo {
+                height: 55px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="mainHeader">
+        <div class="header-title">
+            <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X">
+        </div>
+        <div class="header-actions">
+            <button id="themetoggle" class="theme-toggle" aria-label="تبديل السمة">
+                <span class="toggle-circle">
+                    <span class="icon sun-icon"><i class="fas fa-sun"></i></span>
+                    <span class="icon moon-icon"><i class="fas fa-moon"></i></span>
+                </span>
+            </button>
+            <button id="logoutBtn" class="logout-btn">
+                <i class="las la-sign-out-alt"></i>
+                <span>تسجيل الخروج</span>
+            </button>
+            
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>نحو عالم رقمي <span>مبتكر</span> وإبداعي</h1>
+                        <p>شركة ACSD-X الرائدة في مجال البرمجة وتصميم المواقع وخدمات السوشيال ميديا. نقدم حلولاً رقمية
+                            متكاملة تجمع بين الإبداع والتكنولوجيا لتحقيق أهداف عملك.</p>
+                        <div class="hero-btns">
+                            <a href="#services" class="btn btn-accent">اكتشف خدماتنا</a>
+                            <a href="#contact" class="btn">تواصل معنا</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://telegra.ph/file/e094c75e75a5877c3c059.jpg" alt="تطوير البرمجيات">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-title">
+                    <h2>بنقدم ايه ؟</h2>
+                    <p>ليه احنا...</p>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3>تطوير المواقع</h3>
+                        <p>تصميم وتطوير مواقع ويب احترافية بتقنيات حديثة وسريعة الاستجابة، تلبي احتياجاتك وتواكب تطلعاتك.
+                        </p>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h3>التسويق الرقمي</h3>
+                        <p>حملات تسويقية احترافية عبر منصات التواصل الاجتماعي لتعزيز حضورك الرقمي وزيادة وصولك للجمهور
+                            المستهدف.</p>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <h3>تصميم الهوية</h3>
+                        <p>تصميم هوية بصرية متكاملة تعكس قيم علامتك التجارية وتجعلها مميزة في سوق المنافسة.</p>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>تحليل البيانات</h3>
+                        <p>تحليل بياناتك واستخراج رؤى قابلة للتنفيذ لتحسين أداء أعمالك واتخاذ قرارات مدعومة بالبيانات.</p>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>الدعم الفني</h3>
+                        <p>خدمات دعم فني متكاملة على مدار الساعة لضمان استمرارية عمل أنظمتك وحل أي مشاكل فنية تواجهك.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio" id="portfolio">
+            <div class="container">
+                <div class="section-title">
+                    <h2>أحدث أعمالنا</h2>
+                    <p>إبداعاتنا الرقمية التي نفخر بها والتي تعكس مستوى التميز الذي نقدمه لعملائنا</p>
+                </div>
+
+                <div class="portfolio-grid">
+                    <div class="portfolio-item">
+                        <img src="https://files.catbox.moe/rntln3.jpg" alt="مشروع تطوير موقع">
+                        <div class="portfolio-overlay">
+                            <h3>منصة التعليم الإلكتروني</h3>
+                            <p>تطوير منصة تعليمية متكاملة مع نظام إدارة محتوى متقدم</p>
+                        </div>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <img src="https://files.catbox.moe/rntln3.jpg" alt="مشروع تطبيق جوال">
+                        <div class="portfolio-overlay">
+                            <h3>مملكة كاسل</h3>
+                            <p>مجتمع كامل لعشاق الانمي</p>
+                        </div>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <img src="https://files.catbox.moe/rntln3.jpg" alt="مشروع تصميم هوية">
+                        <div class="portfolio-overlay">
+                            <h3>تطبيق قران</h3>
+                            <p>تطبيق كامل للقران الكريم ومواعيد الاذان</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about" id="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>من نحن</h2>
+                        <p>ACSD-X شركة رائدة في مجال البرمجة وتصميم المواقع وخدمات السوشيال ميديا، تأسست عام 2024 بهدف
+                            تقديم حلول رقمية مبتكرة تلبي احتياجات السوق المتغيرة.</p>
+                        <p>نحن فريق من المبدعين والمبرمجين والمصممين والخبراء في التسويق الرقمي، يجمعنا الشغف بالتكنولوجيا
+                            والرغبة في تقديم أفضل الحلول لعملائنا. نؤمن بأن الجودة والابتكار هما أساس نجاح أي مشروع رقمي.
+                        </p>
+
+                        <div class="stats">
+                            <div class="stat-box">
+                                <h3>20+</h3>
+                                <p>مشروع مكتمل</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>98%</h3>
+                                <p>عملاء راضون</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>5+</h3>
+                                <p>فريق محترف</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3>2</h3>
+                                <p>سنوات خبرة</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-image">
+                        <img src="https://files.catbox.moe/rntln3.jpg" alt="فريق ACSD-X">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact" id="contact">
+            <div class="container">
+                <div class="section-title">
+                    <h2>تواصل معنا</h2>
+                    <p>نحن هنا للإجابة على استفساراتك وتقديم الحلول التي تحتاجها</p>
+                </div>
+
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>العنوان</h3>
+                                <p> مصر </p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>الهاتف</h3>
+                                <p>01281211835</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>البريد الإلكتروني</h3>
+                                <p>info@acsd-x.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>ساعات العمل</h3>
+                                <p>الأحد - الخميس: 9 صباحاً - 12 مساءً</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <form>
+                            <div class="form-group">
+                                <label for="name">الاسم الكامل</label>
+                                <input type="text" id="name" class="form-control" placeholder="أدخل اسمك الكامل">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">البريد الإلكتروني</label>
+                                <input type="email" id="email" class="form-control" placeholder="أدخل بريدك الإلكتروني">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">رقم الهاتف</label>
+                                <input type="tel" id="phone" class="form-control" placeholder="أدخل رقم هاتفك">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">الرسالة</label>
+                                <textarea id="message" class="form-control" placeholder="أدخل رسالتك"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-accent" style="width: 100%;">إرسال الرسالة</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X" class="footer-logo">
+                <div class="social-links">
+                    <a href="https://www.facebook.com/acsd.digital"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/ishadowza/"><i class="fab fa-instagram"></i></a>
+                    <a href="https://whatsapp.com/channel/0029VagYqIG9MF8xajA3Pg3s"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.youtube.com/@ishadowza"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="copyright">
+                    <i class="fas fa-heart pulse"></i>
+                    <span>&lt;Developed By&gt;</span>
+                    <a href="https://www.facebook.com/Abdelrahman.Elshamhuot" target="_blank">Abdelrahman Mohamed</a>
+                    <span>&lt;All Copy Rights Reserved &copy; <span id="current-year"></span>&gt;</span>
+                    <i class="fas fa-heart pulse"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggleBtn = document.getElementById('themetoggle');
+        const body = document.body;
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            body.classList.toggle('light', !isDark);
+            themeToggleBtn.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = !body.classList.contains('light');
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+            Swal.fire({
+                title: 'تسجيل الخروج',
+                text: 'هل أنت متأكد من تسجيل الخروج؟',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#0d99ff',
+                confirmButtonText: 'نعم، تسجيل الخروج',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    window.location.href = '/';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
