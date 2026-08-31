@@ -139,6 +139,17 @@ app.get("/", (req, res) => {
     });
 });
 */
+app.get("/about", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("about", {
+        title: "",
+        activePage: "",
+    });
+});
+
 app.get("/employee-files", (req, res) => {
     res.render("finance/files", {
         title: "",
@@ -192,16 +203,7 @@ app.get("/outgoing", (req, res) => {
         activePage: "outgoing-invoices",
     });
 });
-app.get("/", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
 
-    res.render("index", {
-        title: "",
-        activePage: "",
-    });
-});
 app.get("/visa", (req, res) => {
     if (!req.isAuthenticated) {
         return res.redirect("/login");
