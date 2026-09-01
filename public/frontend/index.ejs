@@ -348,7 +348,6 @@
             overflow: hidden;
             transition: background-color 0.3s;
             cursor: pointer;
-            display: block;
         }
 
         .restaurant-card-item .logo-area:hover {
@@ -590,6 +589,13 @@
         const userType = currentUser?.account_type || null;
         const userPhone = currentUser?.phone_number || null;
 
+        function getArabicType(type) {
+            if (type === 'admin') return 'مدير';
+            if (type === 'cashier') return 'كاشير';
+            if (type === 'viewer') return 'مشاهد';
+            return type || 'غير محدد';
+        }
+
         function displayUserInfo(user) {
             if (!user) {
                 userInfoContainer.innerHTML = '';
@@ -598,6 +604,7 @@
             const avatarHtml = user.profile_picture
                 ? `<img src="${user.profile_picture}" alt="${user.name}">`
                 : `<i class="las la-user"></i>`;
+            const arabicType = getArabicType(user.account_type);
             const userInfoHtml = `
                 <div class="user-info-card">
                     <div class="user-avatar">${avatarHtml}</div>
@@ -605,7 +612,7 @@
                         <div class="user-name">${user.name || 'مستخدم'}</div>
                         <div class="user-meta">
                             <span><i class="las la-phone"></i> ${user.phone_number || 'غير محدد'}</span>
-                            <span><i class="las la-user-tag"></i> ${user.account_type || 'غير محدد'}</span>
+                            <span><i class="las la-user-tag"></i> ${arabicType}</span>
                             <span><i class="las la-envelope"></i> ${user.email || 'غير محدد'}</span>
                         </div>
                     </div>
