@@ -369,6 +369,7 @@
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
         .logout-btn:hover {
@@ -433,15 +434,15 @@
                     <span class="icon moon-icon"><i class="fas fa-moon"></i></span>
                 </span>
             </button>
-<a href="/about" class="logout-btn">
-    <i class="las la-building"></i>
-    <span>Acsd-x</span>
-</a>
+            <a href="/about" class="logout-btn">
+                <i class="las la-building"></i>
+                <span>Acsd-x</span>
+            </a>
+            <div id="adminButtonContainer"></div>
             <button id="logoutBtn" class="logout-btn">
                 <i class="las la-sign-out-alt"></i>
                 <span>تسجيل الخروج</span>
             </button>
-
         </div>
     </header>
 
@@ -450,63 +451,136 @@
             <div class="title-cell">
                 <div class="title-icon"><i class="las la-utensils"></i></div>
                 <h1>إدارة المطاعم</h1>
-                <p>نظام متكامل لإدارة المطاعم</p>
+                <p id="subtitle">نظام متكامل لإدارة المطاعم</p>
             </div>
             <div class="restaurant-grid" id="restaurantGrid"></div>
         </div>
     </main>
 
     <script>
-        const restaurantGrid = document.getElementById('restaurantGrid');
-        let restaurants = [];
+        window.__APP_DATA__ = window.__APP_DATA__ || {};
+        const appData = window.__APP_DATA__;
+        const currentUser = appData.user || null;
+        const isAuthenticated = appData.isAuthenticated || false;
+        const token = appData.token || '';
+        const api = appData.api || '';
 
-        const defaultRestaurants = [{
-            id: "1",
-            name: "ابن حميدو السلام",
-            logo: "https://sys.shadowza.space/logos/1.png",
-            main_link: "/outgoing",
-            admin_link: "/admin/resturant/1"
-        }, {
-            id: "2",
-            name: "مطاعم نعمه",
-            logo: "https://sys.shadowza.space/logos/2.png",
-            main_link: "/neama/outgoing",
-            admin_link: "/admin/resturant/2"
-        }, {
-            id: "3",
-            name: "تشكن كينج",
-            logo: "/logos/3.png",
-            main_link: "/chicken/outgoing",
-            admin_link: "/admin/resturant/3"
-        }];
+        const allRestaurants = [
+            {
+                id: "1",
+                name: "ابن حميدو السلام",
+                logo: "https://sys.shadowza.space/logos/1.png",
+                main_link: "/outgoing",
+                admin_link: "/admin/resturant/1",
+                allowed_phones: ["01000000001", "01000000002"]
+            },
+            {
+                id: "2",
+                name: "مطاعم نعمه",
+                logo: "https://sys.shadowza.space/logos/2.png",
+                main_link: "/neama/outgoing",
+                admin_link: "/admin/resturant/2",
+                allowed_phones: ["01000000003"]
+            },
+            {
+                id: "3",
+                name: "تشكن كينج",
+                logo: "https://sys.shadowza.space/logos/3.png",
+                main_link: "/chicken/outgoing",
+                admin_link: "/admin/resturant/3",
+                allowed_phones: ["01000000004", "01000000005"]
+            }
+        ];
+
+        function getAccessibleRestaurants() {
+            if (!currentUser) return [];
+            if (currentUser.account_type === 'admin') {
+                return allRestaurants;
+            } else {
+                const userPhone = currentUser.phone_number || currentUser.phone || '';
+                return allRestaurants.filter(rest =>
+                    rest.allowed_phones && rest.allowed_phones.includes(userPhone)
+                );
+            }
+        }
+
+        const restaurantGrid = document.getElementById('restaurantGrid');
+        const subtitle = document.getElementById('subtitle');
 
         function renderRestaurantGrid() {
+            const restaurants = getAccessibleRestaurants();
             restaurantGrid.innerHTML = '';
+
+            if (currentUser && currentUser.account_type === 'admin') {
+                subtitle.textContent = 'صلاحيات كاملة - جميع المطاعم';
+            } else {
+                subtitle.textContent = 'المطاعم المتاحة لك';
+            }
+
+            if (!isAuthenticated || !currentUser) {
+                subtitle.textContent = 'يرجى تسجيل الدخول';
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                emptyDiv.innerHTML = `
+                    <i class="las la-user-lock"></i>
+                    <p>أنت غير مسجل الدخول</p>
+                    <p class="sub-text">سجّل الدخول للوصول إلى المطاعم</p>
+                `;
+                restaurantGrid.appendChild(emptyDiv);
+                return;
+            }
+
             if (restaurants.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'empty-state';
                 emptyDiv.innerHTML = `
                     <i class="las la-store-alt"></i>
-                    <p>لا توجد مطاعم حالياً</p>
-                    <p class="sub-text">ابدأ بإضافة مطعم جديد</p>
+                    <p>لا توجد مطاعم متاحة لك</p>
+                    <p class="sub-text">تواصل مع المسؤول لمنحك الصلاحية</p>
                 `;
                 restaurantGrid.appendChild(emptyDiv);
                 return;
             }
+
             restaurants.forEach((rest) => {
                 const card = document.createElement('a');
                 card.className = 'restaurant-card-item';
                 card.href = rest.main_link || '#';
+
                 const logoContent = rest.logo ?
                     `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">` :
                     `<i class="las la-store-alt fallback-icon"></i>`;
+
                 card.innerHTML = `
                     <div class="logo-area">
                         ${logoContent}
                     </div>
                 `;
+
+                if (currentUser.account_type === 'admin' && rest.admin_link) {
+                    card.addEventListener('dblclick', (e) => {
+                        e.preventDefault();
+                        window.location.href = rest.admin_link;
+                    });
+                    card.title = `${rest.name} - انقر نقرًا مزدوجًا للوحة الإدارة`;
+                } else {
+                    card.title = rest.name;
+                }
+
                 restaurantGrid.appendChild(card);
             });
+        }
+
+        function renderAdminButton() {
+            const container = document.getElementById('adminButtonContainer');
+            container.innerHTML = '';
+            if (currentUser && currentUser.account_type === 'admin') {
+                const adminLink = document.createElement('a');
+                adminLink.href = '/admin';
+                adminLink.className = 'logout-btn';
+                adminLink.innerHTML = '<i class="las la-user-shield"></i><span>لوحة الإدارة</span>';
+                container.appendChild(adminLink);
+            }
         }
 
         const themeToggleBtn = document.getElementById('themetoggle');
@@ -546,7 +620,7 @@
             });
         });
 
-        restaurants = defaultRestaurants;
+        renderAdminButton();
         renderRestaurantGrid();
     </script>
 </body>
