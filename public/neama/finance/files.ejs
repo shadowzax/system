@@ -30,6 +30,63 @@
             }
         }
     </script>
+    <style>
+        .admin-lock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .admin-lock-overlay .lock-icon {
+            font-size: 6rem;
+            color: #ef4444;
+            margin-bottom: 1.5rem;
+            animation: pulse-lock 2s ease-in-out infinite;
+        }
+        .admin-lock-overlay h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.75rem;
+            font-family: 'Alexandria', sans-serif;
+        }
+        .admin-lock-overlay p {
+            font-size: 1.1rem;
+            color: #9ca3af;
+            max-width: 500px;
+            line-height: 1.8;
+            font-family: 'Alexandria', sans-serif;
+        }
+        .admin-lock-overlay .lock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            font-family: 'Alexandria', sans-serif;
+        }
+        @keyframes pulse-lock {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+    </style>
 </head>
 <body>
     <script>
@@ -40,7 +97,16 @@
             user: <%- JSON.stringify(user || null) %>
         };
     </script>
-    <%- include('../../sections/header-neama.ejs') %>
+    <div id="adminLockOverlay" class="admin-lock-overlay" style="display:none;">
+        <i class="las la-lock lock-icon"></i>
+        <h2>هذه الصفحة مخصصة للمديرين فقط</h2>
+        <p>عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة. إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع مدير النظام.</p>
+        <div class="lock-badge">
+            <i class="las la-shield-alt"></i>
+            <span>صلاحية المدير مطلوبة</span>
+        </div>
+    </div>
+    <%- include('../../sections/header-ebnhamido.ejs') %>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon"><i class="las la-folder-open"></i></div>
@@ -180,6 +246,9 @@
             var appData = { files: [] };
             var currentFileId = null;
             var RESTAURANT_ID = "2";
+
+            var isAdmin = window.__APP_DATA__.user && window.__APP_DATA__.user.account_type === 'admin';
+
             var sidebar = document.getElementById('dashboardSidebar');
             var headerAvatar = document.getElementById('headerAvatar');
 
@@ -753,6 +822,40 @@
                 }
             }
 
+            function applyAdminLock() {
+                if (!isAdmin) {
+                    var overlay = document.getElementById('adminLockOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                    }
+                    var allInteractive = document.querySelectorAll('input, button, select, textarea, a, .btn, .btn-outline, .btn-primary, .input-field, .file-card, .open-file-btn, #fileSearch, #employeeSearch, #employeeMonthFilter, #backToFilesBtn, #printFileBtn, .bottom-nav-item, .sidebar-item');
+                    allInteractive.forEach(function(el) {
+                        if (el.id !== 'adminLockOverlay' && !el.closest('#adminLockOverlay')) {
+                            el.style.pointerEvents = 'none';
+                            el.setAttribute('tabindex', '-1');
+                            if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON') {
+                                el.setAttribute('disabled', 'disabled');
+                            }
+                        }
+                    });
+                    document.querySelectorAll('a, .btn, .btn-outline, .btn-primary, .file-card, .open-file-btn, .bottom-nav-item, .sidebar-item').forEach(function(el) {
+                        if (el.id !== 'adminLockOverlay' && !el.closest('#adminLockOverlay')) {
+                            el.setAttribute('aria-disabled', 'true');
+                        }
+                    });
+                    var tableHint = document.querySelector('.text-center.text-xs');
+                    if (tableHint) {
+                        tableHint.textContent = 'أنت بحاجة إلى صلاحية المدير لإدارة الملفات والموظفين.';
+                        tableHint.style.color = '#ef4444';
+                    }
+                } else {
+                    var overlay = document.getElementById('adminLockOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+                }
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
                 var themeToggles = document.querySelectorAll('.theme-toggle');
                 var body = document.body;
@@ -771,6 +874,7 @@
                         applyTheme(isDark ? 'light' : 'dark');
                     });
                 });
+                applyAdminLock();
                 loadInitialData();
             });
         })();
