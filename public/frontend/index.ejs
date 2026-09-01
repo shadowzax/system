@@ -651,6 +651,7 @@
         }
     </style>
 </head>
+
 <script>
     window.__APP_DATA__ = {
         token: "<%- token %>",
@@ -698,320 +699,278 @@
     </main>
 
     <script>
-        const restaurantGrid = document.getElementById('restaurantGrid');
-        const userInfoContainer = document.getElementById('userInfoContainer');
-        let restaurants = [];
-        
+        (function () {
+            "use strict";
 
-       const response = await fetch("/json/resturant.json");
-       const defaultRestaurants = await response.json();
+            /* ========== DOM Elements ========== */
+            var restaurantGrid = document.getElementById('restaurantGrid');
+            var userInfoContainer = document.getElementById('userInfoContainer');
+            var themeToggleBtn = document.getElementById('themetoggle');
+            var logoutBtn = document.getElementById('logoutBtn');
+            var body = document.body;
 
+            /* ========== State ========== */
+            var restaurants = [];
 
-        const appData = window.__APP_DATA__;
-        const currentUser = appData.user || null;
-        const userType = currentUser?.account_type || null;
-        const userPhone = currentUser?.phone_number || null;
+            /* ========== App Data ========== */
+            var appData = window.__APP_DATA__ || {};
+            var currentUser = appData.user || null;
+            var userType = currentUser ? currentUser.account_type : null;
+            var userPhone = currentUser ? currentUser.phone_number : null;
 
-        function getArabicType(type) {
-            if (type === 'admin') return 'مدير';
-            if (type === 'cashier') return 'كاشير';
-            if (type === 'viewer') return 'مشاهد';
-            return type || 'غير محدد';
-        }
-
-        function displayUserInfo(user) {
-            if (!user) {
-                userInfoContainer.innerHTML = '';
-                return;
-            }
-            const avatarHtml = user.profile_picture ?
-                `<img src="${user.profile_picture}" alt="${user.name}">` :
-                `<i class="las la-user"></i>`;
-            const arabicType = getArabicType(user.account_type);
-            const email = user.email || 'غير محدد';
-            const userInfoHtml = `
-                <div class="user-info-card">
-                    <div class="user-avatar">${avatarHtml}</div>
-                    <div class="user-details">
-                        <div class="user-name">${user.name || 'مستخدم'}</div>
-                        <div class="user-meta">
-                            <span><i class="las la-phone"></i> ${user.phone_number || 'غير محدد'}</span>
-                            <span><i class="las la-user-tag"></i> ${arabicType}</span>
-                            <span class="meta-email" title="${email}"><i class="las la-envelope"></i> <span class="email-text">${email}</span></span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            userInfoContainer.innerHTML = userInfoHtml;
-        }
-
-        function filterRestaurantsForUser(allRestaurants, userType, userPhone) {
-            if (userType === 'admin' || userType === 'viewer') {
-                return allRestaurants;
-            } else if (userType === 'cashier') {
-                if (!userPhone) return [];
-                return allRestaurants.filter(rest =>
-                    rest.phone_numbers && rest.phone_numbers.includes(userPhone)
-                );
-            } else {
-                return allRestaurants;
-            }
-        }
-
-        function renderRestaurantGrid() {
-            restaurantGrid.innerHTML = '';
-            const filteredRestaurants = filterRestaurantsForUser(restaurants, userType, userPhone);
-
-            if (filteredRestaurants.length === 0) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'empty-state';
-                emptyDiv.innerHTML = `
-                    <i class="las la-store-alt"></i>
-                    <p>لا توجد مطاعم متاحة لك</p>
-                    <p class="sub-text">يرجى التواصل مع المسؤول إذا كنت تعتقد أن هذا خطأ</p>
-                `;
-                restaurantGrid.appendChild(emptyDiv);
-                return;
+            /* ========== Helper Functions ========== */
+            function getArabicType(type) {
+                if (type === 'admin') return 'مدير';
+                if (type === 'cashier') return 'كاشير';
+                if (type === 'viewer') return 'مشاهد';
+                return type || 'غير محدد';
             }
 
-            filteredRestaurants.forEach((rest) => {
-                const cardWrapper = document.createElement('div');
-                cardWrapper.className = 'restaurant-card-item';
+            function displayUserInfo(user) {
+                if (!user) {
+                    userInfoContainer.innerHTML = '';
+                    return;
+                }
+                var avatarHtml = user.profile_picture ?
+                    '<img src="' + user.profile_picture + '" alt="' + (user.name || '') + '">' :
+                    '<i class="las la-user"></i>';
+                var arabicType = getArabicType(user.account_type);
+                var email = user.email || 'غير محدد';
+                var userInfoHtml =
+                    '<div class="user-info-card">' +
+                    '<div class="user-avatar">' + avatarHtml + '</div>' +
+                    '<div class="user-details">' +
+                    '<div class="user-name">' + (user.name || 'مستخدم') + '</div>' +
+                    '<div class="user-meta">' +
+                    '<span><i class="las la-phone"></i> ' + (user.phone_number || 'غير محدد') + '</span>' +
+                    '<span><i class="las la-user-tag"></i> ' + arabicType + '</span>' +
+                    '<span class="meta-email" title="' + email + '"><i class="las la-envelope"></i> <span class="email-text">' + email + '</span></span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+                userInfoContainer.innerHTML = userInfoHtml;
+            }
 
-                const logoLink = document.createElement('a');
-                logoLink.href = rest.main_link || '#';
-                logoLink.className = 'logo-area';
-                const logoContent = rest.logo ?
-                    `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">` :
-                    `<i class="las la-store-alt fallback-icon"></i>`;
-                logoLink.innerHTML = logoContent;
-                cardWrapper.appendChild(logoLink);
+            function filterRestaurantsForUser(allRestaurants, type, phone) {
+                if (type === 'admin' || type === 'viewer') {
+                    return allRestaurants;
+                } else if (type === 'cashier') {
+                    if (!phone) return [];
+                    return allRestaurants.filter(function (rest) {
+                        return rest.phone_numbers && rest.phone_numbers.indexOf(phone) !== -1;
+                    });
+                } else {
+                    return allRestaurants;
+                }
+            }
 
-                if (userType === 'admin' || userType === 'viewer') {
-                    const adminBtn = document.createElement('a');
-                    adminBtn.href = rest.admin_link || '#';
-                    adminBtn.className = 'admin-btn';
-                    adminBtn.title = 'صفحة الإدارة';
-                    adminBtn.innerHTML = '<i class="las la-cog"></i>';
-                    cardWrapper.appendChild(adminBtn);
+            function renderRestaurantGrid() {
+                restaurantGrid.innerHTML = '';
+                var filteredRestaurants = filterRestaurantsForUser(restaurants, userType, userPhone);
+
+                if (filteredRestaurants.length === 0) {
+                    var emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.innerHTML =
+                        '<i class="las la-store-alt"></i>' +
+                        '<p>لا توجد مطاعم متاحة لك</p>' +
+                        '<p class="sub-text">يرجى التواصل مع المسؤول إذا كنت تعتقد أن هذا خطأ</p>';
+                    restaurantGrid.appendChild(emptyDiv);
+                    return;
                 }
 
-                restaurantGrid.appendChild(cardWrapper);
-            });
-        }
+                filteredRestaurants.forEach(function (rest) {
+                    var cardWrapper = document.createElement('div');
+                    cardWrapper.className = 'restaurant-card-item';
 
-        displayUserInfo(currentUser);
-        restaurants = defaultRestaurants;
-        renderRestaurantGrid();
+                    var logoLink = document.createElement('a');
+                    logoLink.href = rest.main_link || '#';
+                    logoLink.className = 'logo-area';
 
-        const themeToggleBtn = document.getElementById('themetoggle');
-        const body = document.body;
+                    var logoContent;
+                    if (rest.logo) {
+                        logoContent =
+                            '<img src="' + rest.logo + '" alt="' + (rest.name || '') + '" onerror="this.onerror=null;this.parentElement.innerHTML=\'<i class=\\\'las la-store-alt fallback-icon\\\'></i>\'">';
+                    } else {
+                        logoContent = '<i class="las la-store-alt fallback-icon"></i>';
+                    }
+                    logoLink.innerHTML = logoContent;
+                    cardWrapper.appendChild(logoLink);
 
-        function applyTheme(theme) {
-            const isDark = theme === 'dark';
-            body.classList.toggle('light', !isDark);
-            themeToggleBtn.classList.toggle('dark', isDark);
-            localStorage.setItem('theme', theme);
-        }
+                    if (userType === 'admin' || userType === 'viewer') {
+                        var adminBtn = document.createElement('a');
+                        adminBtn.href = rest.admin_link || '#';
+                        adminBtn.className = 'admin-btn';
+                        adminBtn.title = 'صفحة الإدارة';
+                        adminBtn.innerHTML = '<i class="las la-cog"></i>';
+                        cardWrapper.appendChild(adminBtn);
+                    }
 
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
+                    restaurantGrid.appendChild(cardWrapper);
+                });
+            }
 
-        themeToggleBtn.addEventListener('click', () => {
-            const isDark = !body.classList.contains('light');
-            applyTheme(isDark ? 'light' : 'dark');
-        });
-
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', () => {
-            Swal.fire({
-                title: 'تسجيل الخروج',
-                text: 'هل أنت متأكد من تسجيل الخروج؟',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#0d99ff',
-                confirmButtonText: 'نعم، تسجيل الخروج',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                    window.location.href = '/';
+            /* ========== Theme Functions ========== */
+            function applyTheme(theme) {
+                var isDark = theme === 'dark';
+                if (isDark) {
+                    body.classList.remove('light');
+                } else {
+                    body.classList.add('light');
                 }
+                if (isDark) {
+                    themeToggleBtn.classList.add('dark');
+                } else {
+                    themeToggleBtn.classList.remove('dark');
+                }
+                try {
+                    localStorage.setItem('theme', theme);
+                } catch (e) {
+                    /* ignore */
+                }
+            }
+
+            var savedTheme = 'dark';
+            try {
+                savedTheme = localStorage.getItem('theme') || 'dark';
+            } catch (e) {
+                /* ignore */
+            }
+            applyTheme(savedTheme);
+
+            themeToggleBtn.addEventListener('click', function () {
+                var isDark = !body.classList.contains('light');
+                applyTheme(isDark ? 'light' : 'dark');
             });
-        });
-    </script>
-<script>
-(() => {
-    "use strict";
 
-    const CONFIG = {
-        devToolsThreshold: 160,
-        detectionInterval: 700,
-        lockOnDetection: true,
-        redirectOnDetection: false,
-        redirectUrl: "/"
-    };
-
-    let locked = false;
-    let previousDetection = false;
-
-    const lockPage = () => {
-        if (locked) return;
-
-        locked = true;
-
-        if (CONFIG.redirectOnDetection) {
-            window.location.replace(CONFIG.redirectUrl);
-            return;
-        }
-
-        document.documentElement.innerHTML = `
-            <head>
-                <title>Security</title>
-                <style>
-                    html,body{
-                        margin:0;
-                        width:100%;
-                        height:100%;
-                        overflow:hidden;
-                        background:#0b0b0b;
+            /* ========== Logout ========== */
+            logoutBtn.addEventListener('click', function () {
+                Swal.fire({
+                    title: 'تسجيل الخروج',
+                    text: 'هل أنت متأكد من تسجيل الخروج؟',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#0d99ff',
+                    confirmButtonText: 'نعم، تسجيل الخروج',
+                    cancelButtonText: 'إلغاء'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                        window.location.href = '/';
                     }
-                    body{
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        color:#fff;
-                        font-family:Arial,sans-serif;
-                    }
-                    div{
-                        font-size:24px;
-                        font-weight:700;
-                        text-align:center;
-                    }
-                </style>
-            </head>
-            <body>
-                <div>Security violation detected</div>
-            </body>
-        `;
-    };
+                });
+            });
 
-    const detectDevTools = () => {
-        const widthDifference =
-            Math.abs(window.outerWidth - window.innerWidth);
+            /* ========== Load Restaurants ========== */
+            function loadRestaurants() {
+                fetch('/json/resturant.json')
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('HTTP ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        restaurants = data;
+                        displayUserInfo(currentUser);
+                        renderRestaurantGrid();
+                    })
+                    .catch(function () {
+                        restaurants = [];
+                        displayUserInfo(currentUser);
+                        renderRestaurantGrid();
+                    });
+            }
 
-        const heightDifference =
-            Math.abs(window.outerHeight - window.innerHeight);
+            /* ========== Init ========== */
+            loadRestaurants();
 
-        return (
-            widthDifference > CONFIG.devToolsThreshold ||
-            heightDifference > CONFIG.devToolsThreshold
-        );
-    };
+            /* ========== DevTools Protection ========== */
+            var CONFIG = {
+                devToolsThreshold: 160,
+                detectionInterval: 700,
+                lockOnDetection: true,
+                redirectOnDetection: false,
+                redirectUrl: '/'
+            };
 
-    const detectDebugger = () => {
-        const start = performance.now();
+            var locked = false;
+            var previousDetection = false;
 
-        debugger;
+            function lockPage() {
+                if (locked) return;
+                locked = true;
 
-        return performance.now() - start > 100;
-    };
+                if (CONFIG.redirectOnDetection) {
+                    window.location.replace(CONFIG.redirectUrl);
+                    return;
+                }
 
-    const inspect = () => {
-        if (locked) return;
+                document.documentElement.innerHTML =
+                    '<head><title>Security</title><style>' +
+                    'html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0b0b;}' +
+                    'body{display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;}' +
+                    'div{font-size:24px;font-weight:700;text-align:center;}' +
+                    '</style></head>' +
+                    '<body><div>Security violation detected</div></body>';
+            }
 
-        let detected = false;
+            function detectDevTools() {
+                var widthDifference = Math.abs(window.outerWidth - window.innerWidth);
+                var heightDifference = Math.abs(window.outerHeight - window.innerHeight);
+                return widthDifference > CONFIG.devToolsThreshold || heightDifference > CONFIG.devToolsThreshold;
+            }
 
-        try {
-            detected =
-                detectDevTools() ||
-                detectDebugger();
-        } catch {
-            detected = true;
-        }
+            function detectDebugger() {
+                var start = performance.now();
+                debugger;
+                return performance.now() - start > 100;
+            }
 
-        if (
-            detected &&
-            !previousDetection &&
-            CONFIG.lockOnDetection
-        ) {
-            lockPage();
-        }
+            function inspect() {
+                if (locked) return;
+                var detected = false;
+                try {
+                    detected = detectDevTools() || detectDebugger();
+                } catch (e) {
+                    detected = true;
+                }
+                if (detected && !previousDetection && CONFIG.lockOnDetection) {
+                    lockPage();
+                }
+                previousDetection = detected;
+            }
 
-        previousDetection = detected;
-    };
-
-    document.addEventListener(
-        "contextmenu",
-        event => {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-        },
-        true
-    );
-
-    document.addEventListener(
-        "keydown",
-        event => {
-            const key = event.key.toLowerCase();
-
-            const devToolsShortcut =
-                event.key === "F12" ||
-                (
-                    event.ctrlKey &&
-                    event.shiftKey &&
-                    ["i", "j", "c", "k"].includes(key)
-                ) ||
-                (
-                    event.metaKey &&
-                    event.altKey &&
-                    ["i", "j", "c", "k"].includes(key)
-                );
-
-            const viewSourceShortcut =
-                (event.ctrlKey || event.metaKey) &&
-                key === "u";
-
-            if (
-                devToolsShortcut ||
-                viewSourceShortcut
-            ) {
+            document.addEventListener('contextmenu', function (event) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
-                lockPage();
-            }
-        },
-        true
-    );
+            }, true);
 
-    window.addEventListener(
-        "resize",
-        inspect,
-        { passive: true }
-    );
+            document.addEventListener('keydown', function (event) {
+                var key = event.key.toLowerCase();
+                var devToolsShortcut =
+                    event.key === 'F12' ||
+                    (event.ctrlKey && event.shiftKey && ['i', 'j', 'c', 'k'].indexOf(key) !== -1) ||
+                    (event.metaKey && event.altKey && ['i', 'j', 'c', 'k'].indexOf(key) !== -1);
+                var viewSourceShortcut = (event.ctrlKey || event.metaKey) && key === 'u';
 
-    window.addEventListener(
-        "blur",
-        () => {
-            setTimeout(inspect, 50);
-        },
-        { passive: true }
-    );
+                if (devToolsShortcut || viewSourceShortcut) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    lockPage();
+                }
+            }, true);
 
-    setInterval(
-        inspect,
-        CONFIG.detectionInterval
-    );
+            window.addEventListener('resize', inspect, { passive: true });
+            window.addEventListener('blur', function () {
+                setTimeout(inspect, 50);
+            }, { passive: true });
 
-    setTimeout(
-        inspect,
-        1000
-    );
-})();
-</script>
-
-
+            setInterval(inspect, CONFIG.detectionInterval);
+            setTimeout(inspect, 1000);
+        })();
+    </script>
 </body>
 
 </html>
