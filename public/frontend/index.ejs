@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="/js/tailwind.js"></script>
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
     </script>
     <script>
@@ -182,6 +181,7 @@
             overflow: hidden;
             font-size: 2rem;
             color: var(--color-muted);
+            flex-shrink: 0;
         }
 
         .user-info-card .user-avatar img {
@@ -192,13 +192,16 @@
 
         .user-info-card .user-details {
             flex: 1;
-            min-width: 200px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .user-info-card .user-details .user-name {
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--color-white);
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .user-info-card .user-details .user-meta {
@@ -206,6 +209,7 @@
             gap: 15px;
             flex-wrap: wrap;
             margin-top: 8px;
+            min-width: 0;
         }
 
         .user-info-card .user-details .user-meta span {
@@ -214,10 +218,100 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .user-info-card .user-details .user-meta span.meta-email {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 1;
+            min-width: 0;
+        }
+
+        .user-info-card .user-details .user-meta span.meta-email i {
+            flex-shrink: 0;
+        }
+
+        .user-info-card .user-details .user-meta span.meta-email .email-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
         }
 
         .user-info-card .user-details .user-meta i {
             color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .user-info-card {
+                padding: 16px;
+                gap: 14px;
+                align-items: flex-start;
+            }
+
+            .user-info-card .user-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.6rem;
+            }
+
+            .user-info-card .user-details .user-name {
+                font-size: 1.05rem;
+            }
+
+            .user-info-card .user-details .user-meta {
+                gap: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info-card .user-details .user-meta span {
+                font-size: 0.82rem;
+                width: 100%;
+            }
+
+            .user-info-card .user-details .user-meta span.meta-email {
+                max-width: 100%;
+                white-space: normal;
+                word-break: break-all;
+                overflow-wrap: anywhere;
+                text-overflow: clip;
+                overflow: visible;
+            }
+
+            .user-info-card .user-details .user-meta span.meta-email .email-text {
+                white-space: normal;
+                word-break: break-all;
+                overflow-wrap: anywhere;
+                text-overflow: clip;
+                overflow: visible;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .user-info-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .user-info-card .user-details .user-meta {
+                align-items: center;
+            }
+
+            .user-info-card .user-details .user-meta span {
+                justify-content: center;
+            }
         }
 
         .theme-toggle {
@@ -231,6 +325,7 @@
             background: linear-gradient(45deg, #ffd700, #ffed4a);
             box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
             transition: all .4s ease;
+            flex-shrink: 0;
         }
 
         .theme-toggle .toggle-circle {
@@ -429,6 +524,7 @@
         .header-title {
             display: flex;
             align-items: center;
+            min-width: 0;
         }
 
         .header-title img {
@@ -456,6 +552,8 @@
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .logout-btn:hover {
@@ -468,6 +566,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            .header-actions {
+                gap: 8px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -498,23 +604,62 @@
             }
 
             .header-actions {
-                gap: 8px;
+                gap: 6px;
             }
 
             #mainHeader {
-                padding: 0 16px;
+                padding: 0 12px;
+            }
+
+            .theme-toggle {
+                width: 60px;
+                height: 32px;
+            }
+
+            .theme-toggle .toggle-circle {
+                width: 24px;
+                height: 24px;
+                top: 4px;
+                right: 4px;
+            }
+
+            .theme-toggle.dark .toggle-circle {
+                right: calc(100% - 28px);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-title img {
+                height: 42px;
+            }
+
+            .theme-toggle {
+                width: 52px;
+                height: 28px;
+            }
+
+            .theme-toggle .toggle-circle {
+                width: 20px;
+                height: 20px;
+                top: 4px;
+                right: 4px;
+            }
+
+            .theme-toggle.dark .toggle-circle {
+                right: calc(100% - 24px);
             }
         }
     </style>
 </head>
-    <script>
-        window.__APP_DATA__ = {
-            token: "<%- token %>",
-            api: "<%- api %>",
-            isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
-            user: <%- JSON.stringify(user || null) %>
-        };
-    </script>
+<script>
+    window.__APP_DATA__ = {
+        token: "<%- token %>",
+        api: "<%- api %>",
+        isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
+        user: <%- JSON.stringify(user || null) %>
+    };
+</script>
+
 <body>
     <header id="mainHeader">
         <div class="header-title">
@@ -557,32 +702,28 @@
         const userInfoContainer = document.getElementById('userInfoContainer');
         let restaurants = [];
 
-        const defaultRestaurants = [
-            {
-                id: "1",
-                name: "ابن حميدو السلام",
-                logo: "/logos/1.png",
-                main_link: "/outgoing",
-                admin_link: "/admin/resturant/1",
-                phone_numbers: ["01063720595", "01000000002", "01111111111"]
-            },
-            {
-                id: "2",
-                name: "مطاعم نعمه",
-                logo: "/logos/2.png",
-                main_link: "/neama/outgoing",
-                admin_link: "/admin/resturant/2",
-                phone_numbers: ["01508036346", "01200000004"]
-            },
-            {
-                id: "3",
-                name: "تشكن كينج",
-                logo: "/logos/3.png",
-                main_link: "/chicken/outgoing",
-                admin_link: "/admin/resturant/3",
-                phone_numbers: ["01012345678", "01198765432"]
-            }
-        ];
+        const defaultRestaurants = [{
+            id: "1",
+            name: "ابن حميدو السلام",
+            logo: "/logos/1.png",
+            main_link: "/outgoing",
+            admin_link: "/admin/resturant/1",
+            phone_numbers: ["01063720595", "01000000002", "01111111111"]
+        }, {
+            id: "2",
+            name: "مطاعم نعمه",
+            logo: "/logos/2.png",
+            main_link: "/neama/outgoing",
+            admin_link: "/admin/resturant/2",
+            phone_numbers: ["01508036346", "01200000004"]
+        }, {
+            id: "3",
+            name: "تشكن كينج",
+            logo: "/logos/3.png",
+            main_link: "/chicken/outgoing",
+            admin_link: "/admin/resturant/3",
+            phone_numbers: ["01012345678", "01198765432"]
+        }];
 
         const appData = window.__APP_DATA__;
         const currentUser = appData.user || null;
@@ -601,10 +742,11 @@
                 userInfoContainer.innerHTML = '';
                 return;
             }
-            const avatarHtml = user.profile_picture
-                ? `<img src="${user.profile_picture}" alt="${user.name}">`
-                : `<i class="las la-user"></i>`;
+            const avatarHtml = user.profile_picture ?
+                `<img src="${user.profile_picture}" alt="${user.name}">` :
+                `<i class="las la-user"></i>`;
             const arabicType = getArabicType(user.account_type);
+            const email = user.email || 'غير محدد';
             const userInfoHtml = `
                 <div class="user-info-card">
                     <div class="user-avatar">${avatarHtml}</div>
@@ -613,7 +755,7 @@
                         <div class="user-meta">
                             <span><i class="las la-phone"></i> ${user.phone_number || 'غير محدد'}</span>
                             <span><i class="las la-user-tag"></i> ${arabicType}</span>
-                            <span><i class="las la-envelope"></i> ${user.email || 'غير محدد'}</span>
+                            <span class="meta-email" title="${email}"><i class="las la-envelope"></i> <span class="email-text">${email}</span></span>
                         </div>
                     </div>
                 </div>
@@ -657,9 +799,9 @@
                 const logoLink = document.createElement('a');
                 logoLink.href = rest.main_link || '#';
                 logoLink.className = 'logo-area';
-                const logoContent = rest.logo
-                    ? `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">`
-                    : `<i class="las la-store-alt fallback-icon"></i>`;
+                const logoContent = rest.logo ?
+                    `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">` :
+                    `<i class="las la-store-alt fallback-icon"></i>`;
                 logoLink.innerHTML = logoContent;
                 cardWrapper.appendChild(logoLink);
 
