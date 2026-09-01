@@ -38,7 +38,6 @@
         }
     </script>
     <style>
-        /* نفس الأنماط السابقة دون تعديل */
         :root {
             --color-primary: #0d99ff;
             --color-secondary: #7c3aed;
@@ -157,6 +156,68 @@
             font-size: 2.4rem;
             color: var(--color-primary);
             margin-bottom: 8px;
+        }
+
+        .user-info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-glow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .user-info-card .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--darker-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 2rem;
+            color: var(--color-muted);
+        }
+
+        .user-info-card .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info-card .user-details {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .user-info-card .user-details .user-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+
+        .user-info-card .user-details .user-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .user-info-card .user-details .user-meta span {
+            color: var(--color-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-info-card .user-details .user-meta i {
+            color: var(--color-primary);
         }
 
         .theme-toggle {
@@ -287,6 +348,7 @@
             overflow: hidden;
             transition: background-color 0.3s;
             cursor: pointer;
+            display: block;
         }
 
         .restaurant-card-item .logo-area:hover {
@@ -311,7 +373,6 @@
             opacity: 0.5;
         }
 
-        /* زر الإدارة */
         .admin-btn {
             position: absolute;
             bottom: 10px;
@@ -485,15 +546,18 @@
                 <h1>إدارة المطاعم</h1>
                 <p>نظام متكامل لإدارة المطاعم</p>
             </div>
+
+            <div id="userInfoContainer"></div>
+
             <div class="restaurant-grid" id="restaurantGrid"></div>
         </div>
     </main>
 
     <script>
         const restaurantGrid = document.getElementById('restaurantGrid');
+        const userInfoContainer = document.getElementById('userInfoContainer');
         let restaurants = [];
 
-        // بيانات المطاعم مع أرقام الهواتف المسموحة
         const defaultRestaurants = [
             {
                 id: "1",
@@ -501,7 +565,7 @@
                 logo: "https://sys.shadowza.space/logos/1.png",
                 main_link: "/outgoing",
                 admin_link: "/admin/resturant/1",
-                phone_numbers: ["01000000001", "01000000002", "01111111111"]
+                phone_numbers: ["01063720595", "01000000002", "01111111111"]
             },
             {
                 id: "2",
@@ -521,25 +585,44 @@
             }
         ];
 
-        // جلب بيانات المستخدم من البيانات الممررة من الخادم
         const appData = window.__APP_DATA__;
         const currentUser = appData.user || null;
-        const userType = currentUser?.type || null;
+        const userType = currentUser?.account_type || null;
         const userPhone = currentUser?.phone_number || null;
 
-        // تصفية المطاعم بناءً على نوع المستخدم
+        function displayUserInfo(user) {
+            if (!user) {
+                userInfoContainer.innerHTML = '';
+                return;
+            }
+            const avatarHtml = user.profile_picture
+                ? `<img src="${user.profile_picture}" alt="${user.name}">`
+                : `<i class="las la-user"></i>`;
+            const userInfoHtml = `
+                <div class="user-info-card">
+                    <div class="user-avatar">${avatarHtml}</div>
+                    <div class="user-details">
+                        <div class="user-name">${user.name || 'مستخدم'}</div>
+                        <div class="user-meta">
+                            <span><i class="las la-phone"></i> ${user.phone_number || 'غير محدد'}</span>
+                            <span><i class="las la-user-tag"></i> ${user.account_type || 'غير محدد'}</span>
+                            <span><i class="las la-envelope"></i> ${user.email || 'غير محدد'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            userInfoContainer.innerHTML = userInfoHtml;
+        }
+
         function filterRestaurantsForUser(allRestaurants, userType, userPhone) {
             if (userType === 'admin' || userType === 'viewer') {
-                // المدير والمشاهد يرون جميع المطاعم
                 return allRestaurants;
             } else if (userType === 'cashier') {
-                // الكاشير يرى فقط المطاعم التي رقمه ضمن قائمتها
                 if (!userPhone) return [];
                 return allRestaurants.filter(rest =>
                     rest.phone_numbers && rest.phone_numbers.includes(userPhone)
                 );
             } else {
-                // إذا لم يتم تحديد نوع المستخدم (غير متوقع) نعرض جميع المطاعم بدون أزرار إدارة
                 return allRestaurants;
             }
         }
@@ -561,21 +644,18 @@
             }
 
             filteredRestaurants.forEach((rest) => {
-                // إنشاء حاوية البطاقة
                 const cardWrapper = document.createElement('div');
                 cardWrapper.className = 'restaurant-card-item';
 
-                // منطقة الشعار (رابط الواجهة الرئيسية للمطعم)
                 const logoLink = document.createElement('a');
                 logoLink.href = rest.main_link || '#';
                 logoLink.className = 'logo-area';
-                const logoContent = rest.logo ?
-                    `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">` :
-                    `<i class="las la-store-alt fallback-icon"></i>`;
+                const logoContent = rest.logo
+                    ? `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">`
+                    : `<i class="las la-store-alt fallback-icon"></i>`;
                 logoLink.innerHTML = logoContent;
                 cardWrapper.appendChild(logoLink);
 
-                // إضافة زر الإدارة إذا كان المستخدم مدير أو مشاهد
                 if (userType === 'admin' || userType === 'viewer') {
                     const adminBtn = document.createElement('a');
                     adminBtn.href = rest.admin_link || '#';
@@ -589,11 +669,10 @@
             });
         }
 
-        // تهيئة قائمة المطاعم
+        displayUserInfo(currentUser);
         restaurants = defaultRestaurants;
         renderRestaurantGrid();
 
-        // تبديل السمة
         const themeToggleBtn = document.getElementById('themetoggle');
         const body = document.body;
 
@@ -612,7 +691,6 @@
             applyTheme(isDark ? 'light' : 'dark');
         });
 
-        // تسجيل الخروج
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.addEventListener('click', () => {
             Swal.fire({
