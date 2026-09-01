@@ -38,6 +38,7 @@
         }
     </script>
     <style>
+        /* نفس الأنماط السابقة دون تعديل */
         :root {
             --color-primary: #0d99ff;
             --color-secondary: #7c3aed;
@@ -265,10 +266,9 @@
             overflow: hidden;
             box-shadow: var(--shadow-glow);
             transition: all 0.3s ease;
-            display: flex;
-            cursor: pointer;
             position: relative;
             text-decoration: none;
+            display: block;
         }
 
         .restaurant-card-item:hover {
@@ -286,6 +286,7 @@
             background: var(--darker-bg);
             overflow: hidden;
             transition: background-color 0.3s;
+            cursor: pointer;
         }
 
         .restaurant-card-item .logo-area:hover {
@@ -308,6 +309,32 @@
             font-size: 3rem;
             color: var(--color-muted);
             opacity: 0.5;
+        }
+
+        /* زر الإدارة */
+        .admin-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(13, 153, 255, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            z-index: 5;
+            text-decoration: none;
+        }
+
+        .admin-btn:hover {
+            background: #0d99ff;
+            transform: scale(1.1);
         }
 
         .empty-state {
@@ -440,15 +467,14 @@
                     <span class="icon moon-icon"><i class="fas fa-moon"></i></span>
                 </span>
             </button>
-<a href="/about" class="logout-btn">
-    <i class="las la-building"></i>
-    <span>Acsd-x</span>
-</a>
+            <a href="/about" class="logout-btn">
+                <i class="las la-building"></i>
+                <span>Acsd-x</span>
+            </a>
             <button id="logoutBtn" class="logout-btn">
                 <i class="las la-sign-out-alt"></i>
                 <span>تسجيل الخروج</span>
             </button>
-
         </div>
     </header>
 
@@ -467,55 +493,107 @@
         const restaurantGrid = document.getElementById('restaurantGrid');
         let restaurants = [];
 
-        const defaultRestaurants = [{
-            id: "1",
-            name: "ابن حميدو السلام",
-            logo: "https://sys.shadowza.space/logos/1.png",
-            main_link: "/outgoing",
-            admin_link: "/admin/resturant/1"
-        }, {
-            id: "2",
-            name: "مطاعم نعمه",
-            logo: "https://sys.shadowza.space/logos/2.png",
-            main_link: "/neama/outgoing",
-            admin_link: "/admin/resturant/2"
-        }, {
-            id: "3",
-            name: "تشكن كينج",
-            logo: "/logos/3.png",
-            main_link: "/chicken/outgoing",
-            admin_link: "/admin/resturant/3"
-        }];
+        // بيانات المطاعم مع أرقام الهواتف المسموحة
+        const defaultRestaurants = [
+            {
+                id: "1",
+                name: "ابن حميدو السلام",
+                logo: "https://sys.shadowza.space/logos/1.png",
+                main_link: "/outgoing",
+                admin_link: "/admin/resturant/1",
+                phone_numbers: ["01000000001", "01000000002", "01111111111"]
+            },
+            {
+                id: "2",
+                name: "مطاعم نعمه",
+                logo: "https://sys.shadowza.space/logos/2.png",
+                main_link: "/neama/outgoing",
+                admin_link: "/admin/resturant/2",
+                phone_numbers: ["01200000003", "01200000004"]
+            },
+            {
+                id: "3",
+                name: "تشكن كينج",
+                logo: "/logos/3.png",
+                main_link: "/chicken/outgoing",
+                admin_link: "/admin/resturant/3",
+                phone_numbers: ["01012345678", "01198765432"]
+            }
+        ];
+
+        // جلب بيانات المستخدم من البيانات الممررة من الخادم
+        const appData = window.__APP_DATA__;
+        const currentUser = appData.user || null;
+        const userType = currentUser?.type || null;
+        const userPhone = currentUser?.phone_number || null;
+
+        // تصفية المطاعم بناءً على نوع المستخدم
+        function filterRestaurantsForUser(allRestaurants, userType, userPhone) {
+            if (userType === 'admin' || userType === 'viewer') {
+                // المدير والمشاهد يرون جميع المطاعم
+                return allRestaurants;
+            } else if (userType === 'cashier') {
+                // الكاشير يرى فقط المطاعم التي رقمه ضمن قائمتها
+                if (!userPhone) return [];
+                return allRestaurants.filter(rest =>
+                    rest.phone_numbers && rest.phone_numbers.includes(userPhone)
+                );
+            } else {
+                // إذا لم يتم تحديد نوع المستخدم (غير متوقع) نعرض جميع المطاعم بدون أزرار إدارة
+                return allRestaurants;
+            }
+        }
 
         function renderRestaurantGrid() {
             restaurantGrid.innerHTML = '';
-            if (restaurants.length === 0) {
+            const filteredRestaurants = filterRestaurantsForUser(restaurants, userType, userPhone);
+
+            if (filteredRestaurants.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'empty-state';
                 emptyDiv.innerHTML = `
                     <i class="las la-store-alt"></i>
-                    <p>لا توجد مطاعم حالياً</p>
-                    <p class="sub-text">ابدأ بإضافة مطعم جديد</p>
+                    <p>لا توجد مطاعم متاحة لك</p>
+                    <p class="sub-text">يرجى التواصل مع المسؤول إذا كنت تعتقد أن هذا خطأ</p>
                 `;
                 restaurantGrid.appendChild(emptyDiv);
                 return;
             }
-            restaurants.forEach((rest) => {
-                const card = document.createElement('a');
-                card.className = 'restaurant-card-item';
-                card.href = rest.main_link || '#';
+
+            filteredRestaurants.forEach((rest) => {
+                // إنشاء حاوية البطاقة
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'restaurant-card-item';
+
+                // منطقة الشعار (رابط الواجهة الرئيسية للمطعم)
+                const logoLink = document.createElement('a');
+                logoLink.href = rest.main_link || '#';
+                logoLink.className = 'logo-area';
                 const logoContent = rest.logo ?
                     `<img src="${rest.logo}" alt="${rest.name}" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'las la-store-alt fallback-icon\\'></i>'">` :
                     `<i class="las la-store-alt fallback-icon"></i>`;
-                card.innerHTML = `
-                    <div class="logo-area">
-                        ${logoContent}
-                    </div>
-                `;
-                restaurantGrid.appendChild(card);
+                logoLink.innerHTML = logoContent;
+                cardWrapper.appendChild(logoLink);
+
+                // إضافة زر الإدارة إذا كان المستخدم مدير أو مشاهد
+                if (userType === 'admin' || userType === 'viewer') {
+                    const adminBtn = document.createElement('a');
+                    adminBtn.href = rest.admin_link || '#';
+                    adminBtn.className = 'admin-btn';
+                    adminBtn.title = 'صفحة الإدارة';
+                    adminBtn.innerHTML = '<i class="las la-cog"></i>';
+                    cardWrapper.appendChild(adminBtn);
+                }
+
+                restaurantGrid.appendChild(cardWrapper);
             });
         }
 
+        // تهيئة قائمة المطاعم
+        restaurants = defaultRestaurants;
+        renderRestaurantGrid();
+
+        // تبديل السمة
         const themeToggleBtn = document.getElementById('themetoggle');
         const body = document.body;
 
@@ -534,6 +612,7 @@
             applyTheme(isDark ? 'light' : 'dark');
         });
 
+        // تسجيل الخروج
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.addEventListener('click', () => {
             Swal.fire({
@@ -552,9 +631,6 @@
                 }
             });
         });
-
-        restaurants = defaultRestaurants;
-        renderRestaurantGrid();
     </script>
 </body>
 
