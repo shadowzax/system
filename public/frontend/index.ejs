@@ -461,19 +461,9 @@
         window.__APP_DATA__ = window.__APP_DATA__ || {};
         const appData = window.__APP_DATA__;
 
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
-        }
-
-        const tokenFromCookie = getCookie('token');
-        const injectedToken = appData.token || '';
-        const token = tokenFromCookie || injectedToken;
-
+        const token = appData.token || '';
         const api = appData.api || '';
-        const isAuthenticated = appData.isAuthenticated || !!token;
+        const isAuthenticated = appData.isAuthenticated || false;
         const currentUser = appData.user || null;
 
         const allRestaurants = [
@@ -507,12 +497,11 @@
             if (!currentUser) return [];
             if (currentUser.account_type === 'admin') {
                 return allRestaurants;
-            } else {
-                const userPhone = currentUser.phone_number || currentUser.phone || '';
-                return allRestaurants.filter(rest =>
-                    rest.allowed_phones && rest.allowed_phones.includes(userPhone)
-                );
             }
+            const userPhone = currentUser.phone_number || currentUser.phone || '';
+            return allRestaurants.filter(rest =>
+                rest.allowed_phones && rest.allowed_phones.includes(userPhone)
+            );
         }
 
         const restaurantGrid = document.getElementById('restaurantGrid');
@@ -524,12 +513,13 @@
 
             if (currentUser && currentUser.account_type === 'admin') {
                 subtitle.textContent = 'صلاحيات كاملة - جميع المطاعم';
-            } else {
+            } else if (isAuthenticated) {
                 subtitle.textContent = 'المطاعم المتاحة لك';
+            } else {
+                subtitle.textContent = 'يرجى تسجيل الدخول';
             }
 
             if (!isAuthenticated || !currentUser) {
-                subtitle.textContent = 'يرجى تسجيل الدخول';
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'empty-state';
                 emptyDiv.innerHTML = `
