@@ -192,6 +192,27 @@
 
             const isAdmin = window.__APP_DATA__.user && window.__APP_DATA__.user.account_type === 'admin';
 
+            // ===== التعديل الجديد: إخفاء المحتوى لغير الأدمن =====
+            if (!isAdmin) {
+                // إخفاء الحاوية الرئيسية
+                const mainContainer = document.querySelector('.container.mx-auto.px-4.py-6.max-w-7xl');
+                if (mainContainer) {
+                    mainContainer.style.display = 'none';
+                }
+                // إنشاء رسالة منع الوصول
+                const accessDenied = document.createElement('div');
+                accessDenied.className = 'info-card text-center';
+                accessDenied.style.marginTop = '100px';
+                accessDenied.innerHTML = `
+                    <i class="las la-lock text-6xl text-[var(--color-muted)]"></i>
+                    <h2 class="text-2xl font-bold mt-4 text-[var(--color-white)]">غير مصرح لك بالوصول</h2>
+                    <p class="text-[var(--color-muted)] mt-2">هذه الصفحة مخصصة للمسؤولين فقط.</p>
+                `;
+                document.querySelector('main').appendChild(accessDenied);
+                return; // إيقاف تنفيذ باقي السكربت
+            }
+            // ================================================
+
             function getToken() {
                 if (window.__APP_DATA__ && window.__APP_DATA__.token) {
                     return window.__APP_DATA__.token;
