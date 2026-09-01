@@ -161,12 +161,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/employee-files", (req, res) => {
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
-        return res.redirect("/login");
-    }
-
-    if (req.user?.account_type !== "admin") {
-        return res.redirect("/");
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
     }
 
     res.render("finance/files", {
@@ -176,12 +172,8 @@ app.get("/employee-files", (req, res) => {
 });
 
 app.get("/employee-advance", (req, res) => {
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
-        return res.redirect("/login");
-    }
-
-    if (req.user?.account_type !== "admin") {
-        return res.redirect("/");
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
     }
 
     res.render("finance/advance", {
@@ -191,12 +183,8 @@ app.get("/employee-advance", (req, res) => {
 });
 
 app.get("/employee-salary", (req, res) => {
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
-        return res.redirect("/login");
-    }
-
-    if (req.user?.account_type !== "admin") {
-        return res.redirect("/");
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
     }
 
     res.render("finance/salary", {
