@@ -425,9 +425,7 @@
             token: "<%- token %>",
             api: "<%- api %>",
             isAuthenticated: <%- isAuthenticated ? 'true' : 'false' %>,
-            user: <%- JSON.stringify(user || null) %>,
-            expenses: <%- JSON.stringify(user && user.expenses ? JSON.parse(user.expenses) : []) %>,
-            restaurant_id: 1
+            user: <%- JSON.stringify(user || null) %>
         };
     </script>
 <body>
