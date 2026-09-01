@@ -160,27 +160,24 @@ app.get("/", (req, res) => {
     });
 });
 
-app.get("/employee-files", requireAdmin, (req, res) => {
+app.get("/employee-files", (req, res) => {
     res.render("finance/files", {
         title: "",
         activePage: "files",
     });
 });
-
-app.get("/employee-advance", requireAdmin, (req, res) => {
+app.get("/employee-advance", (req, res) => {
     res.render("finance/advance", {
         title: "",
         activePage: "employee-advance",
     });
 });
-
-app.get("/employee-salary", requireAdmin, (req, res) => {
+app.get("/employee-salary", (req, res) => {
     res.render("finance/salary", {
         title: "",
         activePage: "daily-salary",
     });
 });
-
 
 
 app.get("/login", (req, res) => {
@@ -193,6 +190,18 @@ app.get("/login", (req, res) => {
         description: "قم بتسجيل الدخول إلى حسابك"
     });
 });
+
+app.get("/admin/acount", (req, res) => {
+    // if (!req.isAuthenticated) {
+    //     return res.redirect("/login");
+    // }
+
+    res.render("mangment/acount", {
+        title: "",
+        description: ""
+    });
+});
+
 /*--------------------------------------------*/
 app.get("/outgoing", (req, res) => {
     if (!req.isAuthenticated) {
