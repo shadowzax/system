@@ -356,6 +356,10 @@ app.get("/neama/me/reports", (req, res) => {
 }); 
 
 app.get("/neama/employee-files", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../neama/finance/files", {
         title: "",
         activePage: "files"
@@ -363,6 +367,10 @@ app.get("/neama/employee-files", (req, res) => {
 });
 
 app.get("/neama/employee-advance", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../neama/finance/advance", {
         title: "",
         activePage: "employee-advance"
@@ -370,6 +378,10 @@ app.get("/neama/employee-advance", (req, res) => {
 });
 
 app.get("/neama/employee-salary", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../neama/finance/salary", {
         title: "",
         activePage: "daily-salary"
@@ -452,6 +464,10 @@ app.get("/chicken/me/reports", (req, res) => {
 }); 
 
 app.get("/chicken/employee-files", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../chicken/finance/files", {
         title: "",
         activePage: "files"
@@ -459,6 +475,10 @@ app.get("/chicken/employee-files", (req, res) => {
 });
 
 app.get("/chicken/employee-advance", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../chicken/finance/advance", {
         title: "",
         activePage: "employee-advance"
@@ -466,6 +486,10 @@ app.get("/chicken/employee-advance", (req, res) => {
 });
 
 app.get("/chicken/employee-salary", (req, res) => {
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
+    }
+
     res.render("../chicken/finance/salary", {
         title: "",
         activePage: "daily-salary"
@@ -475,9 +499,10 @@ app.get("/chicken/employee-salary", (req, res) => {
 /*------------------------------------------*/
 // - Admin - //
 app.get("/admin/account", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
     }
+
     res.render("../admin/0-account", {
         title: "",
         description: "",
@@ -490,6 +515,7 @@ app.get("/admin/account", (req, res) => {
         }
     });
 });
+
 /*------------------------------------------*/
 app.get("/admin/resturant/1", (req, res) => {
     if (!req.isAuthenticated) {
@@ -622,9 +648,10 @@ app.get("/admin/reports/2", async (req, res) => {
 });
 /*-----------------------------------------*/
 app.get("/admin/resturant", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
+    if (!req.user || req.user.account_type !== "admin") {
+        return res.redirect(req.user ? "/" : "/login");
     }
+
     res.render("../admin/all-resturant", {
         title: "",
         description: "",
@@ -637,6 +664,7 @@ app.get("/admin/resturant", (req, res) => {
         }
     });
 });
+
 /*------------------------------------------*/
 app.get("/admin/resturant/3", (req, res) => {
     if (!req.isAuthenticated) {
