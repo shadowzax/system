@@ -863,34 +863,172 @@
 (() => {
     "use strict";
 
-    const blocked = e => {
-        const key = String(e.key || "").toLowerCase();
-
-        const blockedShortcut =
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
-            (e.metaKey && e.altKey && ["i", "j", "c", "k"].includes(key)) ||
-            ((e.ctrlKey || e.metaKey) && key === "u");
-
-        if (blockedShortcut) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-        }
+    const CONFIG = {
+        devToolsThreshold: 160,
+        detectionInterval: 700,
+        lockOnDetection: true,
+        redirectOnDetection: false,
+        redirectUrl: "/"
     };
 
-    ["keydown", "keyup", "keypress"].forEach(type => {
-        document.addEventListener(type, blocked, true);
-        window.addEventListener(type, blocked, true);
-    });
+    let locked = false;
+    let previousDetection = false;
 
-    document.addEventListener("contextmenu", e => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-    }, true);
+    const lockPage = () => {
+        if (locked) return;
+
+        locked = true;
+
+        if (CONFIG.redirectOnDetection) {
+            window.location.replace(CONFIG.redirectUrl);
+            return;
+        }
+
+        document.documentElement.innerHTML = `
+            <head>
+                <title>Security</title>
+                <style>
+                    html,body{
+                        margin:0;
+                        width:100%;
+                        height:100%;
+                        overflow:hidden;
+                        background:#0b0b0b;
+                    }
+                    body{
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        color:#fff;
+                        font-family:Arial,sans-serif;
+                    }
+                    div{
+                        font-size:24px;
+                        font-weight:700;
+                        text-align:center;
+                    }
+                </style>
+            </head>
+            <body>
+                <div>Security violation detected</div>
+            </body>
+        `;
+    };
+
+    const detectDevTools = () => {
+        const widthDifference =
+            Math.abs(window.outerWidth - window.innerWidth);
+
+        const heightDifference =
+            Math.abs(window.outerHeight - window.innerHeight);
+
+        return (
+            widthDifference > CONFIG.devToolsThreshold ||
+            heightDifference > CONFIG.devToolsThreshold
+        );
+    };
+
+    const detectDebugger = () => {
+        const start = performance.now();
+
+        debugger;
+
+        return performance.now() - start > 100;
+    };
+
+    const inspect = () => {
+        if (locked) return;
+
+        let detected = false;
+
+        try {
+            detected =
+                detectDevTools() ||
+                detectDebugger();
+        } catch {
+            detected = true;
+        }
+
+        if (
+            detected &&
+            !previousDetection &&
+            CONFIG.lockOnDetection
+        ) {
+            lockPage();
+        }
+
+        previousDetection = detected;
+    };
+
+    document.addEventListener(
+        "contextmenu",
+        event => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        },
+        true
+    );
+
+    document.addEventListener(
+        "keydown",
+        event => {
+            const key = event.key.toLowerCase();
+
+            const devToolsShortcut =
+                event.key === "F12" ||
+                (
+                    event.ctrlKey &&
+                    event.shiftKey &&
+                    ["i", "j", "c", "k"].includes(key)
+                ) ||
+                (
+                    event.metaKey &&
+                    event.altKey &&
+                    ["i", "j", "c", "k"].includes(key)
+                );
+
+            const viewSourceShortcut =
+                (event.ctrlKey || event.metaKey) &&
+                key === "u";
+
+            if (
+                devToolsShortcut ||
+                viewSourceShortcut
+            ) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                lockPage();
+            }
+        },
+        true
+    );
+
+    window.addEventListener(
+        "resize",
+        inspect,
+        { passive: true }
+    );
+
+    window.addEventListener(
+        "blur",
+        () => {
+            setTimeout(inspect, 50);
+        },
+        { passive: true }
+    );
+
+    setInterval(
+        inspect,
+        CONFIG.detectionInterval
+    );
+
+    setTimeout(
+        inspect,
+        1000
+    );
 })();
 </script>
+
 
 </body>
 
