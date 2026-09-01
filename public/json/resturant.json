@@ -1,0 +1,36 @@
+[
+  {
+    "id": "1",
+    "name": "ابن حميدو السلام",
+    "logo": "/logos/1.png",
+    "main_link": "/outgoing",
+    "admin_link": "/admin/resturant/1",
+    "phone_numbers": [
+      "01063720595",
+      "01000000002",
+      "01111111111"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "مطاعم نعمه",
+    "logo": "/logos/2.png",
+    "main_link": "/neama/outgoing",
+    "admin_link": "/admin/resturant/2",
+    "phone_numbers": [
+      "01508036346",
+      "01200000004"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "تشكن كينج",
+    "logo": "/logos/3.png",
+    "main_link": "/chicken/outgoing",
+    "admin_link": "/admin/resturant/3",
+    "phone_numbers": [
+      "01012345678",
+      "01198765432"
+    ]
+  }
+]
