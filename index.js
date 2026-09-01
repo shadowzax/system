@@ -161,18 +161,44 @@ app.get("/", (req, res) => {
 });
 
 app.get("/employee-files", (req, res) => {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+        return res.redirect("/login");
+    }
+
+    if (req.user?.account_type !== "admin") {
+        return res.redirect("/");
+    }
+
     res.render("finance/files", {
         title: "",
         activePage: "files",
     });
 });
+
 app.get("/employee-advance", (req, res) => {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+        return res.redirect("/login");
+    }
+
+    if (req.user?.account_type !== "admin") {
+        return res.redirect("/");
+    }
+
     res.render("finance/advance", {
         title: "",
         activePage: "employee-advance",
     });
 });
+
 app.get("/employee-salary", (req, res) => {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+        return res.redirect("/login");
+    }
+
+    if (req.user?.account_type !== "admin") {
+        return res.redirect("/");
+    }
+
     res.render("finance/salary", {
         title: "",
         activePage: "daily-salary",
