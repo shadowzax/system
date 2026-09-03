@@ -217,39 +217,8 @@ app.get("/admin/acount", (req, res) => {
 });
 
 /*--------------------------------------------*/
-app.get("/outgoing", (req, res) => {
-    res.render("system/outgoing", {
-        title: "خوارج",
-        activePage: "outgoing-invoices",
-    });
-});
-
-app.get("/visa", (req, res) => {
-    res.render("system/visa", {
-        title: "فيز",
-        activePage: "visa",
-    });
-});
-
-app.get("/cash", (req, res) => {
-    res.render("system/cash", {
-        title: "التحويلات",
-        activePage: "transfers",
-    });
-});
-
-app.get("/advances", (req, res) => {
-    res.render("system/salary-advance", {
-        title: "اداره السلف",
-        activePage: "advances",
-    });
-});
 /*
 app.get("/outgoing", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
     res.render("system/outgoing", {
         title: "خوارج",
         activePage: "outgoing-invoices",
@@ -257,10 +226,6 @@ app.get("/outgoing", (req, res) => {
 });
 
 app.get("/visa", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
     res.render("system/visa", {
         title: "فيز",
         activePage: "visa",
@@ -268,26 +233,62 @@ app.get("/visa", (req, res) => {
 });
 
 app.get("/cash", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
-
     res.render("system/cash", {
         title: "التحويلات",
         activePage: "transfers",
     });
 });
-app.get("/advances", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
 
+app.get("/advances", (req, res) => {
     res.render("system/salary-advance", {
         title: "اداره السلف",
         activePage: "advances",
     });
 });
 */
+app.get("/outgoing", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/outgoing", {
+        title: "خوارج",
+        activePage: "outgoing-invoices",
+    });
+});
+
+app.get("/visa", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/visa", {
+        title: "فيز",
+        activePage: "visa",
+    });
+});
+
+app.get("/cash", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/cash", {
+        title: "التحويلات",
+        activePage: "transfers",
+    });
+});
+app.get("/advances", (req, res) => {
+    if (!req.isAuthenticated) {
+        return res.redirect("/login");
+    }
+
+    res.render("system/salary-advance", {
+        title: "اداره السلف",
+        activePage: "advances",
+    });
+});
+
 /*---------------------------------------*/
 app.get("/settings", (req, res) => {
     if (!req.isAuthenticated) {
