@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -13,13 +12,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="/js/tailwind.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -702,23 +698,19 @@
         (function () {
             "use strict";
 
-            /* ========== DOM Elements ========== */
             var restaurantGrid = document.getElementById('restaurantGrid');
             var userInfoContainer = document.getElementById('userInfoContainer');
             var themeToggleBtn = document.getElementById('themetoggle');
             var logoutBtn = document.getElementById('logoutBtn');
             var body = document.body;
 
-            /* ========== State ========== */
             var restaurants = [];
 
-            /* ========== App Data ========== */
             var appData = window.__APP_DATA__ || {};
             var currentUser = appData.user || null;
             var userType = currentUser ? currentUser.account_type : null;
             var userPhone = currentUser ? currentUser.phone_number : null;
 
-            /* ========== Helper Functions ========== */
             function getArabicType(type) {
                 if (type === 'admin') return 'مدير';
                 if (type === 'cashier') return 'كاشير';
@@ -810,7 +802,6 @@
                 });
             }
 
-            /* ========== Theme Functions ========== */
             function applyTheme(theme) {
                 var isDark = theme === 'dark';
                 if (isDark) {
@@ -826,7 +817,6 @@
                 try {
                     localStorage.setItem('theme', theme);
                 } catch (e) {
-                    /* ignore */
                 }
             }
 
@@ -834,7 +824,6 @@
             try {
                 savedTheme = localStorage.getItem('theme') || 'dark';
             } catch (e) {
-                /* ignore */
             }
             applyTheme(savedTheme);
 
@@ -843,7 +832,6 @@
                 applyTheme(isDark ? 'light' : 'dark');
             });
 
-            /* ========== Logout ========== */
             logoutBtn.addEventListener('click', function () {
                 Swal.fire({
                     title: 'تسجيل الخروج',
@@ -862,7 +850,6 @@
                 });
             });
 
-            /* ========== Load Restaurants ========== */
             function loadRestaurants() {
                 fetch('/json/resturant.json')
                     .then(function (response) {
@@ -883,94 +870,8 @@
                     });
             }
 
-            /* ========== Init ========== */
             loadRestaurants();
-
-            /* ========== DevTools Protection ========== */
-            var CONFIG = {
-                devToolsThreshold: 160,
-                detectionInterval: 700,
-                lockOnDetection: true,
-                redirectOnDetection: false,
-                redirectUrl: '/'
-            };
-
-            var locked = false;
-            var previousDetection = false;
-
-            function lockPage() {
-                if (locked) return;
-                locked = true;
-
-                if (CONFIG.redirectOnDetection) {
-                    window.location.replace(CONFIG.redirectUrl);
-                    return;
-                }
-
-                document.documentElement.innerHTML =
-                    '<head><title>Security</title><style>' +
-                    'html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0b0b;}' +
-                    'body{display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;}' +
-                    'div{font-size:24px;font-weight:700;text-align:center;}' +
-                    '</style></head>' +
-                    '<body><div>Security violation detected</div></body>';
-            }
-
-            function detectDevTools() {
-                var widthDifference = Math.abs(window.outerWidth - window.innerWidth);
-                var heightDifference = Math.abs(window.outerHeight - window.innerHeight);
-                return widthDifference > CONFIG.devToolsThreshold || heightDifference > CONFIG.devToolsThreshold;
-            }
-
-            function detectDebugger() {
-                var start = performance.now();
-                debugger;
-                return performance.now() - start > 100;
-            }
-
-            function inspect() {
-                if (locked) return;
-                var detected = false;
-                try {
-                    detected = detectDevTools() || detectDebugger();
-                } catch (e) {
-                    detected = true;
-                }
-                if (detected && !previousDetection && CONFIG.lockOnDetection) {
-                    lockPage();
-                }
-                previousDetection = detected;
-            }
-
-            document.addEventListener('contextmenu', function (event) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-            }, true);
-
-            document.addEventListener('keydown', function (event) {
-                var key = event.key.toLowerCase();
-                var devToolsShortcut =
-                    event.key === 'F12' ||
-                    (event.ctrlKey && event.shiftKey && ['i', 'j', 'c', 'k'].indexOf(key) !== -1) ||
-                    (event.metaKey && event.altKey && ['i', 'j', 'c', 'k'].indexOf(key) !== -1);
-                var viewSourceShortcut = (event.ctrlKey || event.metaKey) && key === 'u';
-
-                if (devToolsShortcut || viewSourceShortcut) {
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    lockPage();
-                }
-            }, true);
-
-            window.addEventListener('resize', inspect, { passive: true });
-            window.addEventListener('blur', function () {
-                setTimeout(inspect, 50);
-            }, { passive: true });
-
-            setInterval(inspect, CONFIG.detectionInterval);
-            setTimeout(inspect, 1000);
         })();
     </script>
 </body>
-
 </html>
