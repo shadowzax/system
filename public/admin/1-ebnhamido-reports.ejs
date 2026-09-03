@@ -243,64 +243,55 @@
                 const hasMasaei = name.includes('مسائي');
                 if (!hasSbahi && !hasMasaei) return;
                 const shift = hasSbahi ? 'sbahi' : 'masaei';
-                const hasTekawey = name.includes('تيك اواي');
-                const hasDelivery = name.includes('دليفري');
-                if (!hasTekawey && !hasDelivery) return;
                 const dateKey = getReportDateKey(report);
                 if (!dateKey) return;
                 const groupKey = dateKey + '_' + shift;
                 if (!groups.has(groupKey)) {
-                    groups.set(groupKey, { reports: [], hasTekawey: false, hasDelivery: false });
+                    groups.set(groupKey, []);
                 }
-                const group = groups.get(groupKey);
-                group.reports.push(report);
-                if (hasTekawey) group.hasTekawey = true;
-                if (hasDelivery) group.hasDelivery = true;
+                groups.get(groupKey).push(report);
             });
 
             const combinedReports = [];
-            groups.forEach((group, key) => {
-                if (group.hasTekawey && group.hasDelivery) {
-                    const [dateKey, shift] = key.split('_');
-                    const name = shift === 'sbahi' ? `تقارير ${restaurantName} صباحي يومي` : `تقارير ${restaurantName} مسائي يومي`;
-                    const rowsMap = new Map();
-                    group.reports.forEach(report => {
-                        if (report.rows && report.rows.length) {
-                            report.rows.forEach(row => {
-                                const desc = row.desc || '';
-                                const normDesc = normalizeDesc(desc);
-                                const amount = parseAmountValue(row.amount);
-                                if (rowsMap.has(normDesc)) {
-                                    const existing = rowsMap.get(normDesc);
-                                    existing.amount += amount;
-                                    existing.amountStr = existing.amount.toString();
-                                } else {
-                                    rowsMap.set(normDesc, {
-                                        desc: desc,
-                                        amount: amount,
-                                        amountStr: amount.toString()
-                                    });
-                                }
-                            });
-                        }
-                    });
-                    const combinedRows = Array.from(rowsMap.values()).map(item => ({
-                        desc: item.desc,
-                        amount: item.amountStr
-                    }));
-                    const total = combinedRows.reduce((sum, row) => sum + parseAmountValue(row.amount), 0);
-                    const combined = {
-                        id: 'combined_' + key,
-                        name: name,
-                        date: dateKey,
-                        rows: combinedRows,
-                        total: total.toString(),
-                        sourceLabel: 'مجمع',
-                        combined: true,
-                        created_by: { name: 'تجميع تلقائي' }
-                    };
-                    combinedReports.push(combined);
-                }
+            groups.forEach((groupReports, key) => {
+                const [dateKey, shift] = key.split('_');
+                const name = shift === 'sbahi' ? `تقارير ${restaurantName} صباحي يومي` : `تقارير ${restaurantName} مسائي يومي`;
+                const rowsMap = new Map();
+                groupReports.forEach(report => {
+                    if (report.rows && report.rows.length) {
+                        report.rows.forEach(row => {
+                            const desc = row.desc || '';
+                            const normDesc = normalizeDesc(desc);
+                            const amount = parseAmountValue(row.amount);
+                            if (rowsMap.has(normDesc)) {
+                                const existing = rowsMap.get(normDesc);
+                                existing.amount += amount;
+                                existing.amountStr = existing.amount.toString();
+                            } else {
+                                rowsMap.set(normDesc, {
+                                    desc: desc,
+                                    amount: amount,
+                                    amountStr: amount.toString()
+                                });
+                            }
+                        });
+                    }
+                });
+                const combinedRows = Array.from(rowsMap.values()).map(item => ({
+                    desc: item.desc,
+                    amount: item.amountStr
+                }));
+                const total = combinedRows.reduce((sum, row) => sum + parseAmountValue(row.amount), 0);
+                combinedReports.push({
+                    id: 'combined_' + key,
+                    name: name,
+                    date: dateKey,
+                    rows: combinedRows,
+                    total: total.toString(),
+                    sourceLabel: 'مجمع',
+                    combined: true,
+                    created_by: { name: 'تجميع تلقائي' }
+                });
             });
 
             return reports.concat(combinedReports);
