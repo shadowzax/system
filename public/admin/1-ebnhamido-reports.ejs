@@ -254,6 +254,7 @@
 
             const combinedReports = [];
             groups.forEach((groupReports, key) => {
+                if (groupReports.length < 2) return;
                 const [dateKey, shift] = key.split('_');
                 const name = shift === 'sbahi' ? `تقارير ${restaurantName} صباحي يومي` : `تقارير ${restaurantName} مسائي يومي`;
                 const rowsMap = new Map();
