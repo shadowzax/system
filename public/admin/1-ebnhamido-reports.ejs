@@ -77,6 +77,7 @@
                             <p class="text-sm text-[var(--color-muted)]">عرض جميع التقارير المخزنة</p>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <button id="refreshReportsBtn" type="button" class="btn-outline btn-sm"><i class="las la-sync-alt"></i> تحديث التقارير</button>
                             <button id="deleteCashBtn" type="button" class="btn-outline btn-sm"><i class="las la-trash-alt"></i> حذف الكاش</button>
                             <input type="date" id="reportDatePicker" class="input-field" />
                             <div class="relative flex-1 sm:w-64">
@@ -154,6 +155,7 @@
         const dateResultsTbody = document.getElementById('dateResultsTbody');
         const reportDatePicker = document.getElementById('reportDatePicker');
         const deleteCashBtn = document.getElementById('deleteCashBtn');
+        const refreshReportsBtn = document.getElementById('refreshReportsBtn');
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
@@ -184,6 +186,17 @@
             str = str.replace(/[^0-9.\-]/g, '');
             const num = parseFloat(str);
             return isNaN(num) ? 0 : num;
+        }
+
+        function normalizeDesc(desc) {
+            if (!desc) return '';
+            let normalized = String(desc).trim().toLowerCase();
+            normalized = normalized.replace(/[\u064B-\u0652]/g, '');
+            normalized = normalized.replace(/[أإآ]/g, 'ا');
+            normalized = normalized.replace(/ى/g, 'ي');
+            normalized = normalized.replace(/ة/g, 'ه');
+            normalized = normalized.replace(/\s+/g, ' ');
+            return normalized;
         }
 
         function getReportDateKey(report) {
@@ -250,25 +263,42 @@
                 if (group.hasTekawey && group.hasDelivery) {
                     const [dateKey, shift] = key.split('_');
                     const name = shift === 'sbahi' ? `تقارير ${restaurantName} صباحي يومي` : `تقارير ${restaurantName} مسائي يومي`;
+                    const rowsMap = new Map();
+                    group.reports.forEach(report => {
+                        if (report.rows && report.rows.length) {
+                            report.rows.forEach(row => {
+                                const desc = row.desc || '';
+                                const normDesc = normalizeDesc(desc);
+                                const amount = parseAmountValue(row.amount);
+                                if (rowsMap.has(normDesc)) {
+                                    const existing = rowsMap.get(normDesc);
+                                    existing.amount += amount;
+                                    existing.amountStr = existing.amount.toString();
+                                } else {
+                                    rowsMap.set(normDesc, {
+                                        desc: desc,
+                                        amount: amount,
+                                        amountStr: amount.toString()
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    const combinedRows = Array.from(rowsMap.values()).map(item => ({
+                        desc: item.desc,
+                        amount: item.amountStr
+                    }));
+                    const total = combinedRows.reduce((sum, row) => sum + parseAmountValue(row.amount), 0);
                     const combined = {
                         id: 'combined_' + key,
                         name: name,
                         date: dateKey,
-                        rows: [],
-                        total: 0,
+                        rows: combinedRows,
+                        total: total.toString(),
                         sourceLabel: 'مجمع',
                         combined: true,
                         created_by: { name: 'تجميع تلقائي' }
                     };
-                    group.reports.forEach(report => {
-                        if (report.rows && report.rows.length) {
-                            report.rows.forEach(row => {
-                                combined.rows.push({ desc: row.desc || '', amount: row.amount || '0' });
-                                combined.total += parseAmountValue(row.amount);
-                            });
-                        }
-                    });
-                    combined.total = combined.total.toString();
                     combinedReports.push(combined);
                 }
             });
@@ -605,6 +635,10 @@
                 this.style.color = '';
             }
             loadRecentReports();
+        });
+
+        refreshReportsBtn.addEventListener('click', function() {
+            window.location.reload();
         });
 
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
