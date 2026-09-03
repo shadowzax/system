@@ -216,8 +216,61 @@
 
         function getProcessedReports() {
             const reports = Array.isArray(window.expensesReports) ? window.expensesReports : [];
-            if (!excludeCashReports) return reports;
-            return reports.map(processReport);
+            let processed = excludeCashReports ? reports.map(processReport) : reports.slice();
+            processed = combineDailyReports(processed);
+            return processed;
+        }
+
+        function combineDailyReports(reports) {
+            const combinedMap = new Map();
+            const usedReportIds = new Set();
+
+            reports.forEach(report => {
+                const name = (report.name || '').toLowerCase();
+                const hasTekawey = name.includes('تيك اواي');
+                const hasSbahi = name.includes('صباحي');
+                const hasMasaei = name.includes('مسائي');
+
+                if (hasTekawey && (hasSbahi || hasMasaei)) {
+                    const dateKey = getReportDateKey(report);
+                    if (!dateKey) return;
+
+                    const category = hasSbahi ? 'sbahi' : 'masaei';
+                    const combinedKey = dateKey + '_' + category;
+                    if (!combinedMap.has(combinedKey)) {
+                        combinedMap.set(combinedKey, {
+                            id: 'combined_' + category + '_' + dateKey,
+                            name: category === 'sbahi' ? 'تقارير نعمه صباحي يومي' : 'تقارير نعمه مسائي يومي',
+                            date: dateKey,
+                            rows: [],
+                            total: 0,
+                            sourceLabel: 'مجمع',
+                            combined: true,
+                            created_by: { name: 'تجميع تلقائي' }
+                        });
+                    }
+                    const combined = combinedMap.get(combinedKey);
+                    if (report.rows && report.rows.length) {
+                        report.rows.forEach(row => {
+                            combined.rows.push({
+                                desc: row.desc || '',
+                                amount: row.amount || '0'
+                            });
+                            combined.total += parseAmountValue(row.amount);
+                        });
+                    }
+                    usedReportIds.add(report.id);
+                }
+            });
+
+            if (usedReportIds.size === 0) return reports;
+
+            const filteredReports = reports.filter(report => !usedReportIds.has(report.id));
+            const combinedReports = Array.from(combinedMap.values()).map(combined => {
+                return Object.assign({}, combined, { total: combined.total.toString() });
+            });
+
+            return filteredReports.concat(combinedReports);
         }
 
         function hideReportView() {
