@@ -140,6 +140,7 @@
         })();
     </script>
     <script>
+        const restaurantName = "<%= restaurant.name %>";
         const reportViewCard = document.getElementById('reportViewCard');
         const viewReportTitle2 = document.getElementById('viewReportTitle2');
         const viewReportDate2 = document.getElementById('viewReportDate2');
@@ -222,55 +223,57 @@
         }
 
         function combineDailyReports(reports) {
-            const combinedMap = new Map();
-            const usedReportIds = new Set();
-
+            const groups = new Map();
             reports.forEach(report => {
                 const name = (report.name || '').toLowerCase();
-                const hasTekawey = name.includes('تيك اواي');
                 const hasSbahi = name.includes('صباحي');
                 const hasMasaei = name.includes('مسائي');
+                if (!hasSbahi && !hasMasaei) return;
+                const shift = hasSbahi ? 'sbahi' : 'masaei';
+                const hasTekawey = name.includes('تيك اواي');
+                const hasDelivery = name.includes('دليفري');
+                if (!hasTekawey && !hasDelivery) return;
+                const dateKey = getReportDateKey(report);
+                if (!dateKey) return;
+                const groupKey = dateKey + '_' + shift;
+                if (!groups.has(groupKey)) {
+                    groups.set(groupKey, { reports: [], hasTekawey: false, hasDelivery: false });
+                }
+                const group = groups.get(groupKey);
+                group.reports.push(report);
+                if (hasTekawey) group.hasTekawey = true;
+                if (hasDelivery) group.hasDelivery = true;
+            });
 
-                if (hasTekawey && (hasSbahi || hasMasaei)) {
-                    const dateKey = getReportDateKey(report);
-                    if (!dateKey) return;
-
-                    const category = hasSbahi ? 'sbahi' : 'masaei';
-                    const combinedKey = dateKey + '_' + category;
-                    if (!combinedMap.has(combinedKey)) {
-                        combinedMap.set(combinedKey, {
-                            id: 'combined_' + category + '_' + dateKey,
-                            name: category === 'sbahi' ? 'تقارير نعمه صباحي يومي' : 'تقارير نعمه مسائي يومي',
-                            date: dateKey,
-                            rows: [],
-                            total: 0,
-                            sourceLabel: 'مجمع',
-                            combined: true,
-                            created_by: { name: 'تجميع تلقائي' }
-                        });
-                    }
-                    const combined = combinedMap.get(combinedKey);
-                    if (report.rows && report.rows.length) {
-                        report.rows.forEach(row => {
-                            combined.rows.push({
-                                desc: row.desc || '',
-                                amount: row.amount || '0'
+            const combinedReports = [];
+            groups.forEach((group, key) => {
+                if (group.hasTekawey && group.hasDelivery) {
+                    const [dateKey, shift] = key.split('_');
+                    const name = shift === 'sbahi' ? `تقارير ${restaurantName} صباحي يومي` : `تقارير ${restaurantName} مسائي يومي`;
+                    const combined = {
+                        id: 'combined_' + key,
+                        name: name,
+                        date: dateKey,
+                        rows: [],
+                        total: 0,
+                        sourceLabel: 'مجمع',
+                        combined: true,
+                        created_by: { name: 'تجميع تلقائي' }
+                    };
+                    group.reports.forEach(report => {
+                        if (report.rows && report.rows.length) {
+                            report.rows.forEach(row => {
+                                combined.rows.push({ desc: row.desc || '', amount: row.amount || '0' });
+                                combined.total += parseAmountValue(row.amount);
                             });
-                            combined.total += parseAmountValue(row.amount);
-                        });
-                    }
-                    usedReportIds.add(report.id);
+                        }
+                    });
+                    combined.total = combined.total.toString();
+                    combinedReports.push(combined);
                 }
             });
 
-            if (usedReportIds.size === 0) return reports;
-
-            const filteredReports = reports.filter(report => !usedReportIds.has(report.id));
-            const combinedReports = Array.from(combinedMap.values()).map(combined => {
-                return Object.assign({}, combined, { total: combined.total.toString() });
-            });
-
-            return filteredReports.concat(combinedReports);
+            return reports.concat(combinedReports);
         }
 
         function hideReportView() {
