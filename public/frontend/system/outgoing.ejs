@@ -38,7 +38,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* ==== Edit Report Form Compact Styles ==== */
         .edit-report-section {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -174,7 +173,6 @@
             margin-top: 14px;
         }
 
-        /* ==== Light Theme Overrides ==== */
         body.light .edit-report-section {
             background: rgba(0, 0, 0, 0.02);
             border-color: rgba(0, 0, 0, 0.08);
@@ -666,6 +664,36 @@
                 actionTd.style.textAlign = 'right';
 
                 if (isEditMode) {
+                    const upBtn = document.createElement('button');
+                    upBtn.className = 'row-action-btn arrow-btn';
+                    upBtn.tabIndex = -1;
+                    upBtn.title = 'إضافة صف للأعلى';
+                    upBtn.innerHTML = '<i class="las la-arrow-up"></i>';
+                    upBtn.addEventListener('click', function() {
+                        const newTr = createRowElement('', '', true);
+                        editReportTbody.insertBefore(newTr, tr);
+                        updateEditTotal();
+                        const { descInput: newDesc } = getInputsInRow(newTr);
+                        if (newDesc) focusInput(newDesc);
+                    });
+
+                    const downBtn = document.createElement('button');
+                    downBtn.className = 'row-action-btn arrow-btn';
+                    downBtn.tabIndex = -1;
+                    downBtn.title = 'إضافة صف للأسفل';
+                    downBtn.innerHTML = '<i class="las la-arrow-down"></i>';
+                    downBtn.addEventListener('click', function() {
+                        const newTr = createRowElement('', '', true);
+                        if (tr.nextSibling) {
+                            editReportTbody.insertBefore(newTr, tr.nextSibling);
+                        } else {
+                            editReportTbody.appendChild(newTr);
+                        }
+                        updateEditTotal();
+                        const { descInput: newDesc } = getInputsInRow(newTr);
+                        if (newDesc) focusInput(newDesc);
+                    });
+
                     const signBtn = document.createElement('button');
                     signBtn.className = 'row-action-btn sign-btn positive';
                     signBtn.tabIndex = -1;
@@ -699,6 +727,8 @@
                         }
                     });
 
+                    actionTd.appendChild(upBtn);
+                    actionTd.appendChild(downBtn);
                     actionTd.appendChild(signBtn);
                     actionTd.appendChild(deleteBtn);
                 } else {
