@@ -153,6 +153,21 @@
             margin-bottom: 8px;
         }
 
+        /* تنسيق شعار داخل خلية العنوان */
+        .title-cell .title-icon img {
+            height: 80px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* في الوضع الداكن: تحويل الشعار إلى اللون الأبيض ليتناسب مع الخلفية الداكنة */
+        body:not(.light) .title-cell .title-icon img {
+            filter: brightness(0) invert(1);
+        }
+
         .user-info-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -683,7 +698,10 @@
     <main>
         <div class="container mx-auto px-4 py-6 max-w-7xl">
             <div class="title-cell">
-                <div class="title-icon"><i class="las la-utensils"></i></div>
+                <!-- تم استبدال الأيقونة بالشعار -->
+                <div class="title-icon">
+                    <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X">
+                </div>
                 <h1>إدارة المطاعم</h1>
                 <p>نظام متكامل لإدارة المطاعم</p>
             </div>
