@@ -14,8 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="/js/tailwind.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/tailwind.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -153,7 +155,6 @@
             margin-bottom: 8px;
         }
 
-        /* تنسيق شعار داخل خلية العنوان */
         .title-cell .title-icon img {
             height: 80px;
             width: auto;
@@ -163,7 +164,6 @@
             margin: 0 auto;
         }
 
-        /* في الوضع الداكن: تحويل الشعار إلى اللون الأبيض ليتناسب مع الخلفية الداكنة */
         body:not(.light) .title-cell .title-icon img {
             filter: brightness(0) invert(1);
         }
@@ -269,28 +269,23 @@
                 gap: 14px;
                 align-items: flex-start;
             }
-
             .user-info-card .user-avatar {
                 width: 48px;
                 height: 48px;
                 font-size: 1.6rem;
             }
-
             .user-info-card .user-details .user-name {
                 font-size: 1.05rem;
             }
-
             .user-info-card .user-details .user-meta {
                 gap: 10px;
                 flex-direction: column;
                 align-items: flex-start;
             }
-
             .user-info-card .user-details .user-meta span {
                 font-size: 0.82rem;
                 width: 100%;
             }
-
             .user-info-card .user-details .user-meta span.meta-email {
                 max-width: 100%;
                 white-space: normal;
@@ -299,7 +294,6 @@
                 text-overflow: clip;
                 overflow: visible;
             }
-
             .user-info-card .user-details .user-meta span.meta-email .email-text {
                 white-space: normal;
                 word-break: break-all;
@@ -315,11 +309,9 @@
                 align-items: center;
                 text-align: center;
             }
-
             .user-info-card .user-details .user-meta {
                 align-items: center;
             }
-
             .user-info-card .user-details .user-meta span {
                 justify-content: center;
             }
@@ -592,48 +584,38 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
-
             .header-title img {
                 height: 50px;
             }
-
             .logout-btn span {
                 display: none;
             }
-
             .logout-btn {
                 padding: 8px 10px;
                 border-radius: 10px;
             }
-
             .title-cell {
                 padding: 20px 16px;
             }
-
             .title-cell h1 {
                 font-size: 1.4rem;
             }
-
             .header-actions {
                 gap: 6px;
             }
-
             #mainHeader {
                 padding: 0 12px;
             }
-
             .theme-toggle {
                 width: 60px;
                 height: 32px;
             }
-
             .theme-toggle .toggle-circle {
                 width: 24px;
                 height: 24px;
                 top: 4px;
                 right: 4px;
             }
-
             .theme-toggle.dark .toggle-circle {
                 right: calc(100% - 28px);
             }
@@ -643,21 +625,217 @@
             .header-title img {
                 height: 42px;
             }
-
             .theme-toggle {
                 width: 52px;
                 height: 28px;
             }
-
             .theme-toggle .toggle-circle {
                 width: 20px;
                 height: 20px;
                 top: 4px;
                 right: 4px;
             }
-
             .theme-toggle.dark .toggle-circle {
                 right: calc(100% - 24px);
+            }
+        }
+
+        .install-prompt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeInOverlay 0.25s ease;
+        }
+
+        .install-prompt-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .install-prompt-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px 28px 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            position: relative;
+            animation: slideUpCard 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes slideUpCard {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .install-prompt-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--color-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .install-prompt-close:hover {
+            color: #ef4444;
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .install-prompt-logo {
+            height: 80px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 16px;
+            border-radius: 12px;
+            transition: filter 0.3s;
+        }
+
+        body:not(.light) .install-prompt-logo {
+            filter: brightness(0) invert(1);
+        }
+
+        .install-prompt-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-white);
+            margin-bottom: 6px;
+        }
+
+        .install-prompt-card p {
+            color: var(--color-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .install-prompt-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .install-prompt-install {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .install-prompt-install:hover {
+            background: #0a7fd1;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(13, 153, 255, 0.35);
+        }
+
+        .install-prompt-install:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .install-prompt-later {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--color-muted);
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .install-prompt-later:hover {
+            color: var(--color-white);
+            border-color: var(--color-muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        @media (max-width: 480px) {
+            .install-prompt-card {
+                padding: 24px 18px 20px;
+                border-radius: 20px;
+            }
+            .install-prompt-logo {
+                height: 60px;
+                max-width: 160px;
+                margin-bottom: 12px;
+            }
+            .install-prompt-card h3 {
+                font-size: 1.1rem;
+            }
+            .install-prompt-card p {
+                font-size: 0.82rem;
+                margin-bottom: 16px;
+            }
+            .install-prompt-install {
+                padding: 10px 18px;
+                font-size: 0.85rem;
+                border-radius: 12px;
+            }
+            .install-prompt-later {
+                padding: 10px 16px;
+                font-size: 0.82rem;
+                border-radius: 12px;
+            }
+            .install-prompt-close {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+                top: 10px;
+                left: 10px;
             }
         }
     </style>
@@ -698,7 +876,6 @@
     <main>
         <div class="container mx-auto px-4 py-6 max-w-7xl">
             <div class="title-cell">
-                <!-- تم استبدال الأيقونة بالشعار -->
                 <div class="title-icon">
                     <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X">
                 </div>
@@ -711,6 +888,22 @@
             <div class="restaurant-grid" id="restaurantGrid"></div>
         </div>
     </main>
+
+    <div id="installPrompt" class="install-prompt-overlay">
+        <div class="install-prompt-card">
+            <button class="install-prompt-close" id="installPromptClose" aria-label="إغلاق">×</button>
+            <img src="https://i.ibb.co/mrRhHsQh/1788099660805-removebg-preview.png" alt="ACSD-X" class="install-prompt-logo">
+            <h3>تثبيت التطبيق</h3>
+            <p>ثبّت التطبيق على جهازك للوصول السريع وتجربة أفضل بدون اتصال بالإنترنت</p>
+            <div class="install-prompt-actions">
+                <button class="install-prompt-install" id="installPromptBtn">
+                    <i class="las la-download"></i>
+                    تثبيت الآن
+                </button>
+                <button class="install-prompt-later" id="installPromptLater">لاحقاً</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         (function () {
@@ -728,6 +921,101 @@
             var currentUser = appData.user || null;
             var userType = currentUser ? currentUser.account_type : null;
             var userPhone = currentUser ? currentUser.phone_number : null;
+
+            var deferredInstallPrompt = null;
+            var installPromptOverlay = document.getElementById('installPrompt');
+            var installPromptBtn = document.getElementById('installPromptBtn');
+            var installPromptLater = document.getElementById('installPromptLater');
+            var installPromptClose = document.getElementById('installPromptClose');
+
+            var INSTALL_PROMPT_DISMISSED_KEY = 'acsd_install_prompt_dismissed';
+            var INSTALL_PROMPT_DELAY = 1200;
+
+            window.addEventListener('beforeinstallprompt', function (e) {
+                e.preventDefault();
+                deferredInstallPrompt = e;
+                tryShowInstallPrompt();
+            });
+
+            window.addEventListener('appinstalled', function () {
+                deferredInstallPrompt = null;
+                hideInstallPrompt();
+            });
+
+            function isPwaInstalled() {
+                return window.matchMedia('(display-mode: standalone)').matches ||
+                    window.matchMedia('(display-mode: fullscreen)').matches ||
+                    window.navigator.standalone === true;
+            }
+
+            function isPromptDismissed() {
+                try {
+                    return localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) === 'true';
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function setPromptDismissed() {
+                try {
+                    localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, 'true');
+                } catch (e) {}
+            }
+
+            function tryShowInstallPrompt() {
+                if (!deferredInstallPrompt) return;
+                if (isPwaInstalled()) return;
+                if (isPromptDismissed()) return;
+                if (installPromptOverlay.classList.contains('show')) return;
+
+                setTimeout(function () {
+                    if (deferredInstallPrompt && !isPwaInstalled() && !isPromptDismissed()) {
+                        installPromptOverlay.classList.add('show');
+                    }
+                }, INSTALL_PROMPT_DELAY);
+            }
+
+            function hideInstallPrompt() {
+                installPromptOverlay.classList.remove('show');
+            }
+
+            installPromptBtn.addEventListener('click', function () {
+                if (!deferredInstallPrompt) return;
+                deferredInstallPrompt.prompt();
+                deferredInstallPrompt.userChoice.then(function (choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        hideInstallPrompt();
+                        deferredInstallPrompt = null;
+                    } else {
+                        hideInstallPrompt();
+                    }
+                });
+            });
+
+            installPromptLater.addEventListener('click', function () {
+                setPromptDismissed();
+                hideInstallPrompt();
+            });
+
+            installPromptClose.addEventListener('click', function () {
+                setPromptDismissed();
+                hideInstallPrompt();
+            });
+
+            installPromptOverlay.addEventListener('click', function (e) {
+                if (e.target === installPromptOverlay) {
+                    setPromptDismissed();
+                    hideInstallPrompt();
+                }
+            });
+
+            if (!isPwaInstalled() && !isPromptDismissed()) {
+                setTimeout(function () {
+                    if (!deferredInstallPrompt && !isPwaInstalled() && !isPromptDismissed()) {
+                        tryShowInstallPrompt();
+                    }
+                }, INSTALL_PROMPT_DELAY);
+            }
 
             function getArabicType(type) {
                 if (type === 'admin') return 'مدير';
@@ -754,7 +1042,8 @@
                     '<div class="user-meta">' +
                     '<span><i class="las la-phone"></i> ' + (user.phone_number || 'غير محدد') + '</span>' +
                     '<span><i class="las la-user-tag"></i> ' + arabicType + '</span>' +
-                    '<span class="meta-email" title="' + email + '"><i class="las la-envelope"></i> <span class="email-text">' + email + '</span></span>' +
+                    '<span class="meta-email" title="' + email + '"><i class="las la-envelope"></i> <span class="email-text">' +
+                    email + '</span></span>' +
                     '</div>' +
                     '</div>' +
                     '</div>';
@@ -800,7 +1089,8 @@
                     var logoContent;
                     if (rest.logo) {
                         logoContent =
-                            '<img src="' + rest.logo + '" alt="' + (rest.name || '') + '" onerror="this.onerror=null;this.parentElement.innerHTML=\'<i class=\\\'las la-store-alt fallback-icon\\\'></i>\'">';
+                            '<img src="' + rest.logo + '" alt="' + (rest.name || '') +
+                            '" onerror="this.onerror=null;this.parentElement.innerHTML=\'<i class=\\\'las la-store-alt fallback-icon\\\'></i>\'">';
                     } else {
                         logoContent = '<i class="las la-store-alt fallback-icon"></i>';
                     }
@@ -834,15 +1124,13 @@
                 }
                 try {
                     localStorage.setItem('theme', theme);
-                } catch (e) {
-                }
+                } catch (e) {}
             }
 
             var savedTheme = 'dark';
             try {
                 savedTheme = localStorage.getItem('theme') || 'dark';
-            } catch (e) {
-            }
+            } catch (e) {}
             applyTheme(savedTheme);
 
             themeToggleBtn.addEventListener('click', function () {
