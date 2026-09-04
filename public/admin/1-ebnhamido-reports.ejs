@@ -35,6 +35,35 @@
         }
     </script>
     <style>
+        :root {
+            --color-primary: #0d99ff;
+            --color-secondary: #7c3aed;
+            --color-accent: #06b6d4;
+            --color-background: #00080f;
+            --color-card: #00060c;
+            --color-darker: #000308;
+            --color-paragraph: #bababa;
+            --color-white: #ffffff;
+            --color-muted: #9ca3af;
+            --border-subtle: rgba(186, 186, 186, 0.24);
+            --card-bg: #00060c;
+            --border-color: rgba(186, 186, 186, 0.24);
+            --darker-bg: #000308;
+        }
+
+        .light {
+            --color-background: #f1f5f9;
+            --color-card: #ffffff;
+            --color-darker: #e2e8f0;
+            --color-paragraph: #334155;
+            --color-white: #0f172a;
+            --color-muted: #64748b;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --darker-bg: #e2e8f0;
+        }
+
         .dashboard-card {
             display: none;
         }
@@ -45,25 +74,29 @@
             margin-bottom: 1.5rem;
         }
         .summary-item {
-            background: var(--color-card-bg, #1e293b);
-            border: 1px solid var(--color-border, #334155);
+            background: var(--color-card);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.25rem;
             text-align: center;
-            transition: transform 0.2s;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
         .summary-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(13, 153, 255, 0.15);
         }
         .summary-title {
-            font-size: 0.9rem;
-            color: var(--color-muted, #94a3b8);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-muted);
             margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
         }
         .summary-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--color-white, #f8fafc);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--color-white);
+            letter-spacing: 0.5px;
         }
         .summary-value.income {
             color: #10b981;
@@ -72,55 +105,69 @@
             color: #ef4444;
         }
         .summary-value.net {
-            color: #0d99ff;
+            color: var(--color-primary);
         }
         .chart-container {
-            background: var(--color-card-bg, #1e293b);
-            border: 1px solid var(--color-border, #334155);
+            background: var(--color-card);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.25rem;
             margin-bottom: 1.5rem;
             position: relative;
-            height: 300px;
+            height: 320px;
         }
         .dashboard-table-wrapper {
-            background: var(--color-card-bg, #1e293b);
-            border: 1px solid var(--color-border, #334155);
+            background: var(--color-card);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.25rem;
             overflow-x: auto;
             margin-bottom: 1.5rem;
         }
         .dashboard-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
         .dashboard-table th, .dashboard-table td {
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             text-align: right;
-            border-bottom: 1px solid var(--color-border, #334155);
+            border-bottom: 1px solid var(--border-subtle);
         }
         .dashboard-table th {
-            color: var(--color-muted, #94a3b8);
-            font-weight: 600;
+            color: var(--color-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .dashboard-table td {
-            color: var(--color-white, #f8fafc);
+            color: var(--color-white);
+            font-weight: 500;
+        }
+        .dashboard-table tr:last-child td {
+            border-bottom: none;
+        }
+        .dashboard-table tbody tr:hover td {
+            background: rgba(13, 153, 255, 0.03);
         }
         .income-badge {
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.12);
             color: #10b981;
-            padding: 0.2rem 0.6rem;
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
         }
         .expense-badge {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.12);
             color: #ef4444;
-            padding: 0.2rem 0.6rem;
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
         }
     </style>
 </head>
@@ -339,22 +386,14 @@
 
         function getReportDateKey(report) {
             if (!report) return null;
-
             if (report.date) {
                 const dateStr = normalizeArabicDigits(report.date);
                 let m = dateStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-                if (m) {
-                    return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
-                }
+                if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
                 m = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-                if (m) {
-                    return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
-                }
+                if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
             }
-
-            if (report.timestamp) {
-                return String(report.timestamp).slice(0, 10);
-            }
+            if (report.timestamp) return String(report.timestamp).slice(0, 10);
             return null;
         }
 
@@ -384,9 +423,7 @@
                 const dateKey = getReportDateKey(report);
                 if (!dateKey) return;
                 const groupKey = dateKey + '_' + shift;
-                if (!groups.has(groupKey)) {
-                    groups.set(groupKey, []);
-                }
+                if (!groups.has(groupKey)) groups.set(groupKey, []);
                 groups.get(groupKey).push(report);
             });
 
@@ -407,19 +444,12 @@
                                 existing.amount += amount;
                                 existing.amountStr = existing.amount.toString();
                             } else {
-                                rowsMap.set(normDesc, {
-                                    desc: desc,
-                                    amount: amount,
-                                    amountStr: amount.toString()
-                                });
+                                rowsMap.set(normDesc, { desc: desc, amount: amount, amountStr: amount.toString() });
                             }
                         });
                     }
                 });
-                const combinedRows = Array.from(rowsMap.values()).map(item => ({
-                    desc: item.desc,
-                    amount: item.amountStr
-                }));
+                const combinedRows = Array.from(rowsMap.values()).map(item => ({ desc: item.desc, amount: item.amountStr }));
                 const total = combinedRows.reduce((sum, row) => sum + parseAmountValue(row.amount), 0);
                 combinedReports.push({
                     id: 'combined_' + key,
@@ -488,9 +518,7 @@
             const creatorPic = report.created_by ? report.created_by.profile_picture : '';
             const dateSourceLine = `${report.date || ''}${report.sourceLabel ? ' • ' + report.sourceLabel : ''}${creatorName ? ' • بواسطة: ' + creatorName : ''}`.trim();
             let avatarHtml = '';
-            if (creatorPic) {
-                avatarHtml = `<img src="${creatorPic}" class="creator-avatar" alt="creator">`;
-            }
+            if (creatorPic) avatarHtml = `<img src="${creatorPic}" class="creator-avatar" alt="creator">`;
             return `<div class="report-list-item">
                 <div class="report-info">
                     <span class="text-primary"><i class="las la-file-alt text-xl"></i></span>
@@ -590,9 +618,7 @@
             const groupedByMonth = {};
             filteredReports.forEach(report => {
                 const dateKey = getReportDateKey(report);
-                let year = null,
-                    month = null,
-                    day = null;
+                let year = null, month = null, day = null;
                 if (dateKey) {
                     const parts = dateKey.split('-');
                     if (parts.length === 3) {
@@ -603,11 +629,7 @@
                 }
                 const monthKey = (year && month) ? `${year}-${month}` : '__undated__';
                 if (!groupedByMonth[monthKey]) {
-                    groupedByMonth[monthKey] = {
-                        days: {},
-                        monthNum: month ? parseInt(month, 10) : null,
-                        year: year
-                    };
+                    groupedByMonth[monthKey] = { days: {}, monthNum: month ? parseInt(month, 10) : null, year: year };
                 }
                 const dayKey = day || (dateKey ? '__noDay__' : '__undated__');
                 if (!groupedByMonth[monthKey].days[dayKey]) groupedByMonth[monthKey].days[dayKey] = [];
@@ -651,9 +673,7 @@
                     reportsForDay.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
 
                     if (dayKey === '__noDay__' || dayKey === '__undated__') {
-                        reportsForDay.forEach(report => {
-                            html += buildReportListItem(report);
-                        });
+                        reportsForDay.forEach(report => { html += buildReportListItem(report); });
                     } else {
                         let dayTitle = dayKey;
                         if (monthKey !== '__undated__') {
@@ -672,16 +692,13 @@
                         html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
                         html += `</div>`;
                         html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
-                        reportsForDay.forEach(report => {
-                            html += buildReportListItem(report);
-                        });
+                        reportsForDay.forEach(report => { html += buildReportListItem(report); });
                         html += `</div></div>`;
                     }
                 });
                 html += `</div></div>`;
             });
             recentReportsList.innerHTML = html;
-
             attachReportListEvents();
         }
 
@@ -691,9 +708,7 @@
             const isHidden = content.classList.toggle('hidden');
             expandedMonthFolders[monthKey] = !isHidden;
             const btn = document.querySelector(`.month-toggle-btn[data-key="${monthKey}"]`);
-            if (btn) {
-                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
-            }
+            if (btn) btn.textContent = isHidden ? 'فتح' : 'إغلاق';
         }
 
         function toggleDayFolder(dayStateKey) {
@@ -702,9 +717,7 @@
             const isHidden = content.classList.toggle('hidden');
             expandedDayFolders[dayStateKey] = !isHidden;
             const btn = document.querySelector(`.day-toggle-btn[data-key="${dayStateKey}"]`);
-            if (btn) {
-                btn.textContent = isHidden ? 'فتح' : 'إغلاق';
-            }
+            if (btn) btn.textContent = isHidden ? 'فتح' : 'إغلاق';
         }
 
         function renderDateResultsTable(reports) {
@@ -728,9 +741,7 @@
                 viewBtn.className = 'btn-outline btn-xs view-report-btn';
                 viewBtn.setAttribute('data-id', report.id);
                 viewBtn.innerHTML = '<i class="las la-eye"></i> عرض';
-                viewBtn.addEventListener('click', function() {
-                    viewReportById(report.id);
-                });
+                viewBtn.addEventListener('click', function() { viewReportById(report.id); });
                 tdAction.appendChild(viewBtn);
                 tr.appendChild(tdName);
                 tr.appendChild(tdDate);
@@ -742,16 +753,12 @@
 
         reportDatePicker.addEventListener('change', function() {
             selectedDateFilter = this.value;
-            if (!selectedDateFilter) {
-                selectedDateFilter = null;
-            }
+            if (!selectedDateFilter) selectedDateFilter = null;
             loadRecentReports();
         });
 
         if (reportSearchInput) {
-            reportSearchInput.addEventListener('input', function() {
-                loadRecentReports();
-            });
+            reportSearchInput.addEventListener('input', function() { loadRecentReports(); });
         }
 
         deleteCashBtn.addEventListener('click', function() {
@@ -768,9 +775,7 @@
             loadRecentReports();
         });
 
-        refreshReportsBtn.addEventListener('click', function() {
-            window.location.reload();
-        });
+        refreshReportsBtn.addEventListener('click', function() { window.location.reload(); });
 
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
             const LOGO_URL = `<%= restaurant.logo %>`;
@@ -878,34 +883,41 @@
             document.getElementById('dashTotalExpenses').textContent = totalExpenses.toFixed(2);
             document.getElementById('dashNet').textContent = (totalIncome - totalExpenses).toFixed(2);
 
-            // Pie chart
             const pieCtx = document.getElementById('dashPieChart').getContext('2d');
             if (dashPieChartInstance) dashPieChartInstance.destroy();
             dashPieChartInstance = new Chart(pieCtx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: ['الدخل', 'المصروفات'],
                     datasets: [{
                         data: [totalIncome, totalExpenses],
                         backgroundColor: ['#10b981', '#ef4444'],
-                        borderWidth: 0
+                        borderWidth: 2,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-card').trim() || '#00060c'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '55%',
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#f8fafc' }
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--color-white').trim() || '#ffffff',
+                                font: { family: 'Alexandria', size: 13, weight: '600' },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyleWidth: 10
+                            }
                         }
                     }
                 }
             });
 
-            // Bar chart: income categories and expenses
             const barCtx = document.getElementById('dashBarChart').getContext('2d');
             if (dashBarChartInstance) dashBarChartInstance.destroy();
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-muted').trim() || '#9ca3af';
             dashBarChartInstance = new Chart(barCtx, {
                 type: 'bar',
                 data: {
@@ -913,8 +925,10 @@
                     datasets: [{
                         label: 'المبالغ (ج.م)',
                         data: [cashTotal, transferTotal, visaTotal, totalExpenses],
-                        backgroundColor: ['#06b6d4', '#3b82f6', '#8b5cf6', '#ef4444'],
-                        borderRadius: 5
+                        backgroundColor: ['#06b6d4', '#0d99ff', '#7c3aed', '#ef4444'],
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barThickness: 42
                     }]
                 },
                 options: {
@@ -923,30 +937,36 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { color: '#94a3b8' }
+                            ticks: { color: textColor, font: { family: 'Alexandria', size: 12 } },
+                            grid: { color: 'rgba(186,186,186,0.1)' }
                         },
                         x: {
-                            ticks: { color: '#94a3b8' }
+                            ticks: { color: textColor, font: { family: 'Alexandria', size: 12, weight: '600' } },
+                            grid: { display: false }
                         }
                     },
                     plugins: {
-                        legend: {
-                            display: false
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { family: 'Alexandria', size: 13 },
+                            bodyFont: { family: 'Alexandria', size: 12 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleColor: '#ffffff',
+                            bodyColor: '#bababa'
                         }
                     }
                 }
             });
 
-            // Table: categories
             const tbody = document.getElementById('dashCategoryTbody');
             tbody.innerHTML = '';
-            // Income categories
             Object.keys(incomeCategories).forEach(cat => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${cat}</td><td><span class="income-badge">دخل</span></td><td>${incomeCategories[cat].toFixed(2)}</td>`;
                 tbody.appendChild(tr);
             });
-            // Expense categories
             Object.keys(expenseCategories).forEach(cat => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${cat}</td><td><span class="expense-badge">مصروف</span></td><td>${expenseCategories[cat].toFixed(2)}</td>`;
@@ -976,9 +996,7 @@
             if (window.innerWidth >= 1025) {
                 sidebar.classList.remove('mobile-open', 'mobile-closed');
             } else {
-                if (!sidebar.classList.contains('mobile-open')) {
-                    sidebar.classList.add('mobile-closed');
-                }
+                if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
             }
         });
 
@@ -1004,9 +1022,7 @@
                 if (this.id === 'adminSidebarLogoutBtn') return;
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
-                if (window.innerWidth < 1025) {
-                    closeSidebar();
-                }
+                if (window.innerWidth < 1025) closeSidebar();
             });
         });
 
