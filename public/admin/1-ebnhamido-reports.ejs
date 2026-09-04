@@ -98,14 +98,8 @@
             color: var(--color-white);
             letter-spacing: 0.5px;
         }
-        .summary-value.income {
-            color: #10b981;
-        }
         .summary-value.expense {
             color: #ef4444;
-        }
-        .summary-value.net {
-            color: var(--color-primary);
         }
         .chart-container {
             background: var(--color-card);
@@ -151,15 +145,6 @@
         .dashboard-table tbody tr:hover td {
             background: rgba(13, 153, 255, 0.03);
         }
-        .income-badge {
-            background: rgba(16, 185, 129, 0.12);
-            color: #10b981;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            display: inline-block;
-        }
         .expense-badge {
             background: rgba(239, 68, 68, 0.12);
             color: #ef4444;
@@ -168,6 +153,44 @@
             font-size: 0.78rem;
             font-weight: 600;
             display: inline-block;
+        }
+        .date-range-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .date-range-filter label {
+            color: var(--color-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .date-range-filter input[type="date"] {
+            background: var(--color-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            color: var(--color-white);
+            font-family: 'Alexandria', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .date-range-filter input[type="date"]:focus {
+            border-color: var(--color-primary);
+        }
+        .folder-dash-btn {
+            background: rgba(13, 153, 255, 0.1);
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .folder-dash-btn:hover {
+            background: rgba(13, 153, 255, 0.2);
         }
     </style>
 </head>
@@ -243,37 +266,40 @@
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
                             <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-chart-pie text-primary"></i> لوحة المعلومات</h3>
-                            <p class="text-sm text-[var(--color-muted)]">ملخص الدخل والمصروفات</p>
+                            <p class="text-sm text-[var(--color-muted)]" id="dashboardPeriodLabel">جميع الفترات</p>
                         </div>
                         <button id="closeDashboardBtn" class="btn-outline btn-sm"><i class="las la-times"></i> إغلاق اللوحة</button>
                     </div>
+                    <div class="date-range-filter">
+                        <label for="dashDateFrom">من تاريخ:</label>
+                        <input type="date" id="dashDateFrom" />
+                        <label for="dashDateTo">إلى تاريخ:</label>
+                        <input type="date" id="dashDateTo" />
+                        <button id="applyDateRangeBtn" class="btn-primary btn-sm"><i class="las la-filter"></i> تطبيق</button>
+                        <button id="resetDateRangeBtn" class="btn-outline btn-sm"><i class="las la-undo-alt"></i> إعادة تعيين</button>
+                    </div>
                     <div class="summary-grid">
-                        <div class="summary-item">
-                            <div class="summary-title">إجمالي الدخل</div>
-                            <div class="summary-value income" id="dashTotalIncome">0</div>
-                        </div>
                         <div class="summary-item">
                             <div class="summary-title">إجمالي المصروفات</div>
                             <div class="summary-value expense" id="dashTotalExpenses">0</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-title">الصافي</div>
-                            <div class="summary-value net" id="dashNet">0</div>
+                            <div class="summary-title">عدد البنود</div>
+                            <div class="summary-value" id="dashItemCount">0</div>
                         </div>
                     </div>
                     <div class="chart-container">
-                        <canvas id="dashPieChart"></canvas>
+                        <canvas id="dashExpensePieChart"></canvas>
                     </div>
                     <div class="chart-container">
-                        <canvas id="dashBarChart"></canvas>
+                        <canvas id="dashExpenseBarChart"></canvas>
                     </div>
                     <div class="dashboard-table-wrapper">
-                        <h4 class="text-md font-bold text-[var(--color-white)] mb-3">تفاصيل الفئات</h4>
+                        <h4 class="text-md font-bold text-[var(--color-white)] mb-3">تفاصيل بنود المصروفات</h4>
                         <table class="dashboard-table" id="dashCategoryTable">
                             <thead>
                                 <tr>
-                                    <th>الفئة</th>
-                                    <th>النوع</th>
+                                    <th>البيان</th>
                                     <th>المبلغ (ج.م)</th>
                                 </tr>
                             </thead>
@@ -339,14 +365,21 @@
         const showDashboardBtn = document.getElementById('showDashboardBtn');
         const closeDashboardBtn = document.getElementById('closeDashboardBtn');
         const dashboardCard = document.getElementById('dashboardCard');
+        const dashDateFrom = document.getElementById('dashDateFrom');
+        const dashDateTo = document.getElementById('dashDateTo');
+        const applyDateRangeBtn = document.getElementById('applyDateRangeBtn');
+        const resetDateRangeBtn = document.getElementById('resetDateRangeBtn');
+        const dashboardPeriodLabel = document.getElementById('dashboardPeriodLabel');
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
         let expandedMonthFolders = {};
         let expandedDayFolders = {};
         let excludeCashReports = false;
-        let dashPieChartInstance = null;
-        let dashBarChartInstance = null;
+        let dashExpensePieChartInstance = null;
+        let dashExpenseBarChartInstance = null;
+        let dashboardDateFrom = null;
+        let dashboardDateTo = null;
 
         const arabicMonths = [
             'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -539,7 +572,7 @@
         function attachReportListEvents() {
             document.querySelectorAll('.folder-header[data-toggle="month"]').forEach(header => {
                 header.addEventListener('click', function(e) {
-                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
+                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn') || e.target.closest('.folder-dash-btn')) return;
                     const monthKey = this.getAttribute('data-key');
                     toggleMonthFolder(monthKey);
                 });
@@ -547,7 +580,7 @@
 
             document.querySelectorAll('.folder-header[data-toggle="day"]').forEach(header => {
                 header.addEventListener('click', function(e) {
-                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn')) return;
+                    if (e.target.closest('.folder-toggle-btn') || e.target.closest('.view-report-btn') || e.target.closest('.folder-dash-btn')) return;
                     const dayStateKey = this.getAttribute('data-key');
                     toggleDayFolder(dayStateKey);
                 });
@@ -573,6 +606,15 @@
                 btn.addEventListener('click', function() {
                     const reportId = this.getAttribute('data-id');
                     viewReportById(reportId);
+                });
+            });
+
+            document.querySelectorAll('.folder-dash-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const type = this.getAttribute('data-type');
+                    const key = this.getAttribute('data-key');
+                    openFolderDashboard(type, key);
                 });
             });
         }
@@ -656,7 +698,10 @@
                 html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
                 html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
                 html += `<div class="folder-title"><i class="las la-folder"></i><span>${monthTitle}</span></div>`;
+                html += `<div class="flex gap-2 items-center">`;
+                html += `<button class="folder-dash-btn" data-type="month" data-key="${monthKey}" title="لوحة معلومات الشهر"><i class="las la-chart-bar"></i></button>`;
                 html += `<button class="btn-outline btn-xs folder-toggle-btn month-toggle-btn" data-toggle="month" data-key="${monthKey}">${monthExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                html += `</div>`;
                 html += `</div>`;
                 html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
 
@@ -689,7 +734,10 @@
                         html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
                         html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
                         html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
+                        html += `<div class="flex gap-2 items-center">`;
+                        html += `<button class="folder-dash-btn" data-type="day" data-key="${dayStateKey}" title="لوحة معلومات اليوم"><i class="las la-chart-bar"></i></button>`;
                         html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                        html += `</div>`;
                         html += `</div>`;
                         html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
                         reportsForDay.forEach(report => { html += buildReportListItem(report); });
@@ -831,21 +879,82 @@
             loadRecentReports();
         }
 
-        showDashboardBtn.addEventListener('click', showDashboard);
+        showDashboardBtn.addEventListener('click', function() {
+            dashboardDateFrom = null;
+            dashboardDateTo = null;
+            dashDateFrom.value = '';
+            dashDateTo.value = '';
+            dashboardPeriodLabel.textContent = 'جميع الفترات';
+            showDashboard();
+        });
+
         closeDashboardBtn.addEventListener('click', hideDashboard);
+
+        applyDateRangeBtn.addEventListener('click', function() {
+            dashboardDateFrom = dashDateFrom.value || null;
+            dashboardDateTo = dashDateTo.value || null;
+            if (dashboardDateFrom && dashboardDateTo) {
+                dashboardPeriodLabel.textContent = `من ${dashboardDateFrom} إلى ${dashboardDateTo}`;
+            } else if (dashboardDateFrom) {
+                dashboardPeriodLabel.textContent = `من ${dashboardDateFrom}`;
+            } else if (dashboardDateTo) {
+                dashboardPeriodLabel.textContent = `حتى ${dashboardDateTo}`;
+            } else {
+                dashboardPeriodLabel.textContent = 'جميع الفترات';
+            }
+            buildDashboard();
+        });
+
+        resetDateRangeBtn.addEventListener('click', function() {
+            dashDateFrom.value = '';
+            dashDateTo.value = '';
+            dashboardDateFrom = null;
+            dashboardDateTo = null;
+            dashboardPeriodLabel.textContent = 'جميع الفترات';
+            buildDashboard();
+        });
+
+        function openFolderDashboard(type, key) {
+            if (type === 'month') {
+                const [year, month] = key.split('-');
+                const monthNum = parseInt(month, 10);
+                const lastDay = new Date(year, monthNum, 0).getDate();
+                dashboardDateFrom = `${year}-${month}-01`;
+                dashboardDateTo = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+                dashDateFrom.value = dashboardDateFrom;
+                dashDateTo.value = dashboardDateTo;
+                const monthName = arabicMonths[monthNum - 1] || '';
+                dashboardPeriodLabel.textContent = `شهر ${monthName} ${year}`;
+            } else if (type === 'day') {
+                const [year, month, day] = key.split('-');
+                dashboardDateFrom = `${year}-${month}-${day}`;
+                dashboardDateTo = `${year}-${month}-${day}`;
+                dashDateFrom.value = dashboardDateFrom;
+                dashDateTo.value = dashboardDateTo;
+                const monthName = arabicMonths[parseInt(month, 10) - 1] || '';
+                const dayNum = parseInt(day, 10);
+                const dateObj = new Date(year, parseInt(month, 10) - 1, dayNum);
+                const weekdayName = arabicDays[dateObj.getDay()];
+                dashboardPeriodLabel.textContent = `يوم ${dayNum} ${monthName} ${year} (${weekdayName})`;
+            }
+            showDashboard();
+        }
 
         function buildDashboard() {
             const reports = window.expensesReports.filter(r => !r.combined);
             const incomeKeywords = ['كاش', 'نقدي', 'تحويلات', 'فيزا', 'فيز'];
-            let totalIncome = 0;
-            let totalExpenses = 0;
-            let cashTotal = 0;
-            let transferTotal = 0;
-            let visaTotal = 0;
             const expenseCategories = {};
-            const incomeCategories = {};
 
             reports.forEach(report => {
+                if (dashboardDateFrom || dashboardDateTo) {
+                    const reportDate = getReportDateKey(report);
+                    if (reportDate) {
+                        if (dashboardDateFrom && reportDate < dashboardDateFrom) return;
+                        if (dashboardDateTo && reportDate > dashboardDateTo) return;
+                    } else {
+                        return;
+                    }
+                }
                 if (report.rows && report.rows.length) {
                     report.rows.forEach(row => {
                         const desc = row.desc || '';
@@ -858,20 +967,7 @@
                                 break;
                             }
                         }
-                        if (isIncome) {
-                            totalIncome += amount;
-                            if (normDesc.includes('كاش') || normDesc.includes('نقدي')) {
-                                cashTotal += amount;
-                                incomeCategories['كاش / نقدي'] = (incomeCategories['كاش / نقدي'] || 0) + amount;
-                            } else if (normDesc.includes('تحويلات')) {
-                                transferTotal += amount;
-                                incomeCategories['تحويلات'] = (incomeCategories['تحويلات'] || 0) + amount;
-                            } else if (normDesc.includes('فيزا') || normDesc.includes('فيز')) {
-                                visaTotal += amount;
-                                incomeCategories['فيزا / فيز'] = (incomeCategories['فيزا / فيز'] || 0) + amount;
-                            }
-                        } else {
-                            totalExpenses += amount;
+                        if (!isIncome) {
                             const catKey = normDesc || 'غير مصنف';
                             expenseCategories[catKey] = (expenseCategories[catKey] || 0) + amount;
                         }
@@ -879,19 +975,32 @@
                 }
             });
 
-            document.getElementById('dashTotalIncome').textContent = totalIncome.toFixed(2);
-            document.getElementById('dashTotalExpenses').textContent = totalExpenses.toFixed(2);
-            document.getElementById('dashNet').textContent = (totalIncome - totalExpenses).toFixed(2);
+            const totalExpenses = Object.values(expenseCategories).reduce((sum, val) => sum + val, 0);
+            const itemCount = Object.keys(expenseCategories).length;
 
-            const pieCtx = document.getElementById('dashPieChart').getContext('2d');
-            if (dashPieChartInstance) dashPieChartInstance.destroy();
-            dashPieChartInstance = new Chart(pieCtx, {
+            document.getElementById('dashTotalExpenses').textContent = totalExpenses.toFixed(2);
+            document.getElementById('dashItemCount').textContent = itemCount;
+
+            const sortedCategories = Object.entries(expenseCategories).sort((a, b) => b[1] - a[1]);
+
+            const pieCtx = document.getElementById('dashExpensePieChart').getContext('2d');
+            if (dashExpensePieChartInstance) dashExpensePieChartInstance.destroy();
+            const topForPie = sortedCategories.slice(0, 8);
+            const otherSum = sortedCategories.slice(8).reduce((sum, [, val]) => sum + val, 0);
+            const pieLabels = topForPie.map(([label]) => label);
+            const pieData = topForPie.map(([, val]) => val);
+            if (otherSum > 0) {
+                pieLabels.push('أخرى');
+                pieData.push(otherSum);
+            }
+            const pieColors = ['#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
+            dashExpensePieChartInstance = new Chart(pieCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['الدخل', 'المصروفات'],
+                    labels: pieLabels,
                     datasets: [{
-                        data: [totalIncome, totalExpenses],
-                        backgroundColor: ['#10b981', '#ef4444'],
+                        data: pieData,
+                        backgroundColor: pieColors.slice(0, pieData.length),
                         borderWidth: 2,
                         borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-card').trim() || '#00060c'
                     }]
@@ -905,8 +1014,8 @@
                             position: 'bottom',
                             labels: {
                                 color: getComputedStyle(document.documentElement).getPropertyValue('--color-white').trim() || '#ffffff',
-                                font: { family: 'Alexandria', size: 13, weight: '600' },
-                                padding: 15,
+                                font: { family: 'Alexandria', size: 12, weight: '600' },
+                                padding: 12,
                                 usePointStyle: true,
                                 pointStyleWidth: 10
                             }
@@ -915,32 +1024,37 @@
                 }
             });
 
-            const barCtx = document.getElementById('dashBarChart').getContext('2d');
-            if (dashBarChartInstance) dashBarChartInstance.destroy();
+            const barCtx = document.getElementById('dashExpenseBarChart').getContext('2d');
+            if (dashExpenseBarChartInstance) dashExpenseBarChartInstance.destroy();
+            const topForBar = sortedCategories.slice(0, 10);
+            const barLabels = topForBar.map(([label]) => label);
+            const barData = topForBar.map(([, val]) => val);
+            const barColors = topForBar.map((_, i) => pieColors[i % pieColors.length]);
             const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-muted').trim() || '#9ca3af';
-            dashBarChartInstance = new Chart(barCtx, {
+            dashExpenseBarChartInstance = new Chart(barCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['كاش / نقدي', 'تحويلات', 'فيزا / فيز', 'مصروفات'],
+                    labels: barLabels,
                     datasets: [{
-                        label: 'المبالغ (ج.م)',
-                        data: [cashTotal, transferTotal, visaTotal, totalExpenses],
-                        backgroundColor: ['#06b6d4', '#0d99ff', '#7c3aed', '#ef4444'],
+                        label: 'المبلغ (ج.م)',
+                        data: barData,
+                        backgroundColor: barColors,
                         borderRadius: 6,
                         borderSkipped: false,
-                        barThickness: 42
+                        barThickness: 30
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
+                        x: {
                             beginAtZero: true,
                             ticks: { color: textColor, font: { family: 'Alexandria', size: 12 } },
                             grid: { color: 'rgba(186,186,186,0.1)' }
                         },
-                        x: {
+                        y: {
                             ticks: { color: textColor, font: { family: 'Alexandria', size: 12, weight: '600' } },
                             grid: { display: false }
                         }
@@ -962,18 +1076,13 @@
 
             const tbody = document.getElementById('dashCategoryTbody');
             tbody.innerHTML = '';
-            Object.keys(incomeCategories).forEach(cat => {
+            sortedCategories.forEach(([cat, amount]) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${cat}</td><td><span class="income-badge">دخل</span></td><td>${incomeCategories[cat].toFixed(2)}</td>`;
-                tbody.appendChild(tr);
-            });
-            Object.keys(expenseCategories).forEach(cat => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${cat}</td><td><span class="expense-badge">مصروف</span></td><td>${expenseCategories[cat].toFixed(2)}</td>`;
+                tr.innerHTML = `<td>${cat}</td><td>${amount.toFixed(2)}</td>`;
                 tbody.appendChild(tr);
             });
             if (tbody.children.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-[var(--color-muted)]">لا توجد بيانات</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-[var(--color-muted)]">لا توجد بيانات</td></tr>';
             }
         }
 
