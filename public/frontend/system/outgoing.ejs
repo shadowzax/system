@@ -13,10 +13,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/outgoing.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -1338,32 +1336,33 @@
 
         .sidebar-toggle-btn {
             position: absolute;
-            left: 6px;
-            top: 20px;
+            left: -15px;
+            top: 160px;
             width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #0d99ff;
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.25);
+            height: 90px;
+            border-radius: 22px;
+            background: #e4f0ec;
+            color: #296f61;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 1000;
-            font-size: 14px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-toggle-btn:hover {
-            background: #0b8ae8;
-            transform: scale(1.1);
-            box-shadow: 0 4px 16px rgba(13, 153, 255, 0.6);
+            background: #d0e8e0;
         }
 
-        .sidebar-toggle-btn i {
+        .sidebar-toggle-btn .toggle-icon {
             transition: transform 0.3s ease;
+        }
+
+        body.sidebar-collapsed .sidebar-toggle-btn .toggle-icon {
+            transform: rotate(180deg);
         }
 
         @media (max-width: 1023px) {
@@ -1431,14 +1430,6 @@
             border-right: none;
         }
 
-        body.sidebar-collapsed .sidebar-toggle-btn {
-            left: 4px;
-        }
-
-        body.sidebar-collapsed .sidebar-toggle-btn i {
-            transform: rotate(180deg);
-        }
-
         .sidebar-footer {
             transition: opacity 0.2s ease;
         }
@@ -1458,8 +1449,8 @@
 <body>
     <div class="relative min-h-screen">
         <aside class="dashboard-sidebar mobile-closed" id="dashboardSidebar">
-            <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="طي القائمة">
-                <i class="las la-angle-right"></i>
+            <button type="button" id="sidebarToggleBtn" class="sidebar-toggle-btn" aria-label="توسيع القائمة">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="toggle-icon" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M15.8351 11.6296L9.20467 5.1999C8.79094 4.79869 8 5.04189 8 5.5703L8 18.4297C8 18.9581 8.79094 19.2013 9.20467 18.8001L15.8351 12.3704C16.055 12.1573 16.0549 11.8427 15.8351 11.6296Z"></path></svg>
             </button>
             <div class="mb-6 px-2 mt-4 user-info-section">
                 <div class="flex items-center gap-3 pb-4 border-b border-[var(--border-color)]">
@@ -1806,14 +1797,12 @@
                 const saved = localStorage.getItem('sidebarCollapsed');
                 if (saved === 'true') {
                     body.classList.add('sidebar-collapsed');
-                    const icon = sidebarToggleBtn.querySelector('i');
-                    if (icon) icon.className = 'las la-angle-left';
-                    sidebarToggleBtn.title = 'فتح القائمة';
+                    sidebarToggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
+                    sidebarToggleBtn.setAttribute('aria-label', 'فتح القائمة');
                 } else {
                     body.classList.remove('sidebar-collapsed');
-                    const icon = sidebarToggleBtn.querySelector('i');
-                    if (icon) icon.className = 'las la-angle-right';
-                    sidebarToggleBtn.title = 'طي القائمة';
+                    sidebarToggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
+                    sidebarToggleBtn.setAttribute('aria-label', 'طي القائمة');
                 }
             }
 
@@ -1822,15 +1811,13 @@
                 const isCollapsed = body.classList.contains('sidebar-collapsed');
                 if (isCollapsed) {
                     body.classList.remove('sidebar-collapsed');
-                    const icon = sidebarToggleBtn.querySelector('i');
-                    if (icon) icon.className = 'las la-angle-right';
-                    sidebarToggleBtn.title = 'طي القائمة';
+                    sidebarToggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
+                    sidebarToggleBtn.setAttribute('aria-label', 'طي القائمة');
                     localStorage.setItem('sidebarCollapsed', 'false');
                 } else {
                     body.classList.add('sidebar-collapsed');
-                    const icon = sidebarToggleBtn.querySelector('i');
-                    if (icon) icon.className = 'las la-angle-left';
-                    sidebarToggleBtn.title = 'فتح القائمة';
+                    sidebarToggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
+                    sidebarToggleBtn.setAttribute('aria-label', 'فتح القائمة');
                     localStorage.setItem('sidebarCollapsed', 'true');
                 }
             });
