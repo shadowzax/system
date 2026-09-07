@@ -211,6 +211,63 @@
             border-color: rgba(0, 0, 0, 0.06);
             background: rgba(0, 0, 0, 0.02);
         }
+
+        .sidebar-toggle-btn {
+            position: fixed;
+            left: 0;
+            top: 40%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            height: 90px;
+            width: 30px;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            background: #e4f0ec;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: #d0e8e0;
+        }
+
+        .sidebar-toggle-btn svg {
+            color: #296f61;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        body.light .sidebar-toggle-btn {
+            background: #e4f0ec;
+        }
+
+        body.light .sidebar-toggle-btn:hover {
+            background: #d0e8e0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-toggle-btn {
+                display: none;
+            }
+        }
+
+        #dashboardSidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+            transition: width 0.3s ease;
+        }
+
+        #dashboardSidebar {
+            transition: width 0.3s ease;
+        }
     </style>
     <script>
         window.__APP_DATA__ = {
@@ -226,6 +283,9 @@
 
 <body>
     <%- include('../../sections/header-ebnhamido.ejs') %>
+            <button type="button" id="sidebarToggleBtn" class="sidebar-toggle-btn" aria-label="توسيع القائمة">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="text-sm text-[#296f61] iconify iconify--solar" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M15.8351 11.6296L9.20467 5.1999C8.79094 4.79869 8 5.04189 8 5.5703L8 18.4297C8 18.9581 8.79094 19.2013 9.20467 18.8001L15.8351 12.3704C16.055 12.1573 16.0549 11.8427 15.8351 11.6296Z"></path></svg>
+            </button>
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon"><i class="las la-chart-pie"></i></div>
@@ -1467,12 +1527,35 @@
 
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
+            const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+
             function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
             function closeSidebar() { sidebar.classList.remove('mobile-open'); sidebar.classList.add('mobile-closed'); }
+
+            function toggleSidebarCollapse() {
+                if (window.innerWidth < 1025) return;
+                sidebar.classList.toggle('collapsed');
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebarToggleBtn.querySelector('svg').style.transform = 'rotate(180deg)';
+                } else {
+                    sidebarToggleBtn.querySelector('svg').style.transform = 'rotate(0deg)';
+                }
+            }
+
+            sidebarToggleBtn.addEventListener('click', toggleSidebarCollapse);
+
             if (window.innerWidth < 1025) sidebar.classList.add('mobile-closed');
             window.addEventListener('resize', function() {
-                if (window.innerWidth >= 1025) sidebar.classList.remove('mobile-open', 'mobile-closed');
-                else if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
+                if (window.innerWidth >= 1025) {
+                    sidebar.classList.remove('mobile-open', 'mobile-closed');
+                    if (sidebar.classList.contains('collapsed')) {
+                        sidebarToggleBtn.querySelector('svg').style.transform = 'rotate(180deg)';
+                    } else {
+                        sidebarToggleBtn.querySelector('svg').style.transform = 'rotate(0deg)';
+                    }
+                } else {
+                    if (!sidebar.classList.contains('mobile-open')) sidebar.classList.add('mobile-closed');
+                }
             });
             headerAvatar.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1511,7 +1594,6 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
                         window.location.href = '/';
                     }
                 });
