@@ -38,6 +38,108 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 50%;
+            right: 260px;
+            transform: translateY(-50%);
+            z-index: 9999;
+            width: 32px;
+            height: 48px;
+            border-radius: 0 24px 24px 0;
+            background: rgba(13, 153, 255, 0.12);
+            border: 1px solid rgba(13, 153, 255, 0.25);
+            color: #0d99ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle-btn i {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: rgba(13, 153, 255, 0.25);
+            border-color: rgba(13, 153, 255, 0.45);
+            box-shadow: 0 6px 24px rgba(13, 153, 255, 0.3);
+        }
+
+        .sidebar-toggle-btn.collapsed {
+            right: 12px;
+        }
+
+        .sidebar-toggle-btn.collapsed i {
+            transform: rotate(180deg);
+        }
+
+        #dashboardSidebar {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        #dashboardSidebar.sidebar-collapsed {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .main-content-wrapper {
+            transition: margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 260px;
+        }
+
+        .main-content-wrapper.expanded {
+            margin-right: 0;
+        }
+
+        body.light .sidebar-toggle-btn {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #555;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .sidebar-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-toggle-btn {
+                display: none;
+            }
+
+            .main-content-wrapper {
+                margin-right: 0;
+            }
+
+            #dashboardSidebar {
+                transform: translateX(100%);
+                opacity: 0;
+                pointer-events: none;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                z-index: 9998;
+            }
+
+            #dashboardSidebar.mobile-open {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
         .edit-report-section {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -226,6 +328,10 @@
 
 <body>
     <%- include('../../sections/header-ebnhamido.ejs') %>
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="إخفاء / إظهار القائمة الجانبية" style="display:none;">
+            <i class="las la-angle-right"></i>
+        </button>
+        <div class="main-content-wrapper" id="mainContentWrapper">
             <div class="container mx-auto px-4 py-6 max-w-7xl">
                 <div class="title-cell">
                     <div class="title-icon"><i class="las la-chart-pie"></i></div>
@@ -400,7 +506,8 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
     </div>
     <div id="printArea" style="display:none;"></div>
 
@@ -1465,6 +1572,39 @@
                 setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 300);
             });
 
+            const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+            const dashboardSidebar = document.getElementById('dashboardSidebar');
+            const mainContentWrapper = document.getElementById('mainContentWrapper');
+            let sidebarCollapsed = false;
+
+            if (isAdmin) {
+                sidebarToggleBtn.style.display = 'flex';
+                sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            } else {
+                sidebarToggleBtn.style.display = 'none';
+                sidebarCollapsed = false;
+                localStorage.removeItem('sidebarCollapsed');
+            }
+
+            function updateSidebarState() {
+                if (sidebarCollapsed) {
+                    dashboardSidebar.classList.add('sidebar-collapsed');
+                    mainContentWrapper.classList.add('expanded');
+                    sidebarToggleBtn.classList.add('collapsed');
+                } else {
+                    dashboardSidebar.classList.remove('sidebar-collapsed');
+                    mainContentWrapper.classList.remove('expanded');
+                    sidebarToggleBtn.classList.remove('collapsed');
+                }
+            }
+
+            sidebarToggleBtn.addEventListener('click', function() {
+                if (!isAdmin) return;
+                sidebarCollapsed = !sidebarCollapsed;
+                localStorage.setItem('sidebarCollapsed', String(sidebarCollapsed));
+                updateSidebarState();
+            });
+
             const sidebar = document.getElementById('dashboardSidebar');
             const headerAvatar = document.getElementById('headerAvatar');
             function openSidebar() { sidebar.classList.add('mobile-open'); sidebar.classList.remove('mobile-closed'); }
@@ -1586,6 +1726,8 @@
                 const isDark = body.classList.contains('light') === false;
                 applyTheme(isDark ? 'light' : 'dark');
             });
+
+            updateSidebarState();
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (!loadFromSession()) {
