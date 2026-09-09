@@ -1432,19 +1432,31 @@
             showDashboard();
         }
 
+        function normalizeIncomeCategory(desc) {
+            const normDesc = normalizeDesc(desc);
+            if (normDesc.includes('فيزا') || normDesc.includes('فيز') || normDesc.includes('visa') || normDesc.includes('بطاقه') || normDesc.includes('بطاقة')) {
+                return 'فيزا';
+            }
+            if (normDesc.includes('كاش') || normDesc.includes('نقدي') || normDesc.includes('نقدية') || normDesc.includes('cash')) {
+                if (normDesc.includes('كاشير')) return normDesc;
+                return 'كاش';
+            }
+            if (normDesc.includes('تحويل') || normDesc.includes('حواله') || normDesc.includes('حوالة') || normDesc.includes('تحويلات') || normDesc.includes('حوالات')) {
+                return 'تحويلات';
+            }
+            if (normDesc.includes('ايداع') || normDesc.includes('إيداع') || normDesc.includes('ايراد') || normDesc.includes('إيراد') || normDesc.includes('ايرادات') || normDesc.includes('إيرادات') || normDesc.includes('مبيعات')) {
+                return normDesc;
+            }
+            return normDesc;
+        }
+
         function isIncomeRow(desc) {
             const normDesc = normalizeDesc(desc);
-            const exactIncomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويل', 'تحويلات', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات'];
-            const startsWithIncome = exactIncomeKeywords.some(kw => normDesc.startsWith(kw) || normDesc.includes(' ' + kw + ' ') || normDesc === kw);
-            if (startsWithIncome) return true;
-            const containsIncomePhrase = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويلات', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات'].some(kw => {
-                const regex = new RegExp('(^|\\s)' + kw + '(\\s|$|\\d)');
-                return regex.test(normDesc);
-            });
             const excludedPhrases = ['كاشير', 'كاشيرات', 'كاشير ', 'كاشير(' , 'كاشير2', 'كاشير 2'];
             const hasExcluded = excludedPhrases.some(ph => normDesc.includes(ph));
             if (hasExcluded) return false;
-            return containsIncomePhrase;
+            const incomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'visa', 'بطاقه', 'بطاقة', 'تحويل', 'تحويلات', 'حواله', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات', 'cash'];
+            return incomeKeywords.some(kw => normDesc.includes(kw));
         }
 
         function buildDashboard() {
@@ -1470,7 +1482,7 @@
                         const normDesc = normalizeDesc(desc);
                         const isIncome = isIncomeRow(desc);
                         if (isIncome) {
-                            let catKey = normDesc || 'دخل غير مصنف';
+                            let catKey = normalizeIncomeCategory(desc);
                             incomeCategories[catKey] = (incomeCategories[catKey] || 0) + amount;
                             dailyIncome[dateKey] = (dailyIncome[dateKey] || 0) + amount;
                         } else {
