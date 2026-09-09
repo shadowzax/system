@@ -548,9 +548,10 @@ app.get("/admin/account", (req, res) => {
 
 /*------------------------------------------*/
 app.get("/admin/resturant/1", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
+
     res.render("../admin/1-ebnhamido", {
         title: "ابن حميدو السلام",
         description: "",
@@ -564,9 +565,10 @@ app.get("/admin/resturant/1", (req, res) => {
     });
 });
 app.get("/admin/reports/1", async (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
+
 
     let reports = [];
     try {
@@ -613,9 +615,10 @@ app.get("/admin/reports/1", async (req, res) => {
 });
 /*----------------------------------------------*/
 app.get("/admin/resturant/2", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
+
     res.render("../admin/1-ebnhamido", {
         title: "مطاعم نعمه",
         description: "",
@@ -629,9 +632,9 @@ app.get("/admin/resturant/2", (req, res) => {
     });
 });
 app.get("/admin/reports/2", async (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
 
     let reports = [];
     try {
@@ -697,9 +700,10 @@ app.get("/admin/resturant", (req, res) => {
 
 /*------------------------------------------*/
 app.get("/admin/resturant/3", (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
+
     res.render("../admin/1-ebnhamido", {
         title: "تشكن كينج",
         description: "",
@@ -713,9 +717,10 @@ app.get("/admin/resturant/3", (req, res) => {
     });
 });
 app.get("/admin/reports/3", async (req, res) => {
-    if (!req.isAuthenticated) {
-        return res.redirect("/login");
-    }
+if (!req.user || !["admin", "viewer"].includes(req.user.account_type)) {
+    return res.redirect(req.user ? "/" : "/login");
+}
+
 
     let reports = [];
     try {
