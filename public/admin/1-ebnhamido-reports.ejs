@@ -1434,7 +1434,7 @@
 
         function isIncomeRow(desc) {
             const normDesc = normalizeDesc(desc);
-            const exactIncomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويل', 'تحويلات', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات', 'مبيعات نقدية', 'مبيعات فيزا', 'مبيعات كاش'];
+            const exactIncomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويل', 'تحويلات', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات'];
             const startsWithIncome = exactIncomeKeywords.some(kw => normDesc.startsWith(kw) || normDesc.includes(' ' + kw + ' ') || normDesc === kw);
             if (startsWithIncome) return true;
             const containsIncomePhrase = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويلات', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات'].some(kw => {
