@@ -1315,7 +1315,6 @@
                 const monthName = getArabicMonthName(parseInt(month, 10));
                 const dayNum = parseInt(day, 10);
                 const dayName = getArabicDayName(`${year}-${month}-${day}`);
-                const dateObj = new Date(year, parseInt(month, 10) - 1, dayNum);
                 const weekdayName = dayName || '';
                 dashboardPeriodLabel.textContent = `يوم ${dayNum} ${monthName} ${year} ${weekdayName ? '(' + weekdayName + ')' : ''}`;
             }
@@ -1350,7 +1349,10 @@
                             }
                         }
                         if (!isIncome) {
-                            const catKey = normDesc || 'غير مصنف';
+                            let catKey = normDesc || 'غير مصنف';
+                            if (catKey.includes('راتب') || catKey.includes('رواتب')) {
+                                catKey = 'رواتب';
+                            }
                             expenseCategories[catKey] = (expenseCategories[catKey] || 0) + amount;
                             dailyExpenses[dateKey] = (dailyExpenses[dateKey] || 0) + amount;
                         }
