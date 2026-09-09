@@ -892,7 +892,10 @@
         function processReport(report) {
             if (!excludeCashReports) return report;
             const cashKeywords = ['كاش', 'نقدي'];
-            const rows = Array.isArray(report.rows) ? report.rows.filter(row => !(row.desc && cashKeywords.some(k => row.desc.includes(k)))) : [];
+            const rows = Array.isArray(report.rows) ? report.rows.filter(row => {
+                const normDesc = normalizeDesc(row.desc || '');
+                return !cashKeywords.some(k => normDesc === k || normDesc === k + ' ' || normDesc.includes(k + ' ') && !normDesc.includes('كاشير'));
+            }) : [];
             const total = rows.reduce((sum, row) => sum + parseAmountValue(row.amount), 0);
             return Object.assign({}, report, { rows: rows, total: total.toString() });
         }
@@ -1429,9 +1432,23 @@
             showDashboard();
         }
 
+        function isIncomeRow(desc) {
+            const normDesc = normalizeDesc(desc);
+            const exactIncomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويل', 'تحويلات', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات', 'مبيعات نقدية', 'مبيعات فيزا', 'مبيعات كاش'];
+            const startsWithIncome = exactIncomeKeywords.some(kw => normDesc.startsWith(kw) || normDesc.includes(' ' + kw + ' ') || normDesc === kw);
+            if (startsWithIncome) return true;
+            const containsIncomePhrase = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'تحويلات', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات'].some(kw => {
+                const regex = new RegExp('(^|\\s)' + kw + '(\\s|$|\\d)');
+                return regex.test(normDesc);
+            });
+            const excludedPhrases = ['كاشير', 'كاشيرات', 'كاشير ', 'كاشير(' , 'كاشير2', 'كاشير 2'];
+            const hasExcluded = excludedPhrases.some(ph => normDesc.includes(ph));
+            if (hasExcluded) return false;
+            return containsIncomePhrase;
+        }
+
         function buildDashboard() {
             const reports = window.expensesReports.filter(r => !r.combined && r.source !== 'transfers' && r.source !== 'fees');
-            const incomeKeywords = ['كاش', 'نقدي', 'فيزا', 'فيز', 'تحويلات'];
             const expenseCategories = {};
             const incomeCategories = {};
             const dailyExpenses = {};
@@ -1451,13 +1468,7 @@
                         const desc = row.desc || '';
                         const amount = parseAmountValue(row.amount);
                         const normDesc = normalizeDesc(desc);
-                        let isIncome = false;
-                        for (const kw of incomeKeywords) {
-                            if (normDesc.includes(kw.toLowerCase())) {
-                                isIncome = true;
-                                break;
-                            }
-                        }
+                        const isIncome = isIncomeRow(desc);
                         if (isIncome) {
                             let catKey = normDesc || 'دخل غير مصنف';
                             incomeCategories[catKey] = (incomeCategories[catKey] || 0) + amount;
