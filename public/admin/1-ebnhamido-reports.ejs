@@ -1434,6 +1434,7 @@
 
         function normalizeIncomeCategory(desc) {
             const normDesc = normalizeDesc(desc);
+            if (normDesc.includes('برنجت')) return 'برنجت';
             if (normDesc.includes('فيزا') || normDesc.includes('فيز') || normDesc.includes('visa') || normDesc.includes('بطاقه') || normDesc.includes('بطاقة')) {
                 return 'فيزا';
             }
