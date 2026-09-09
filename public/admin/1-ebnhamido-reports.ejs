@@ -551,7 +551,10 @@
                 <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-chart-line text-primary"></i> لوحة تحليلات المصروفات والدخل</h3>
                 <p class="text-sm text-[var(--color-muted)]" id="dashboardPeriodLabel">جميع الفترات</p>
             </div>
-            <button id="closeDashboardBtn" class="btn-outline btn-sm"><i class="las la-times"></i> إغلاق اللوحة</button>
+            <div class="flex gap-2">
+                <button id="printDashboardBtn" class="btn-outline btn-sm"><i class="las la-print"></i> طباعة اللوحة</button>
+                <button id="closeDashboardBtn" class="btn-outline btn-sm"><i class="las la-times"></i> إغلاق اللوحة</button>
+            </div>
         </div>
         <div class="date-range-filter">
             <label for="dashDateFrom">من تاريخ:</label>
@@ -763,6 +766,7 @@
         const refreshReportsBtn = document.getElementById('refreshReportsBtn');
         const showDashboardBtn = document.getElementById('showDashboardBtn');
         const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+        const printDashboardBtn = document.getElementById('printDashboardBtn');
         const dashboardCard = document.getElementById('dashboardCard');
         const dashDateFrom = document.getElementById('dashDateFrom');
         const dashDateTo = document.getElementById('dashDateTo');
@@ -1427,7 +1431,7 @@
 
         function buildDashboard() {
             const reports = window.expensesReports.filter(r => !r.combined && r.source !== 'transfers' && r.source !== 'fees');
-            const incomeKeywords = ['كاش', 'نقدي', 'تحويلات', 'فيزا', 'فيز'];
+            const incomeKeywords = ['كاش', 'فيزا', 'تحويلات', 'فيز'];
             const expenseCategories = {};
             const incomeCategories = {};
             const dailyExpenses = {};
@@ -1508,7 +1512,6 @@
             document.getElementById('dashMaxDaily').textContent = maxDaily.toFixed(2);
             document.getElementById('dashMaxDailyDate').textContent = maxDailyDate !== '-' ? maxDailyDate : '-';
             document.getElementById('dashItemCount').textContent = itemCount;
-
             document.getElementById('dashTotalIncome').textContent = totalIncome.toFixed(2);
             document.getElementById('dashAvgDailyIncome').textContent = avgDailyIncome.toFixed(2);
             document.getElementById('dashMaxDailyIncome').textContent = maxDailyIncome.toFixed(2);
@@ -1764,6 +1767,70 @@
             dashIncomePrevPageBtn.disabled = currentIncomePage <= 0;
             dashIncomeNextPageBtn.disabled = currentIncomePage >= totalIncomePages - 1;
         }
+
+        printDashboardBtn.addEventListener('click', function() {
+            const printArea = document.getElementById('printArea');
+            const LOGO_URL = `<%= restaurant.logo %>`;
+            let html = '';
+            html += '<div style="text-align:center; margin-bottom:4mm; font-family: Arial, sans-serif; color:#000;">';
+            html += '<img src="' + LOGO_URL + '" style="width:20mm; height:auto; margin:0 auto; display:block;" alt="Logo" />';
+            html += '<div style="font-size:20px; font-weight:800; margin-top:1mm;">' + restaurantName + '</div>';
+            html += '<div style="font-size:12px; font-weight:600; margin-top:0.5mm;">تقرير تحليلي للمصروفات والدخل</div>';
+            html += '<div style="font-size:10px; font-weight:400; margin-top:0.5mm;">' + dashboardPeriodLabel.textContent + '</div>';
+            html += '</div>';
+            html += '<div style="width:100%; height:2px; background:#000; margin-bottom:3mm;"></div>';
+
+            html += '<h3 style="font-size:14px; font-weight:700; color:#000; margin-bottom:1mm;">ملخص المصروفات</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; border:1px solid #000; margin-bottom:3mm;">';
+            html += '<thead><tr><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">البيان</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">القيمة</th></tr></thead><tbody>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">إجمالي المصروفات</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashTotalExpenses').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">عدد التقارير</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashReportCount').textContent + '</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">متوسط اليومي</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashAvgDaily').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">أعلى يوم مصروف</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashMaxDaily').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">عدد بنود المصروفات</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashItemCount').textContent + '</td></tr>';
+            html += '</tbody></table>';
+
+            html += '<h3 style="font-size:14px; font-weight:700; color:#000; margin-bottom:1mm;">ملخص الدخل</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; border:1px solid #000; margin-bottom:3mm;">';
+            html += '<thead><tr><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">البيان</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">القيمة</th></tr></thead><tbody>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">إجمالي الدخل</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashTotalIncome').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">متوسط الدخل اليومي</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashAvgDailyIncome').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">أعلى يوم دخل</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashMaxDailyIncome').textContent + ' ج.م</td></tr>';
+            html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">عدد بنود الدخل</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + document.getElementById('dashIncomeItemCount').textContent + '</td></tr>';
+            html += '</tbody></table>';
+
+            html += '<h3 style="font-size:14px; font-weight:700; color:#000; margin-bottom:1mm;">تفاصيل بنود المصروفات</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; border:1px solid #000; margin-bottom:3mm;">';
+            html += '<thead><tr><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">البيان</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">المبلغ (ج.م)</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">النسبة</th></tr></thead><tbody>';
+            dashCategories.forEach(([cat, amount]) => {
+                const totalExpenses = dashCategories.reduce((sum, [, val]) => sum + val, 0);
+                const pct = totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : 0;
+                html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + cat + '</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + amount.toFixed(2) + '</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + pct + '%</td></tr>';
+            });
+            html += '</tbody></table>';
+
+            html += '<h3 style="font-size:14px; font-weight:700; color:#000; margin-bottom:1mm;">تفاصيل بنود الدخل</h3>';
+            html += '<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; border:1px solid #000; margin-bottom:3mm;">';
+            html += '<thead><tr><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">البيان</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">المبلغ (ج.م)</th><th style="padding:3px 5px; border:0.5px solid #000; background:#e8e8e8; text-align:center; font-weight:700;">النسبة</th></tr></thead><tbody>';
+            dashIncomeCategories.forEach(([cat, amount]) => {
+                const totalIncome = dashIncomeCategories.reduce((sum, [, val]) => sum + val, 0);
+                const pct = totalIncome > 0 ? ((amount / totalIncome) * 100).toFixed(1) : 0;
+                html += '<tr><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + cat + '</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + amount.toFixed(2) + '</td><td style="padding:3px 5px; border:0.5px solid #000; text-align:center;">' + pct + '%</td></tr>';
+            });
+            html += '</tbody></table>';
+
+            html += '<div class="footer" style="margin-top:6mm; padding-top:2mm; border-top:1px dashed #333; text-align:center; font-size:11px; color:#000; font-weight:700; line-height:1.5;">';
+            html += '<div class="dev" style="font-size:10px; font-weight:600; color:#111; margin-top:1mm;"><p>Developed By Abdelrahman & Mando</p><p>&lt;&nbsp;All Copyrights Reserved&nbsp;&copy;&nbsp;2026&nbsp;&gt;</p></div>';
+            html += '<div class="dev-version" style="font-size:10px; font-weight:600; color:#111; margin-top:0.5mm;">v3.2</div>';
+            html += '</div>';
+
+            printArea.innerHTML = html;
+            printArea.style.display = 'block';
+            setTimeout(() => {
+                window.print();
+                printArea.style.display = 'none';
+            }, 300);
+        });
 
         const sidebar = document.getElementById('dashboardSidebar');
         const headerAvatar = document.getElementById('headerAvatar');
