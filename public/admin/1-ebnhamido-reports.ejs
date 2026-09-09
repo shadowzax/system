@@ -616,6 +616,23 @@
                     </thead>
                     <tbody id="dashCategoryTbody"></tbody>
                 </table>
+                <div class="flex flex-wrap items-center justify-between gap-3 mt-4" id="dashPaginationContainer" style="display:none;">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                        <select id="dashPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-xs text-[var(--color-muted)]">بنود</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="btn-outline btn-xs" id="dashPrevPageBtn" disabled=""><i class="las la-angle-right"></i></button>
+                        <span class="text-xs text-[var(--color-muted)]" id="dashPageIndicator">0 / 0</span>
+                        <button class="btn-outline btn-xs" id="dashNextPageBtn" disabled=""><i class="las la-angle-left"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -685,6 +702,11 @@
         const prevReportsPageBtn = document.getElementById('prevReportsPageBtn');
         const nextReportsPageBtn = document.getElementById('nextReportsPageBtn');
         const reportsPageIndicator = document.getElementById('reportsPageIndicator');
+        const dashPaginationContainer = document.getElementById('dashPaginationContainer');
+        const dashPageSize = document.getElementById('dashPageSize');
+        const dashPrevPageBtn = document.getElementById('dashPrevPageBtn');
+        const dashNextPageBtn = document.getElementById('dashNextPageBtn');
+        const dashPageIndicator = document.getElementById('dashPageIndicator');
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
@@ -700,6 +722,10 @@
         let totalPages = 0;
         let pageSize = 10;
         let monthKeys = [];
+        let currentDashPage = 0;
+        let totalDashPages = 0;
+        let dashPageSizeValue = 10;
+        let dashCategories = [];
 
         const arabicMonths = [
             'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -750,6 +776,31 @@
             return null;
         }
 
+        function isValidDateKey(dateKey) {
+            if (!dateKey) return false;
+            const parts = dateKey.split('-');
+            if (parts.length !== 3) return false;
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+            const dateObj = new Date(year, month - 1, day);
+            return dateObj.getFullYear() === year && dateObj.getMonth() === month - 1 && dateObj.getDate() === day;
+        }
+
+        function getArabicDayName(dateKey) {
+            if (!isValidDateKey(dateKey)) return '';
+            const parts = dateKey.split('-').map(Number);
+            const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            const dayIndex = dateObj.getDay();
+            return arabicDays[dayIndex] || '';
+        }
+
+        function getArabicMonthName(monthNum) {
+            if (monthNum >= 1 && monthNum <= 12) return arabicMonths[monthNum - 1];
+            return '';
+        }
+
         function processReport(report) {
             if (!excludeCashReports) return report;
             const cashKeywords = ['كاش', 'نقدي'];
@@ -774,7 +825,7 @@
                 if (!hasSbahi && !hasMasaei) return;
                 const shift = hasSbahi ? 'sbahi' : 'masaei';
                 const dateKey = getReportDateKey(report);
-                if (!dateKey) return;
+                if (!dateKey || !isValidDateKey(dateKey)) return;
                 const groupKey = dateKey + '_' + shift;
                 if (!groups.has(groupKey)) groups.set(groupKey, []);
                 groups.get(groupKey).push(report);
@@ -969,30 +1020,22 @@
             const groupedByMonth = {};
             filteredReports.forEach(report => {
                 const dateKey = getReportDateKey(report);
+                if (!dateKey || !isValidDateKey(dateKey)) return;
                 let year = null,
                     month = null,
                     day = null;
-                if (dateKey) {
-                    const parts = dateKey.split('-');
-                    if (parts.length === 3) {
-                        year = parts[0];
-                        month = parts[1];
-                        day = parts[2];
-                    }
-                }
-                const monthKey = (year && month) ? `${year}-${month}` : '__undated__';
+                const parts = dateKey.split('-');
+                year = parts[0];
+                month = parts[1];
+                day = parts[2];
+                const monthKey = `${year}-${month}`;
                 if (!groupedByMonth[monthKey]) {
-                    groupedByMonth[monthKey] = { days: {}, monthNum: month ? parseInt(month, 10) : null, year: year };
+                    groupedByMonth[monthKey] = { days: {}, monthNum: parseInt(month, 10), year: year };
                 }
-                const dayKey = day || (dateKey ? '__noDay__' : '__undated__');
-                if (!groupedByMonth[monthKey].days[dayKey]) groupedByMonth[monthKey].days[dayKey] = [];
-                groupedByMonth[monthKey].days[dayKey].push(report);
+                if (!groupedByMonth[monthKey].days[day]) groupedByMonth[monthKey].days[day] = [];
+                groupedByMonth[monthKey].days[day].push(report);
             });
-            monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
-                if (a === '__undated__') return 1;
-                if (b === '__undated__') return -1;
-                return b.localeCompare(a);
-            });
+            monthKeys = Object.keys(groupedByMonth).sort((a, b) => b.localeCompare(a));
             totalPages = Math.ceil(monthKeys.length / pageSize);
             if (currentPage > totalPages - 1) currentPage = totalPages - 1;
             if (currentPage < 0) currentPage = 0;
@@ -1002,13 +1045,9 @@
             let html = '';
             currentMonthKeys.forEach(monthKey => {
                 const monthData = groupedByMonth[monthKey];
-                let monthTitle = monthKey;
-                if (monthKey !== '__undated__' && monthData.monthNum) {
-                    const monthName = arabicMonths[monthData.monthNum - 1] || '';
-                    monthTitle = `${monthKey} - ${monthName}`;
-                } else if (monthKey === '__undated__') {
-                    monthTitle = 'غير مؤرخ';
-                }
+                const monthNum = monthData.monthNum;
+                const monthName = getArabicMonthName(monthNum);
+                const monthTitle = `${monthKey} - ${monthName}`;
                 const monthExpanded = expandedMonthFolders[monthKey] || false;
                 html += `<div class="folder-item month-folder" data-month="${monthKey}">`;
                 html += `<div class="folder-header" data-toggle="month" data-key="${monthKey}">`;
@@ -1019,42 +1058,26 @@
                 html += `</div>`;
                 html += `</div>`;
                 html += `<div class="folder-content${monthExpanded ? '' : ' hidden'}" data-month-content="${monthKey}">`;
-                const dayKeys = Object.keys(monthData.days).sort((a, b) => {
-                    if (a === '__undated__' || a === '__noDay__') return 1;
-                    if (b === '__undated__' || b === '__noDay__') return -1;
-                    return a.localeCompare(b);
-                });
+                const dayKeys = Object.keys(monthData.days).sort((a, b) => a.localeCompare(b));
                 dayKeys.forEach(dayKey => {
                     const dayStateKey = monthKey + '_' + dayKey;
                     const dayExpanded = expandedDayFolders[dayStateKey] || false;
                     const reportsForDay = monthData.days[dayKey];
                     reportsForDay.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-                    if (dayKey === '__noDay__' || dayKey === '__undated__') {
-                        reportsForDay.forEach(report => { html += buildReportListItem(report); });
-                    } else {
-                        let dayTitle = dayKey;
-                        if (monthKey !== '__undated__') {
-                            const year = monthData.year;
-                            const monthNum = monthData.monthNum;
-                            const dayNum = parseInt(dayKey, 10);
-                            if (year && monthNum && !isNaN(dayNum)) {
-                                const dateObj = new Date(year, monthNum - 1, dayNum);
-                                const weekdayName = arabicDays[dateObj.getDay()];
-                                dayTitle = `${dayKey} - ${weekdayName}`;
-                            }
-                        }
-                        html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
-                        html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
-                        html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
-                        html += `<div class="flex gap-2 items-center">`;
-                        html += `<button class="folder-dash-btn" data-type="day" data-key="${dayStateKey}" title="لوحة معلومات اليوم"><i class="las la-chart-bar"></i></button>`;
-                        html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
-                        html += `</div>`;
-                        html += `</div>`;
-                        html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
-                        reportsForDay.forEach(report => { html += buildReportListItem(report); });
-                        html += `</div></div>`;
-                    }
+                    let dayTitle = dayKey;
+                    const dayName = getArabicDayName(`${monthKey}-${dayKey}`);
+                    if (dayName) dayTitle += ` - ${dayName}`;
+                    html += `<div class="folder-item day-folder" data-day="${dayKey}" data-month="${monthKey}">`;
+                    html += `<div class="folder-header" data-toggle="day" data-key="${dayStateKey}">`;
+                    html += `<div class="folder-title"><i class="las la-folder-open"></i><span>${dayTitle}</span></div>`;
+                    html += `<div class="flex gap-2 items-center">`;
+                    html += `<button class="folder-dash-btn" data-type="day" data-key="${dayStateKey}" title="لوحة معلومات اليوم"><i class="las la-chart-bar"></i></button>`;
+                    html += `<button class="btn-outline btn-xs folder-toggle-btn day-toggle-btn" data-toggle="day" data-key="${dayStateKey}">${dayExpanded ? 'إغلاق' : 'فتح'}</button>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                    html += `<div class="folder-content${dayExpanded ? '' : ' hidden'}" data-day-content="${dayStateKey}">`;
+                    reportsForDay.forEach(report => { html += buildReportListItem(report); });
+                    html += `</div></div>`;
                 });
                 html += `</div></div>`;
             });
@@ -1166,6 +1189,26 @@
             }
         });
 
+        dashPageSize.addEventListener('change', function() {
+            dashPageSizeValue = parseInt(this.value, 10);
+            currentDashPage = 0;
+            buildDashboard();
+        });
+
+        dashPrevPageBtn.addEventListener('click', function() {
+            if (currentDashPage > 0) {
+                currentDashPage--;
+                renderDashCategoryTable();
+            }
+        });
+
+        dashNextPageBtn.addEventListener('click', function() {
+            if (currentDashPage < totalDashPages - 1) {
+                currentDashPage++;
+                renderDashCategoryTable();
+            }
+        });
+
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
             const LOGO_URL = `<%= restaurant.logo %>`;
             let html = '';
@@ -1261,7 +1304,7 @@
                 dashboardDateTo = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
                 dashDateFrom.value = dashboardDateFrom;
                 dashDateTo.value = dashboardDateTo;
-                const monthName = arabicMonths[monthNum - 1] || '';
+                const monthName = getArabicMonthName(monthNum);
                 dashboardPeriodLabel.textContent = `شهر ${monthName} ${year}`;
             } else if (type === 'day') {
                 const [year, month, day] = key.split('-');
@@ -1269,11 +1312,12 @@
                 dashboardDateTo = `${year}-${month}-${day}`;
                 dashDateFrom.value = dashboardDateFrom;
                 dashDateTo.value = dashboardDateTo;
-                const monthName = arabicMonths[parseInt(month, 10) - 1] || '';
+                const monthName = getArabicMonthName(parseInt(month, 10));
                 const dayNum = parseInt(day, 10);
+                const dayName = getArabicDayName(`${year}-${month}-${day}`);
                 const dateObj = new Date(year, parseInt(month, 10) - 1, dayNum);
-                const weekdayName = arabicDays[dateObj.getDay()];
-                dashboardPeriodLabel.textContent = `يوم ${dayNum} ${monthName} ${year} (${weekdayName})`;
+                const weekdayName = dayName || '';
+                dashboardPeriodLabel.textContent = `يوم ${dayNum} ${monthName} ${year} ${weekdayName ? '(' + weekdayName + ')' : ''}`;
             }
             showDashboard();
         }
@@ -1287,14 +1331,12 @@
             reports.forEach(report => {
                 if (dashboardDateFrom || dashboardDateTo) {
                     const reportDate = getReportDateKey(report);
-                    if (reportDate) {
-                        if (dashboardDateFrom && reportDate < dashboardDateFrom) return;
-                        if (dashboardDateTo && reportDate > dashboardDateTo) return;
-                    } else {
-                        return;
-                    }
+                    if (!reportDate || !isValidDateKey(reportDate)) return;
+                    if (dashboardDateFrom && reportDate < dashboardDateFrom) return;
+                    if (dashboardDateTo && reportDate > dashboardDateTo) return;
                 }
                 const dateKey = getReportDateKey(report);
+                if (!dateKey || !isValidDateKey(dateKey)) return;
                 if (report.rows && report.rows.length) {
                     report.rows.forEach(row => {
                         const desc = row.desc || '';
@@ -1310,9 +1352,7 @@
                         if (!isIncome) {
                             const catKey = normDesc || 'غير مصنف';
                             expenseCategories[catKey] = (expenseCategories[catKey] || 0) + amount;
-                            if (dateKey) {
-                                dailyExpenses[dateKey] = (dailyExpenses[dateKey] || 0) + amount;
-                            }
+                            dailyExpenses[dateKey] = (dailyExpenses[dateKey] || 0) + amount;
                         }
                     });
                 }
@@ -1321,15 +1361,10 @@
             const totalExpenses = Object.values(expenseCategories).reduce((sum, val) => sum + val, 0);
             const itemCount = Object.keys(expenseCategories).length;
             const reportCount = reports.filter(r => {
-                if (dashboardDateFrom || dashboardDateTo) {
-                    const rd = getReportDateKey(r);
-                    if (rd) {
-                        if (dashboardDateFrom && rd < dashboardDateFrom) return false;
-                        if (dashboardDateTo && rd > dashboardDateTo) return false;
-                    } else {
-                        return false;
-                    }
-                }
+                const rd = getReportDateKey(r);
+                if (!rd || !isValidDateKey(rd)) return false;
+                if (dashboardDateFrom && rd < dashboardDateFrom) return false;
+                if (dashboardDateTo && rd > dashboardDateTo) return false;
                 return true;
             }).length;
             const dailyKeys = Object.keys(dailyExpenses);
@@ -1350,7 +1385,12 @@
             document.getElementById('dashMaxDailyDate').textContent = maxDailyDate !== '-' ? maxDailyDate : '-';
             document.getElementById('dashItemCount').textContent = itemCount;
 
-            const sortedCategories = Object.entries(expenseCategories).sort((a, b) => b[1] - a[1]);
+            dashCategories = Object.entries(expenseCategories).sort((a, b) => b[1] - a[1]);
+            totalDashPages = Math.ceil(dashCategories.length / dashPageSizeValue);
+            if (currentDashPage > totalDashPages - 1) currentDashPage = totalDashPages - 1;
+            if (currentDashPage < 0) currentDashPage = 0;
+            renderDashCategoryTable();
+
             const sortedDailyKeys = dailyKeys.sort((a, b) => a.localeCompare(b));
             const dailyLabels = sortedDailyKeys.map(dk => {
                 const parts = dk.split('-');
@@ -1438,7 +1478,7 @@
 
             const barCtx = document.getElementById('dashExpenseBarChart').getContext('2d');
             if (dashExpenseBarChartInstance) dashExpenseBarChartInstance.destroy();
-            const topForBar = sortedCategories.slice(0, 10);
+            const topForBar = dashCategories.slice(0, 10);
             const barLabels = topForBar.map(([label]) => label);
             const barData = topForBar.map(([, val]) => val);
             const barColors = topForBar.map((_, i) => {
@@ -1491,8 +1531,8 @@
 
             const pieCtx = document.getElementById('dashExpensePieChart').getContext('2d');
             if (dashExpensePieChartInstance) dashExpensePieChartInstance.destroy();
-            const topForPie = sortedCategories.slice(0, 8);
-            const otherSum = sortedCategories.slice(8).reduce((sum, [, val]) => sum + val, 0);
+            const topForPie = dashCategories.slice(0, 8);
+            const otherSum = dashCategories.slice(8).reduce((sum, [, val]) => sum + val, 0);
             const pieLabels = topForPie.map(([label]) => label);
             const pieData = topForPie.map(([, val]) => val);
             if (otherSum > 0) {
@@ -1546,28 +1586,44 @@
                     }
                 }
             });
+        }
 
+        function renderDashCategoryTable() {
             const tbody = document.getElementById('dashCategoryTbody');
             tbody.innerHTML = '';
-            sortedCategories.forEach(([cat, amount], index) => {
+            if (dashCategories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-[var(--color-muted)]">لا توجد بيانات</td></tr>';
+                dashPaginationContainer.style.display = 'none';
+                return;
+            }
+            dashPaginationContainer.style.display = 'flex';
+            const startIdx = currentDashPage * dashPageSizeValue;
+            const endIdx = Math.min(startIdx + dashPageSizeValue, dashCategories.length);
+            const pageCategories = dashCategories.slice(startIdx, endIdx);
+            const totalExpenses = dashCategories.reduce((sum, [, val]) => sum + val, 0);
+            pageCategories.forEach(([cat, amount], index) => {
+                const globalIndex = startIdx + index;
                 const pct = totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : 0;
-                const prevAmount = index < sortedCategories.length - 1 ? sortedCategories[index + 1][1] : 0;
+                const prevAmount = globalIndex < dashCategories.length - 1 ? dashCategories[globalIndex + 1][1] : 0;
                 let trendClass = 'boursa-badge blue';
                 let trendIcon = '<i class="las la-minus"></i>';
-                if (index === 0) {
+                let trendText = 'ثابت';
+                if (globalIndex === 0) {
                     trendClass = 'boursa-badge red';
                     trendIcon = '<i class="las la-arrow-up"></i>';
+                    trendText = 'الأعلى';
                 } else if (amount < prevAmount) {
                     trendClass = 'boursa-badge green';
                     trendIcon = '<i class="las la-arrow-down"></i>';
+                    trendText = 'انخفاض';
                 }
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${cat}</td><td>${amount.toFixed(2)}</td><td>${pct}%</td><td><span class="${trendClass}">${trendIcon} ${index === 0 ? 'الأعلى' : (amount < prevAmount ? 'انخفاض' : 'ثابت')}</span></td>`;
+                tr.innerHTML = `<td>${cat}</td><td>${amount.toFixed(2)}</td><td>${pct}%</td><td><span class="${trendClass}">${trendIcon} ${trendText}</span></td>`;
                 tbody.appendChild(tr);
             });
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-[var(--color-muted)]">لا توجد بيانات</td></tr>';
-            }
+            dashPageIndicator.textContent = `${currentDashPage + 1} / ${totalDashPages}`;
+            dashPrevPageBtn.disabled = currentDashPage <= 0;
+            dashNextPageBtn.disabled = currentDashPage >= totalDashPages - 1;
         }
 
         const sidebar = document.getElementById('dashboardSidebar');
@@ -1667,6 +1723,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             currentPage = 0;
             pageSize = parseInt(reportsPageSize.value, 10);
+            dashPageSizeValue = parseInt(dashPageSize.value, 10);
             loadRecentReports();
         });
     </script>
