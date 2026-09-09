@@ -1092,7 +1092,7 @@
         }
 
         function buildDashboard() {
-            const reports = window.expensesReports.filter(r => !r.combined);
+            const reports = window.expensesReports.filter(r => !r.combined && r.source !== 'transfers' && r.source !== 'fees');
             const incomeKeywords = ['كاش', 'نقدي', 'تحويلات', 'فيزا', 'فيز'];
             const expenseCategories = {};
             const dailyExpenses = {};
