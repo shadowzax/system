@@ -548,7 +548,7 @@
     <div class="mt-6 info-card dashboard-card" id="dashboardCard">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div>
-                <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-chart-line text-primary"></i> لوحة تحليلات المصروفات</h3>
+                <h3 class="text-lg font-bold text-[var(--color-white)] flex items-center gap-2"><i class="las la-chart-line text-primary"></i> لوحة تحليلات المصروفات والدخل</h3>
                 <p class="text-sm text-[var(--color-muted)]" id="dashboardPeriodLabel">جميع الفترات</p>
             </div>
             <button id="closeDashboardBtn" class="btn-outline btn-sm"><i class="las la-times"></i> إغلاق اللوحة</button>
@@ -561,7 +561,8 @@
             <button id="applyDateRangeBtn" class="btn-primary btn-sm"><i class="las la-filter"></i> تطبيق</button>
             <button id="resetDateRangeBtn" class="btn-outline btn-sm"><i class="las la-undo-alt"></i> إعادة تعيين</button>
         </div>
-        <div class="boursa-summary-grid" id="boursaSummaryGrid">
+
+        <div class="boursa-summary-grid" id="expenseSummaryGrid">
             <div class="boursa-ticker-item ticker-red">
                 <div class="boursa-ticker-label">إجمالي المصروفات</div>
                 <div class="boursa-ticker-value" id="dashTotalExpenses">0</div>
@@ -588,14 +589,48 @@
                 <div class="boursa-ticker-sub">بند</div>
             </div>
         </div>
+
+        <div class="boursa-summary-grid" id="incomeSummaryGrid" style="margin-top:1rem;">
+            <div class="boursa-ticker-item ticker-green">
+                <div class="boursa-ticker-label">إجمالي الدخل</div>
+                <div class="boursa-ticker-value" id="dashTotalIncome">0</div>
+                <div class="boursa-ticker-sub">جنيه مصري</div>
+            </div>
+            <div class="boursa-ticker-item ticker-blue">
+                <div class="boursa-ticker-label">متوسط الدخل اليومي</div>
+                <div class="boursa-ticker-value" id="dashAvgDailyIncome">0</div>
+                <div class="boursa-ticker-sub">جنيه / يوم</div>
+            </div>
+            <div class="boursa-ticker-item ticker-gold">
+                <div class="boursa-ticker-label">أعلى يوم دخل</div>
+                <div class="boursa-ticker-value" id="dashMaxDailyIncome">0</div>
+                <div class="boursa-ticker-sub" id="dashMaxDailyIncomeDate">-</div>
+            </div>
+            <div class="boursa-ticker-item ticker-purple">
+                <div class="boursa-ticker-label">عدد بنود الدخل</div>
+                <div class="boursa-ticker-value" id="dashIncomeItemCount">0</div>
+                <div class="boursa-ticker-sub">بند</div>
+            </div>
+        </div>
+
         <div class="boursa-grid-2col">
             <div class="boursa-chart-container">
                 <div class="boursa-chart-title"><i class="las la-chart-area"></i> منحنى المصروفات اليومية</div>
                 <canvas id="dashExpenseAreaChart"></canvas>
             </div>
             <div class="boursa-chart-container">
+                <div class="boursa-chart-title"><i class="las la-chart-area"></i> منحنى الدخل اليومي</div>
+                <canvas id="dashIncomeAreaChart"></canvas>
+            </div>
+        </div>
+        <div class="boursa-grid-2col">
+            <div class="boursa-chart-container">
                 <div class="boursa-chart-title"><i class="las la-chart-bar"></i> أعلى 10 بنود مصروفات</div>
                 <canvas id="dashExpenseBarChart"></canvas>
+            </div>
+            <div class="boursa-chart-container">
+                <div class="boursa-chart-title"><i class="las la-chart-bar"></i> أعلى 10 بنود دخل</div>
+                <canvas id="dashIncomeBarChart"></canvas>
             </div>
         </div>
         <div class="boursa-grid-2col">
@@ -603,35 +638,72 @@
                 <div class="boursa-chart-title"><i class="las la-chart-pie"></i> توزيع المصروفات حسب البند</div>
                 <canvas id="dashExpensePieChart"></canvas>
             </div>
-            <div class="boursa-table-wrapper">
-                <div class="boursa-chart-title"><i class="las la-list"></i> تفاصيل بنود المصروفات</div>
-                <table class="boursa-table" id="dashCategoryTable">
-                    <thead>
-                        <tr>
-                            <th>البيان</th>
-                            <th>المبلغ (ج.م)</th>
-                            <th>النسبة</th>
-                            <th>الاتجاه</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dashCategoryTbody"></tbody>
-                </table>
-                <div class="flex flex-wrap items-center justify-between gap-3 mt-4" id="dashPaginationContainer" style="display:none;">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-[var(--color-muted)]">عرض</span>
-                        <select id="dashPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span class="text-xs text-[var(--color-muted)]">بنود</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button class="btn-outline btn-xs" id="dashPrevPageBtn" disabled=""><i class="las la-angle-right"></i></button>
-                        <span class="text-xs text-[var(--color-muted)]" id="dashPageIndicator">0 / 0</span>
-                        <button class="btn-outline btn-xs" id="dashNextPageBtn" disabled=""><i class="las la-angle-left"></i></button>
-                    </div>
+            <div class="boursa-chart-container half">
+                <div class="boursa-chart-title"><i class="las la-chart-pie"></i> توزيع الدخل حسب البند</div>
+                <canvas id="dashIncomePieChart"></canvas>
+            </div>
+        </div>
+
+        <div class="boursa-table-wrapper">
+            <div class="boursa-chart-title"><i class="las la-list"></i> تفاصيل بنود المصروفات</div>
+            <table class="boursa-table" id="dashCategoryTable">
+                <thead>
+                    <tr>
+                        <th>البيان</th>
+                        <th>المبلغ (ج.م)</th>
+                        <th>النسبة</th>
+                        <th>الاتجاه</th>
+                    </tr>
+                </thead>
+                <tbody id="dashCategoryTbody"></tbody>
+            </table>
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4" id="dashPaginationContainer" style="display:none;">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                    <select id="dashPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span class="text-xs text-[var(--color-muted)]">بنود</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn-outline btn-xs" id="dashPrevPageBtn" disabled=""><i class="las la-angle-right"></i></button>
+                    <span class="text-xs text-[var(--color-muted)]" id="dashPageIndicator">0 / 0</span>
+                    <button class="btn-outline btn-xs" id="dashNextPageBtn" disabled=""><i class="las la-angle-left"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="boursa-table-wrapper">
+            <div class="boursa-chart-title"><i class="las la-list"></i> تفاصيل بنود الدخل</div>
+            <table class="boursa-table" id="dashIncomeTable">
+                <thead>
+                    <tr>
+                        <th>البيان</th>
+                        <th>المبلغ (ج.م)</th>
+                        <th>النسبة</th>
+                        <th>الاتجاه</th>
+                    </tr>
+                </thead>
+                <tbody id="dashIncomeTbody"></tbody>
+            </table>
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4" id="dashIncomePaginationContainer" style="display:none;">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                    <select id="dashIncomePageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span class="text-xs text-[var(--color-muted)]">بنود</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn-outline btn-xs" id="dashIncomePrevPageBtn" disabled=""><i class="las la-angle-right"></i></button>
+                    <span class="text-xs text-[var(--color-muted)]" id="dashIncomePageIndicator">0 / 0</span>
+                    <button class="btn-outline btn-xs" id="dashIncomeNextPageBtn" disabled=""><i class="las la-angle-left"></i></button>
                 </div>
             </div>
         </div>
@@ -707,6 +779,11 @@
         const dashPrevPageBtn = document.getElementById('dashPrevPageBtn');
         const dashNextPageBtn = document.getElementById('dashNextPageBtn');
         const dashPageIndicator = document.getElementById('dashPageIndicator');
+        const dashIncomePaginationContainer = document.getElementById('dashIncomePaginationContainer');
+        const dashIncomePageSize = document.getElementById('dashIncomePageSize');
+        const dashIncomePrevPageBtn = document.getElementById('dashIncomePrevPageBtn');
+        const dashIncomeNextPageBtn = document.getElementById('dashIncomeNextPageBtn');
+        const dashIncomePageIndicator = document.getElementById('dashIncomePageIndicator');
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
@@ -714,8 +791,11 @@
         let expandedDayFolders = {};
         let excludeCashReports = false;
         let dashExpenseAreaChartInstance = null;
+        let dashIncomeAreaChartInstance = null;
         let dashExpenseBarChartInstance = null;
+        let dashIncomeBarChartInstance = null;
         let dashExpensePieChartInstance = null;
+        let dashIncomePieChartInstance = null;
         let dashboardDateFrom = null;
         let dashboardDateTo = null;
         let currentPage = 0;
@@ -726,6 +806,10 @@
         let totalDashPages = 0;
         let dashPageSizeValue = 10;
         let dashCategories = [];
+        let currentIncomePage = 0;
+        let totalIncomePages = 0;
+        let dashIncomePageSizeValue = 10;
+        let dashIncomeCategories = [];
 
         const arabicMonths = [
             'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -1209,6 +1293,26 @@
             }
         });
 
+        dashIncomePageSize.addEventListener('change', function() {
+            dashIncomePageSizeValue = parseInt(this.value, 10);
+            currentIncomePage = 0;
+            buildDashboard();
+        });
+
+        dashIncomePrevPageBtn.addEventListener('click', function() {
+            if (currentIncomePage > 0) {
+                currentIncomePage--;
+                renderDashIncomeTable();
+            }
+        });
+
+        dashIncomeNextPageBtn.addEventListener('click', function() {
+            if (currentIncomePage < totalIncomePages - 1) {
+                currentIncomePage++;
+                renderDashIncomeTable();
+            }
+        });
+
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
             const LOGO_URL = `<%= restaurant.logo %>`;
             let html = '';
@@ -1325,7 +1429,9 @@
             const reports = window.expensesReports.filter(r => !r.combined && r.source !== 'transfers' && r.source !== 'fees');
             const incomeKeywords = ['كاش', 'نقدي', 'تحويلات', 'فيزا', 'فيز'];
             const expenseCategories = {};
+            const incomeCategories = {};
             const dailyExpenses = {};
+            const dailyIncome = {};
 
             reports.forEach(report => {
                 if (dashboardDateFrom || dashboardDateTo) {
@@ -1348,7 +1454,11 @@
                                 break;
                             }
                         }
-                        if (!isIncome) {
+                        if (isIncome) {
+                            let catKey = normDesc || 'دخل غير مصنف';
+                            incomeCategories[catKey] = (incomeCategories[catKey] || 0) + amount;
+                            dailyIncome[dateKey] = (dailyIncome[dateKey] || 0) + amount;
+                        } else {
                             let catKey = normDesc || 'غير مصنف';
                             if (catKey.includes('راتب') || catKey.includes('رواتب')) {
                                 catKey = 'رواتب';
@@ -1361,7 +1471,9 @@
             });
 
             const totalExpenses = Object.values(expenseCategories).reduce((sum, val) => sum + val, 0);
+            const totalIncome = Object.values(incomeCategories).reduce((sum, val) => sum + val, 0);
             const itemCount = Object.keys(expenseCategories).length;
+            const incomeItemCount = Object.keys(incomeCategories).length;
             const reportCount = reports.filter(r => {
                 const rd = getReportDateKey(r);
                 if (!rd || !isValidDateKey(rd)) return false;
@@ -1379,6 +1491,16 @@
                     maxDailyDate = dk;
                 }
             });
+            const dailyIncomeKeys = Object.keys(dailyIncome);
+            const avgDailyIncome = dailyIncomeKeys.length > 0 ? totalIncome / dailyIncomeKeys.length : 0;
+            let maxDailyIncome = 0;
+            let maxDailyIncomeDate = '-';
+            dailyIncomeKeys.forEach(dk => {
+                if (dailyIncome[dk] > maxDailyIncome) {
+                    maxDailyIncome = dailyIncome[dk];
+                    maxDailyIncomeDate = dk;
+                }
+            });
 
             document.getElementById('dashTotalExpenses').textContent = totalExpenses.toFixed(2);
             document.getElementById('dashReportCount').textContent = reportCount;
@@ -1387,11 +1509,24 @@
             document.getElementById('dashMaxDailyDate').textContent = maxDailyDate !== '-' ? maxDailyDate : '-';
             document.getElementById('dashItemCount').textContent = itemCount;
 
+            document.getElementById('dashTotalIncome').textContent = totalIncome.toFixed(2);
+            document.getElementById('dashAvgDailyIncome').textContent = avgDailyIncome.toFixed(2);
+            document.getElementById('dashMaxDailyIncome').textContent = maxDailyIncome.toFixed(2);
+            document.getElementById('dashMaxDailyIncomeDate').textContent = maxDailyIncomeDate !== '-' ? maxDailyIncomeDate : '-';
+            document.getElementById('dashIncomeItemCount').textContent = incomeItemCount;
+
             dashCategories = Object.entries(expenseCategories).sort((a, b) => b[1] - a[1]);
+            dashIncomeCategories = Object.entries(incomeCategories).sort((a, b) => b[1] - a[1]);
+
             totalDashPages = Math.ceil(dashCategories.length / dashPageSizeValue);
             if (currentDashPage > totalDashPages - 1) currentDashPage = totalDashPages - 1;
             if (currentDashPage < 0) currentDashPage = 0;
             renderDashCategoryTable();
+
+            totalIncomePages = Math.ceil(dashIncomeCategories.length / dashIncomePageSizeValue);
+            if (currentIncomePage > totalIncomePages - 1) currentIncomePage = totalIncomePages - 1;
+            if (currentIncomePage < 0) currentIncomePage = 0;
+            renderDashIncomeTable();
 
             const sortedDailyKeys = dailyKeys.sort((a, b) => a.localeCompare(b));
             const dailyLabels = sortedDailyKeys.map(dk => {
@@ -1404,6 +1539,17 @@
                 return dk;
             });
             const dailyData = sortedDailyKeys.map(dk => dailyExpenses[dk]);
+            const sortedIncomeDailyKeys = dailyIncomeKeys.sort((a, b) => a.localeCompare(b));
+            const dailyIncomeLabels = sortedIncomeDailyKeys.map(dk => {
+                const parts = dk.split('-');
+                if (parts.length === 3) {
+                    const dayNum = parseInt(parts[2], 10);
+                    const monthNum = parseInt(parts[1], 10);
+                    return `${dayNum}/${monthNum}`;
+                }
+                return dk;
+            });
+            const dailyIncomeData = sortedIncomeDailyKeys.map(dk => dailyIncome[dk]);
 
             const ctx = document.documentElement;
             const cardBg = getComputedStyle(ctx).getPropertyValue('--color-card').trim() || '#00060c';
@@ -1445,35 +1591,55 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        x: {
-                            ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, maxRotation: 45 },
-                            grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } },
-                            grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false }
-                        }
+                        x: { ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, maxRotation: 45 }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } },
+                        y: { beginAtZero: true, ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } }
                     },
                     plugins: {
                         legend: { display: true, labels: { color: whiteColor, font: { family: 'Alexandria', size: 12, weight: '600' }, usePointStyle: true, pointStyleWidth: 12, padding: 15 } },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
-                            titleFont: { family: 'Alexandria', size: 13, weight: '700' },
-                            bodyFont: { family: 'Alexandria', size: 12 },
-                            padding: 12,
-                            cornerRadius: 8,
-                            titleColor: '#ffffff',
-                            bodyColor: '#bababa',
-                            callbacks: {
-                                label: function(context) { return 'المصروف: ' + context.parsed.y.toFixed(2) + ' ج.م'; }
-                            }
-                        }
+                        tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 13, weight: '700' }, bodyFont: { family: 'Alexandria', size: 12 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa', callbacks: { label: function(context) { return 'المصروف: ' + context.parsed.y.toFixed(2) + ' ج.م'; } } }
+                    }
+                }
+            });
+
+            const incomeAreaCtx = document.getElementById('dashIncomeAreaChart').getContext('2d');
+            if (dashIncomeAreaChartInstance) dashIncomeAreaChartInstance.destroy();
+            const incomeAreaGradient = incomeAreaCtx.createLinearGradient(0, 0, 0, 320);
+            incomeAreaGradient.addColorStop(0, greenUp + '55');
+            incomeAreaGradient.addColorStop(1, greenUp + '05');
+            dashIncomeAreaChartInstance = new Chart(incomeAreaCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyIncomeLabels,
+                    datasets: [{
+                        label: 'الدخل اليومي',
+                        data: dailyIncomeData,
+                        borderColor: greenUp,
+                        backgroundColor: incomeAreaGradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: whiteColor,
+                        pointBorderColor: greenUp,
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: greenUp,
+                        pointHoverBorderColor: whiteColor
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, maxRotation: 45 }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } },
+                        y: { beginAtZero: true, ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } }
+                    },
+                    plugins: {
+                        legend: { display: true, labels: { color: whiteColor, font: { family: 'Alexandria', size: 12, weight: '600' }, usePointStyle: true, pointStyleWidth: 12, padding: 15 } },
+                        tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 13, weight: '700' }, bodyFont: { family: 'Alexandria', size: 12 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa', callbacks: { label: function(context) { return 'الدخل: ' + context.parsed.y.toFixed(2) + ' ج.م'; } } }
                     }
                 }
             });
@@ -1489,46 +1655,23 @@
             });
             dashExpenseBarChartInstance = new Chart(barCtx, {
                 type: 'bar',
-                data: {
-                    labels: barLabels,
-                    datasets: [{
-                        label: 'المبلغ (ج.م)',
-                        data: barData,
-                        backgroundColor: barColors,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barThickness: 22,
-                        hoverBackgroundColor: barColors.map(c => c + 'cc')
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } },
-                            grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false }
-                        },
-                        y: {
-                            ticks: { color: whiteColor, font: { family: 'Alexandria', size: 11, weight: '600' } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
-                            titleFont: { family: 'Alexandria', size: 12, weight: '700' },
-                            bodyFont: { family: 'Alexandria', size: 11 },
-                            padding: 12,
-                            cornerRadius: 8,
-                            titleColor: '#ffffff',
-                            bodyColor: '#bababa'
-                        }
-                    }
-                }
+                data: { labels: barLabels, datasets: [{ label: 'المبلغ (ج.م)', data: barData, backgroundColor: barColors, borderRadius: 6, borderSkipped: false, barThickness: 22, hoverBackgroundColor: barColors.map(c => c + 'cc') }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } }, y: { ticks: { color: whiteColor, font: { family: 'Alexandria', size: 11, weight: '600' } }, grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 12, weight: '700' }, bodyFont: { family: 'Alexandria', size: 11 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa' } } }
+            });
+
+            const incomeBarCtx = document.getElementById('dashIncomeBarChart').getContext('2d');
+            if (dashIncomeBarChartInstance) dashIncomeBarChartInstance.destroy();
+            const topForIncomeBar = dashIncomeCategories.slice(0, 10);
+            const incomeBarLabels = topForIncomeBar.map(([label]) => label);
+            const incomeBarData = topForIncomeBar.map(([, val]) => val);
+            const incomeBarColors = topForIncomeBar.map((_, i) => {
+                const palette = [greenUp, goldAccent, blueAccent, redDown, purpleAccent, primaryColor, '#ec4899', '#06b6d4', '#f97316', '#64748b'];
+                return palette[i % palette.length];
+            });
+            dashIncomeBarChartInstance = new Chart(incomeBarCtx, {
+                type: 'bar',
+                data: { labels: incomeBarLabels, datasets: [{ label: 'المبلغ (ج.م)', data: incomeBarData, backgroundColor: incomeBarColors, borderRadius: 6, borderSkipped: false, barThickness: 22, hoverBackgroundColor: incomeBarColors.map(c => c + 'cc') }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { color: textColor, font: { family: 'Alexandria', size: 11 }, callback: function(value) { return value.toFixed(0); } }, grid: { color: 'rgba(186,186,186,0.08)', drawBorder: false } }, y: { ticks: { color: whiteColor, font: { family: 'Alexandria', size: 11, weight: '600' } }, grid: { display: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 12, weight: '700' }, bodyFont: { family: 'Alexandria', size: 11 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa' } } }
             });
 
             const pieCtx = document.getElementById('dashExpensePieChart').getContext('2d');
@@ -1537,56 +1680,26 @@
             const otherSum = dashCategories.slice(8).reduce((sum, [, val]) => sum + val, 0);
             const pieLabels = topForPie.map(([label]) => label);
             const pieData = topForPie.map(([, val]) => val);
-            if (otherSum > 0) {
-                pieLabels.push('أخرى');
-                pieData.push(otherSum);
-            }
+            if (otherSum > 0) { pieLabels.push('أخرى'); pieData.push(otherSum); }
             const pieColors = [redDown, goldAccent, blueAccent, greenUp, purpleAccent, primaryColor, '#ec4899', '#06b6d4', '#f97316'];
             dashExpensePieChartInstance = new Chart(pieCtx, {
                 type: 'doughnut',
-                data: {
-                    labels: pieLabels,
-                    datasets: [{
-                        data: pieData,
-                        backgroundColor: pieColors.slice(0, pieData.length),
-                        borderWidth: 3,
-                        borderColor: cardBg,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '58%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: whiteColor,
-                                font: { family: 'Alexandria', size: 10, weight: '600' },
-                                padding: 10,
-                                usePointStyle: true,
-                                pointStyleWidth: 8
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
-                            titleFont: { family: 'Alexandria', size: 12, weight: '700' },
-                            bodyFont: { family: 'Alexandria', size: 11 },
-                            padding: 12,
-                            cornerRadius: 8,
-                            titleColor: '#ffffff',
-                            bodyColor: '#bababa',
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                    return context.label + ': ' + context.parsed.toFixed(2) + ' ج.م (' + pct + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
+                data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: pieColors.slice(0, pieData.length), borderWidth: 3, borderColor: cardBg, hoverOffset: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '58%', plugins: { legend: { position: 'bottom', labels: { color: whiteColor, font: { family: 'Alexandria', size: 10, weight: '600' }, padding: 10, usePointStyle: true, pointStyleWidth: 8 } }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 12, weight: '700' }, bodyFont: { family: 'Alexandria', size: 11 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa', callbacks: { label: function(context) { const total = context.dataset.data.reduce((a, b) => a + b, 0); const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0; return context.label + ': ' + context.parsed.toFixed(2) + ' ج.م (' + pct + '%)'; } } } } }
+            });
+
+            const incomePieCtx = document.getElementById('dashIncomePieChart').getContext('2d');
+            if (dashIncomePieChartInstance) dashIncomePieChartInstance.destroy();
+            const topForIncomePie = dashIncomeCategories.slice(0, 8);
+            const otherIncomeSum = dashIncomeCategories.slice(8).reduce((sum, [, val]) => sum + val, 0);
+            const incomePieLabels = topForIncomePie.map(([label]) => label);
+            const incomePieData = topForIncomePie.map(([, val]) => val);
+            if (otherIncomeSum > 0) { incomePieLabels.push('أخرى'); incomePieData.push(otherIncomeSum); }
+            const incomePieColors = [greenUp, goldAccent, blueAccent, redDown, purpleAccent, primaryColor, '#ec4899', '#06b6d4', '#f97316'];
+            dashIncomePieChartInstance = new Chart(incomePieCtx, {
+                type: 'doughnut',
+                data: { labels: incomePieLabels, datasets: [{ data: incomePieData, backgroundColor: incomePieColors.slice(0, incomePieData.length), borderWidth: 3, borderColor: cardBg, hoverOffset: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '58%', plugins: { legend: { position: 'bottom', labels: { color: whiteColor, font: { family: 'Alexandria', size: 10, weight: '600' }, padding: 10, usePointStyle: true, pointStyleWidth: 8 } }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', titleFont: { family: 'Alexandria', size: 12, weight: '700' }, bodyFont: { family: 'Alexandria', size: 11 }, padding: 12, cornerRadius: 8, titleColor: '#ffffff', bodyColor: '#bababa', callbacks: { label: function(context) { const total = context.dataset.data.reduce((a, b) => a + b, 0); const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0; return context.label + ': ' + context.parsed.toFixed(2) + ' ج.م (' + pct + '%)'; } } } } }
             });
         }
 
@@ -1610,15 +1723,8 @@
                 let trendClass = 'boursa-badge blue';
                 let trendIcon = '<i class="las la-minus"></i>';
                 let trendText = 'ثابت';
-                if (globalIndex === 0) {
-                    trendClass = 'boursa-badge red';
-                    trendIcon = '<i class="las la-arrow-up"></i>';
-                    trendText = 'الأعلى';
-                } else if (amount < prevAmount) {
-                    trendClass = 'boursa-badge green';
-                    trendIcon = '<i class="las la-arrow-down"></i>';
-                    trendText = 'انخفاض';
-                }
+                if (globalIndex === 0) { trendClass = 'boursa-badge red'; trendIcon = '<i class="las la-arrow-up"></i>'; trendText = 'الأعلى'; }
+                else if (amount < prevAmount) { trendClass = 'boursa-badge green'; trendIcon = '<i class="las la-arrow-down"></i>'; trendText = 'انخفاض'; }
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${cat}</td><td>${amount.toFixed(2)}</td><td>${pct}%</td><td><span class="${trendClass}">${trendIcon} ${trendText}</span></td>`;
                 tbody.appendChild(tr);
@@ -1626,6 +1732,37 @@
             dashPageIndicator.textContent = `${currentDashPage + 1} / ${totalDashPages}`;
             dashPrevPageBtn.disabled = currentDashPage <= 0;
             dashNextPageBtn.disabled = currentDashPage >= totalDashPages - 1;
+        }
+
+        function renderDashIncomeTable() {
+            const tbody = document.getElementById('dashIncomeTbody');
+            tbody.innerHTML = '';
+            if (dashIncomeCategories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-[var(--color-muted)]">لا توجد بيانات</td></tr>';
+                dashIncomePaginationContainer.style.display = 'none';
+                return;
+            }
+            dashIncomePaginationContainer.style.display = 'flex';
+            const startIdx = currentIncomePage * dashIncomePageSizeValue;
+            const endIdx = Math.min(startIdx + dashIncomePageSizeValue, dashIncomeCategories.length);
+            const pageCategories = dashIncomeCategories.slice(startIdx, endIdx);
+            const totalIncome = dashIncomeCategories.reduce((sum, [, val]) => sum + val, 0);
+            pageCategories.forEach(([cat, amount], index) => {
+                const globalIndex = startIdx + index;
+                const pct = totalIncome > 0 ? ((amount / totalIncome) * 100).toFixed(1) : 0;
+                const prevAmount = globalIndex < dashIncomeCategories.length - 1 ? dashIncomeCategories[globalIndex + 1][1] : 0;
+                let trendClass = 'boursa-badge blue';
+                let trendIcon = '<i class="las la-minus"></i>';
+                let trendText = 'ثابت';
+                if (globalIndex === 0) { trendClass = 'boursa-badge red'; trendIcon = '<i class="las la-arrow-up"></i>'; trendText = 'الأعلى'; }
+                else if (amount < prevAmount) { trendClass = 'boursa-badge green'; trendIcon = '<i class="las la-arrow-down"></i>'; trendText = 'انخفاض'; }
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${cat}</td><td>${amount.toFixed(2)}</td><td>${pct}%</td><td><span class="${trendClass}">${trendIcon} ${trendText}</span></td>`;
+                tbody.appendChild(tr);
+            });
+            dashIncomePageIndicator.textContent = `${currentIncomePage + 1} / ${totalIncomePages}`;
+            dashIncomePrevPageBtn.disabled = currentIncomePage <= 0;
+            dashIncomeNextPageBtn.disabled = currentIncomePage >= totalIncomePages - 1;
         }
 
         const sidebar = document.getElementById('dashboardSidebar');
@@ -1726,6 +1863,7 @@
             currentPage = 0;
             pageSize = parseInt(reportsPageSize.value, 10);
             dashPageSizeValue = parseInt(dashPageSize.value, 10);
+            dashIncomePageSizeValue = parseInt(dashIncomePageSize.value, 10);
             loadRecentReports();
         });
     </script>
