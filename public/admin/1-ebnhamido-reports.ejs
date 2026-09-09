@@ -1460,7 +1460,7 @@
         }
 
         function buildDashboard() {
-            const reports = window.expensesReports.filter(r => !r.combined && r.source !== 'transfers' && r.source !== 'fees');
+            const reports = window.expensesReports.filter(r => !r.combined && r.source === 'expenses');
             const expenseCategories = {};
             const incomeCategories = {};
             const dailyExpenses = {};
