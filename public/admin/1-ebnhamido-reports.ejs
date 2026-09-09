@@ -1455,7 +1455,7 @@
             const excludedPhrases = ['كاشير', 'كاشيرات', 'كاشير ', 'كاشير(' , 'كاشير2', 'كاشير 2'];
             const hasExcluded = excludedPhrases.some(ph => normDesc.includes(ph));
             if (hasExcluded) return false;
-            const incomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'visa', 'بطاقه', 'بطاقة', 'تحويل', 'تحويلات', 'حواله', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات', 'cash'];
+            const incomeKeywords = ['كاش', 'نقدي', 'نقدية', 'فيزا', 'فيز', 'visa', 'بطاقه', 'بطاقة', 'تحويل', 'تحويلات', 'حواله', 'حوالة', 'حوالات', 'ايداع', 'إيداع', 'ايراد', 'إيراد', 'ايرادات', 'إيرادات', 'مبيعات', 'cash', 'برنجت', 'تويستا'];
             return incomeKeywords.some(kw => normDesc.includes(kw));
         }
 
