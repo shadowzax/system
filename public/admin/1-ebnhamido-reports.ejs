@@ -284,6 +284,88 @@
             .boursa-chart-container {
                 height: 280px;
             }
+            .boursa-chart-container.half {
+                height: 240px;
+            }
+            .boursa-summary-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.5rem;
+            }
+            .boursa-ticker-value {
+                font-size: 1.2rem;
+            }
+            .boursa-ticker-label {
+                font-size: 0.65rem;
+            }
+            .date-range-filter {
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+            .date-range-filter input[type="date"] {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.75rem;
+            }
+            .boursa-table th,
+            .boursa-table td {
+                padding: 0.5rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            .boursa-chart-title {
+                font-size: 0.75rem;
+            }
+            .info-card {
+                padding: 0.75rem;
+            }
+            .flex-col.md\:flex-row {
+                flex-direction: column;
+            }
+            .w-full.md\:w-auto {
+                width: 100%;
+            }
+            .sm\:flex-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sm\:w-64 {
+                width: 100%;
+            }
+            .flex.gap-3 {
+                gap: 0.5rem;
+            }
+            .btn-sm {
+                padding: 0.35rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            .input-field {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .report-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .report-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .folder-header {
+                padding: 0.5rem;
+            }
+            .folder-title {
+                font-size: 0.85rem;
+            }
+            .folder-dash-btn {
+                padding: 0.15rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .pagination-controls .flex.items-center {
+                justify-content: center;
+            }
         }
 
         .summary-grid {
@@ -337,6 +419,44 @@
         .boursa-badge.gold {
             background: rgba(245, 158, 11, 0.12);
             color: var(--gold-accent);
+        }
+
+        .pagination-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .pagination-controls select,
+        .pagination-controls button {
+            font-family: 'Alexandria', sans-serif;
+            background: var(--color-card);
+            border: 1px solid var(--border-color);
+            color: var(--color-white);
+            border-radius: 6px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-controls select:focus,
+        .pagination-controls button:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-controls button:not(:disabled):hover {
+            background: rgba(13, 153, 255, 0.1);
         }
     </style>
 </head>
@@ -407,6 +527,23 @@
             </table>
         </div>
         <div class="mt-4" id="recentReportsList"></div>
+        <div class="flex flex-wrap items-center justify-between gap-3 mt-4" id="paginationContainer" style="display:none;">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-[var(--color-muted)]">عرض</span>
+                <select id="reportsPageSize" class="input-field text-xs py-1 px-2" style="width:auto; padding:4px 8px;">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span class="text-xs text-[var(--color-muted)]">تقارير</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="btn-outline btn-xs" id="prevReportsPageBtn" disabled=""><i class="las la-angle-right"></i></button>
+                <span class="text-xs text-[var(--color-muted)]" id="reportsPageIndicator">0 / 0</span>
+                <button class="btn-outline btn-xs" id="nextReportsPageBtn" disabled=""><i class="las la-angle-left"></i></button>
+            </div>
+        </div>
     </div>
     <div class="mt-6 info-card dashboard-card" id="dashboardCard">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
@@ -543,6 +680,11 @@
         const applyDateRangeBtn = document.getElementById('applyDateRangeBtn');
         const resetDateRangeBtn = document.getElementById('resetDateRangeBtn');
         const dashboardPeriodLabel = document.getElementById('dashboardPeriodLabel');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const reportsPageSize = document.getElementById('reportsPageSize');
+        const prevReportsPageBtn = document.getElementById('prevReportsPageBtn');
+        const nextReportsPageBtn = document.getElementById('nextReportsPageBtn');
+        const reportsPageIndicator = document.getElementById('reportsPageIndicator');
 
         let currentViewReportId = null;
         let selectedDateFilter = null;
@@ -554,6 +696,10 @@
         let dashExpensePieChartInstance = null;
         let dashboardDateFrom = null;
         let dashboardDateTo = null;
+        let currentPage = 0;
+        let totalPages = 0;
+        let pageSize = 10;
+        let monthKeys = [];
 
         const arabicMonths = [
             'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -802,12 +948,14 @@
             }
             if (selectedDateFilter) {
                 dateResultsContainer.style.display = 'block';
+                paginationContainer.style.display = 'none';
                 renderDateResultsTable(filteredReports);
                 recentReportsList.innerHTML = '';
                 return;
             } else {
                 dateResultsContainer.style.display = 'none';
                 dateResultsTbody.innerHTML = '';
+                paginationContainer.style.display = 'flex';
             }
             if (filteredReports.length === 0) {
                 if (reportSearchInput.value.trim() || excludeCashReports) {
@@ -815,6 +963,7 @@
                 } else {
                     recentReportsList.innerHTML = '<div class="empty-state"><i class="las la-folder-open"></i><p>لا توجد تقارير محفوظة بعد</p></div>';
                 }
+                paginationContainer.style.display = 'none';
                 return;
             }
             const groupedByMonth = {};
@@ -839,13 +988,19 @@
                 if (!groupedByMonth[monthKey].days[dayKey]) groupedByMonth[monthKey].days[dayKey] = [];
                 groupedByMonth[monthKey].days[dayKey].push(report);
             });
-            let html = '';
-            const monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
+            monthKeys = Object.keys(groupedByMonth).sort((a, b) => {
                 if (a === '__undated__') return 1;
                 if (b === '__undated__') return -1;
                 return b.localeCompare(a);
             });
-            monthKeys.forEach(monthKey => {
+            totalPages = Math.ceil(monthKeys.length / pageSize);
+            if (currentPage > totalPages - 1) currentPage = totalPages - 1;
+            if (currentPage < 0) currentPage = 0;
+            const startIdx = currentPage * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, monthKeys.length);
+            const currentMonthKeys = monthKeys.slice(startIdx, endIdx);
+            let html = '';
+            currentMonthKeys.forEach(monthKey => {
                 const monthData = groupedByMonth[monthKey];
                 let monthTitle = monthKey;
                 if (monthKey !== '__undated__' && monthData.monthNum) {
@@ -905,6 +1060,13 @@
             });
             recentReportsList.innerHTML = html;
             attachReportListEvents();
+            updatePaginationUI();
+        }
+
+        function updatePaginationUI() {
+            reportsPageIndicator.textContent = `${currentPage + 1} / ${totalPages}`;
+            prevReportsPageBtn.disabled = currentPage <= 0;
+            nextReportsPageBtn.disabled = currentPage >= totalPages - 1;
         }
 
         function toggleMonthFolder(monthKey) {
@@ -959,10 +1121,14 @@
         reportDatePicker.addEventListener('change', function() {
             selectedDateFilter = this.value;
             if (!selectedDateFilter) selectedDateFilter = null;
+            currentPage = 0;
             loadRecentReports();
         });
         if (reportSearchInput) {
-            reportSearchInput.addEventListener('input', function() { loadRecentReports(); });
+            reportSearchInput.addEventListener('input', function() {
+                currentPage = 0;
+                loadRecentReports();
+            });
         }
         deleteCashBtn.addEventListener('click', function() {
             excludeCashReports = !excludeCashReports;
@@ -975,9 +1141,30 @@
                 this.style.borderColor = '';
                 this.style.color = '';
             }
+            currentPage = 0;
             loadRecentReports();
         });
         refreshReportsBtn.addEventListener('click', function() { window.location.reload(); });
+
+        reportsPageSize.addEventListener('change', function() {
+            pageSize = parseInt(this.value, 10);
+            currentPage = 0;
+            loadRecentReports();
+        });
+
+        prevReportsPageBtn.addEventListener('click', function() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadRecentReports();
+            }
+        });
+
+        nextReportsPageBtn.addEventListener('click', function() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                loadRecentReports();
+            }
+        });
 
         function buildPrintHTML(name, dateStr, rowsData, totalText) {
             const LOGO_URL = `<%= restaurant.logo %>`;
@@ -1478,6 +1665,8 @@
             applyTheme(isDark ? 'light' : 'dark');
         });
         document.addEventListener('DOMContentLoaded', function() {
+            currentPage = 0;
+            pageSize = parseInt(reportsPageSize.value, 10);
             loadRecentReports();
         });
     </script>
