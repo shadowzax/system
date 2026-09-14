@@ -1847,6 +1847,98 @@
 
             function formatNumber(num) { if (num === 0 || num === -0) return '0'; const abs = Math.abs(num); const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); return num < 0 ? '-' + formatted : formatted; }
 
+            /* ============================================================
+               ✅ محرك العمليات الحسابية داخل خلية المبلغ
+               يدعم : الجمع (+) والطرح (-) والضرب (*) والقسمة (/)
+               أمثلة : 100+50  |  200-30  |  300/2  |  (10+5)*2
+               ============================================================ */
+            function evaluateExpression(value) {
+                let str = convertArabicNumerals(String(value == null ? '' : value));
+                str = str
+                    .replace(/,/g, '')
+                    .replace(/[×xX]/g, '*')
+                    .replace(/[÷]/g, '/')
+                    .replace(/[٫]/g, '.')
+                    .replace(/\s+/g, '')
+                    .trim();
+
+                if (!str) return null;
+
+                // رقم بسيط (موجب أو سالب)
+                if (/^-?\d+(\.\d+)?$/.test(str)) {
+                    const n = parseFloat(str);
+                    return isFinite(n) ? n : null;
+                }
+
+                // التحقق من أن المدخل يحتوي على أرقام وعمليات فقط
+                if (!/^[\d+\-*/.()]+$/.test(str)) return null;
+
+                const s = str;
+                let pos = 0;
+
+                function parseExpression() {
+                    let val = parseTerm();
+                    while (pos < s.length && (s[pos] === '+' || s[pos] === '-')) {
+                        const op = s[pos++];
+                        const right = parseTerm();
+                        val = (op === '+') ? (val + right) : (val - right);
+                    }
+                    return val;
+                }
+
+                function parseTerm() {
+                    let val = parseFactor();
+                    while (pos < s.length && (s[pos] === '*' || s[pos] === '/')) {
+                        const op = s[pos++];
+                        const right = parseFactor();
+                        if (op === '*') {
+                            val = val * right;
+                        } else {
+                            val = (right === 0) ? NaN : (val / right);
+                        }
+                    }
+                    return val;
+                }
+
+                function parseFactor() {
+                    let sign = 1;
+                    while (pos < s.length && (s[pos] === '+' || s[pos] === '-')) {
+                        if (s[pos] === '-') sign = -sign;
+                        pos++;
+                    }
+                    let val;
+                    if (s[pos] === '(') {
+                        pos++;
+                        val = parseExpression();
+                        if (s[pos] === ')') pos++;
+                    } else {
+                        const start = pos;
+                        while (pos < s.length && (/\d/.test(s[pos]) || s[pos] === '.')) pos++;
+                        if (start === pos) return NaN;
+                        val = parseFloat(s.slice(start, pos));
+                    }
+                    return sign * val;
+                }
+
+                const result = parseExpression();
+                if (pos < s.length) return null;
+                if (typeof result !== 'number' || !isFinite(result)) return null;
+                return Math.round(result * 100) / 100;
+            }
+
+            // يحول قيمة الخلية إلى رقم (مع تنفيذ أي عملية حسابية)
+            function parseAmountValue(val) {
+                const r = evaluateExpression(val);
+                return r === null ? 0 : r;
+            }
+
+            // يحول قيمة الخلية إلى نص رقمي منسق للتخزين
+            function normalizeAmountValue(val) {
+                const r = evaluateExpression(val);
+                if (r === null) return '0';
+                return formatNumber(r);
+            }
+
             function formatDateForInput(date) { const yyyy = date.getFullYear(); const mm = String(date.getMonth() + 1).padStart(2, '0'); const dd = String(date.getDate()).padStart(2, '0'); return yyyy + '-' + mm + '-' + dd; }
 
             const tbody = document.getElementById('restaurantTbody');
@@ -1866,7 +1958,7 @@
                 const rows = tbody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const input = row.querySelector('.amount-input');
-                    if (input) total += parseNumber(input.value);
+                    if (input) total += parseAmountValue(input.value);
                 });
                 totalAmountEl.textContent = formatNumber(total);
             }
@@ -1876,7 +1968,7 @@
                 const rows = editReportTbody.querySelectorAll('tr');
                 rows.forEach(row => {
                     const input = row.querySelector('.amount-input');
-                    if (input) total += parseNumber(input.value);
+                    if (input) total += parseAmountValue(input.value);
                 });
                 editReportTotal.textContent = formatNumber(total);
             }
@@ -1971,7 +2063,7 @@
                 const amountInput = row.querySelector('.amount-input');
                 const signBtn = row.querySelector('.sign-btn');
                 if (!amountInput || !signBtn) return;
-                const val = parseNumber(amountInput.value);
+                const val = parseAmountValue(amountInput.value);
                 if (val < 0) {
                     signBtn.classList.add('negative');
                     signBtn.classList.remove('positive');
@@ -2003,7 +2095,8 @@
                 const amountInput = document.createElement('input');
                 amountInput.type = 'text';
                 amountInput.className = 'input-field amount-input';
-                amountInput.placeholder = 'المبلغ';
+                amountInput.placeholder = 'المبلغ أو عملية';
+                amountInput.title = 'يمكنك كتابة عملية حسابية: 100+50  |  200-30  |  300/2';
                 amountInput.value = amount ? formatNumber(parseNumber(amount)) : '';
                 amountInput.setAttribute('inputmode', 'decimal');
                 if (!isEditMode) {
@@ -2014,9 +2107,13 @@
                         updateSignButton(tr);
                     });
                     amountInput.addEventListener('blur', function() {
-                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
-                        const num = parseFloat(val);
-                        if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; }
+                        // ✅ تنفيذ العملية الحسابية (جمع / طرح / ضرب / قسمة)
+                        const evaluated = evaluateExpression(this.value);
+                        if (evaluated !== null) {
+                            this.value = formatNumber(evaluated);
+                        } else {
+                            this.value = '';
+                        }
                         updateEditTotal();
                         updateSignButton(tr);
                     });
@@ -2056,7 +2153,7 @@
                     signBtn.title = 'تغيير إشارة المبلغ (جمع / طرح)';
                     signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
                     signBtn.addEventListener('click', function() {
-                        const currentVal = parseNumber(amountInput.value);
+                        const currentVal = parseAmountValue(amountInput.value);
                         if (currentVal === 0) { amountInput.value = '';
                             updateSignButton(tr);
                             updateEditTotal(); return; }
@@ -2114,7 +2211,7 @@
                     signBtn.innerHTML = '<i class="las la-plus-circle"></i>';
                     signBtn.addEventListener('click', function() {
                         if (isViewer) return;
-                        const currentVal = parseNumber(amountInput.value);
+                        const currentVal = parseAmountValue(amountInput.value);
                         if (currentVal === 0) { amountInput.value = '';
                             updateSignButton(tr);
                             updateTotal();
@@ -2153,9 +2250,13 @@
                         updateSignButton(tr);
                     });
                     amountInput.addEventListener('blur', function() {
-                        let val = convertArabicNumerals(this.value).replace(/,/g, '');
-                        const num = parseFloat(val);
-                        if (!isNaN(num) && val !== '') { this.value = formatNumber(num); } else { this.value = ''; }
+                        // ✅ تنفيذ العملية الحسابية (جمع / طرح / ضرب / قسمة)
+                        const evaluated = evaluateExpression(this.value);
+                        if (evaluated !== null) {
+                            this.value = formatNumber(evaluated);
+                        } else {
+                            this.value = '';
+                        }
                         updateTotal();
                         updateSignButton(tr);
                         saveToSession();
@@ -2194,7 +2295,9 @@
                 rows.forEach(row => {
                     const descInput = row.querySelector('.desc-input');
                     const amountInput = row.querySelector('.amount-input');
-                    if (descInput && amountInput) { data.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); }
+                    if (descInput && amountInput) {
+                        data.push({ desc: descInput.value || '', amount: normalizeAmountValue(amountInput.value) });
+                    }
                 });
                 return data;
             }
@@ -2205,7 +2308,9 @@
                 rows.forEach(row => {
                     const descInput = row.querySelector('.desc-input');
                     const amountInput = row.querySelector('.amount-input');
-                    if (descInput && amountInput) { data.push({ desc: descInput.value || '', amount: amountInput.value || '0' }); }
+                    if (descInput && amountInput) {
+                        data.push({ desc: descInput.value || '', amount: normalizeAmountValue(amountInput.value) });
+                    }
                 });
                 return data;
             }
