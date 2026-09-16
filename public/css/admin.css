@@ -705,12 +705,13 @@
             max-width: 44px;
             padding: 5px 2px;
             text-align: center;
-            background: transparent;
+            background: var(--card-bg);
             border: 1px solid transparent;
             border-radius: 6px;
             color: var(--color-white);
             font-family: inherit;
             font-size: 0.78rem;
+            font-weight: 600;
             transition: all 0.2s;
             outline: none;
         }
@@ -721,17 +722,12 @@
             z-index: 2;
             position: relative;
         }
-        .shared-table tbody td .day-input.has-value {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.35);
-            color: #10b981;
-            font-weight: 700;
-        }
+        .shared-table tbody td .day-input.has-value,
         .shared-table tbody td .day-input.has-value-zero {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #ef4444;
-            font-weight: 700;
+            background: var(--card-bg);
+            border-color: transparent;
+            color: var(--color-white);
+            font-weight: 600;
         }
         .shared-table tfoot td {
             background: var(--darker-bg);
@@ -1131,14 +1127,14 @@
         }
         .day-input[readonly] {
             cursor: default;
-            opacity: 0.85;
+            opacity: 0.9;
         }
         .day-input[readonly]:hover {
-            border-color: var(--color-border, #374151);
+            border-color: transparent;
             box-shadow: none;
         }
         .day-input[readonly]:focus {
-            border-color: var(--color-border, #374151);
+            border-color: transparent;
             box-shadow: none;
             outline: none;
         }
@@ -1148,36 +1144,36 @@
             text-align: center;
             padding: 0.25rem 0.2rem;
             border-radius: 6px;
-            border: 1px solid var(--color-border, #374151);
-            background: var(--color-bg-input, #111827);
+            border: 1px solid transparent;
+            background: var(--card-bg);
             color: var(--color-white);
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .deduction-input:focus {
             border-color: var(--color-primary, #0d99ff);
+            background: rgba(13, 153, 255, 0.06);
             box-shadow: 0 0 0 3px rgba(13, 153, 255, 0.2);
             outline: none;
         }
-        .deduction-input.has-value {
-            background: rgba(13, 153, 255, 0.1);
-            border-color: var(--color-primary, #0d99ff);
-        }
+        .deduction-input.has-value,
         .deduction-input.has-value-zero {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: #ef4444;
+            background: var(--card-bg);
+            border-color: transparent;
+            color: var(--color-white);
+            font-weight: 600;
         }
         .deduction-input[readonly] {
             cursor: default;
-            opacity: 0.85;
+            opacity: 0.9;
         }
         .deduction-input[readonly]:hover {
-            border-color: var(--color-border, #374151);
+            border-color: transparent;
             box-shadow: none;
         }
         .deduction-input[readonly]:focus {
-            border-color: var(--color-border, #374151);
+            border-color: transparent;
             box-shadow: none;
             outline: none;
         }
